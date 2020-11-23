@@ -1,0 +1,19 @@
+{
+    "name": "bviguier/m-buddy",
+    "type": "project",
+    "authors": [
+        {
+            "name": "Benoit Viguier",
+            "email": "benoit.viguier.pro+github@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "bviguier\\MBuddy\\": "src/"
+        }
+    },
+    "require": {
+        "php": ">=7.4",
+        "bviguier/php-rtmidi": "dev-main"
+    }
+}
