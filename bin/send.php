@@ -10,6 +10,9 @@ $output = $browser->openOutput('Impulse  Impulse ');
 
 echo "Sending...\n";
 $data = file_get_contents(__DIR__."/../var/$file.syx");
+if($data === false) {
+    die("Error while reading content…\n");
+}
 $msg = RtMidi\Message::fromBinString($data);
 $output->send($msg);
 echo "Done\n";

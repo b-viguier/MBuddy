@@ -8,13 +8,20 @@ class MidiSyxBank
 
     public function __construct(string $folder)
     {
-        $this->folder = (new \SplFileInfo($folder))->getRealPath();
+        $path = (new \SplFileInfo($folder))->getRealPath();
+        if ($path === false) {
+            throw new \Exception("Invalid folder [$folder].");
+        }
+        $this->folder = $path;
         foreach (new \DirectoryIterator($folder) as $file) {
             if ($file->getExtension() !== 'syx') {
                 continue;
             }
+            if ($file->getRealPath() === false) {
+                continue;
+            }
             [$id, $name] = explode('-', $file->getBasename('.syx'));
-            $this->fileMap[(int)$id] = ['name' => $name, 'path' => $file->getRealPath()];
+            $this->fileMap[(int) $id] = ['name' => $name, 'path' => $file->getRealPath()];
         }
     }
 
@@ -31,7 +38,7 @@ class MidiSyxBank
             if ($id === null) {
                 throw new \Exception("Cannot save [$name]: no available slot.");
             }
-            $strId = str_pad($id, 3, '0', STR_PAD_LEFT);
+            $strId = str_pad((string)$id, 3, '0', STR_PAD_LEFT);
             $this->fileMap[$id] = ['name' => $name, 'path' => $this->folder."/$strId-$name.syx"];
         }
 
@@ -51,6 +58,7 @@ class MidiSyxBank
     }
 
     private string $folder;
+    /** @var array<int,array{name:string,path:string}>  */
     private array $fileMap = [];
 
     private function searchIdFromName(string $name): ?int

@@ -16,23 +16,15 @@ class Config
         $this->data = require $filepath;
     }
 
-    /**
-     * @return $this
-     */
-    public function set(string $key, string $value): self
+    public function get(string $key): string
     {
-        $this->data[$key] = $value;
-    }
+        assert(isset($this->data[$key]));
 
-    /**
-     * @return string|null
-     */
-    public function get(string $key)
-    {
-        return $this->data[$key] ?? null;
+        return $this->data[$key];
     }
 
 
     private string $filepath;
+    /** @var array<string,string> */
     private array $data;
 }

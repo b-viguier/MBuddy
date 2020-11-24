@@ -38,7 +38,7 @@ final class Router
     }
 
     /**
-     * @var array<Handler>
+     * @var array<array<Handler>>
      */
     private array $filteredHandlers = [];
     /**
