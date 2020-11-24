@@ -5,37 +5,35 @@ require __DIR__.'/../vendor/autoload.php';
 use \bviguier\RtMidi;
 use \bviguier\MBuddy;
 
+$midiBrowser = new RtMidi\MidiBrowser();
+
 $config = new MBuddy\Config(__DIR__.'/../config.php');
 
-$impulseBank = new MBuddy\MidiSyxBank($config->get(MBuddy\Config::IMPULSE_BANK_FOLDER));
+/** @var array<MBuddy\Device> $devices */
+$devices = [
+    $impulse = new MBuddy\Device\Impulse(
+        $midiBrowser->openInput($config->get(MBuddy\Config::IMPULSE_IN)),
+        $midiBrowser->openOutput($config->get(MBuddy\Config::IMPULSE_OUT)),
+        new MBuddy\MidiSyxBank($config->get(MBuddy\Config::IMPULSE_BANK_FOLDER))
+    ),
+    $pa50 = new MBuddy\Device\Pa50(
+        $midiBrowser->openInput($config->get(MBuddy\Config::PA50_IN)),
+        $midiBrowser->openOutput($config->get(MBuddy\Config::PA50_OUT)),
+    ),
+];
 
-$midiBrowser = new RtMidi\MidiBrowser();
-$impulseInput = $midiBrowser->openInput($config->get(MBuddy\Config::IMPULSE_IN));
-$impulseOutput = $midiBrowser->openOutput($config->get(MBuddy\Config::IMPULSE_OUT));
-$pa50Input = $midiBrowser->openInput($config->get(MBuddy\Config::PA50_IN));
-$pa50Output = $midiBrowser->openOutput($config->get(MBuddy\Config::PA50_OUT));
+$impulse->onPresetSaved($pa50->doSaveExternalPreset());
+$impulse->onMidiEvent($pa50->doPlayEvent());
+$pa50->onExternalPresetLoaded($impulse->doLoadPreset());
 
-$impulseInput->allow(RtMidi\Input::ALLOW_SYSEX);
-
-$impulseRouter = MBuddy\Router::fromHandlers(
-    new MBuddy\Impulse\Handler\Sysex($impulseBank, $pa50Output),
-    new MBuddy\Impulse\Handler\Forward($pa50Output),
-);
-
-$pa50Router = MBuddy\Router::fromHandlers(
-    $prgChangeHandler = new MBuddy\Pa50\Handler\ProgramChange($impulseBank, $impulseOutput),
-    new MBuddy\Pa50\Handler\BankChange($prgChangeHandler),
-);
-
+const MSG_LIMIT = 2;
 echo "Running…\n";
 while (true) {
     do {
-        if ($msgImpulse = $impulseInput->pullMessage()) {
-            $impulseRouter->handle($msgImpulse);
+        $activity = false;
+        foreach ($devices as $device) {
+            $activity |= MSG_LIMIT === $device->process(MSG_LIMIT);
         }
-        if($msgPa50 = $pa50Input->pullMessage()) {
-            $pa50Router->handle($msgPa50);
-        }
-    } while($msgImpulse || $msgPa50);
+    } while ($activity);
     usleep(1000);
 }
