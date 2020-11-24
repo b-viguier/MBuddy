@@ -2,10 +2,10 @@
 
 namespace bviguier\MBuddy;
 
-use bviguier\RtMidi;
-
 class MidiSyxBank
 {
+    public const MAX_SIZE = 128;
+
     public function __construct(string $folder)
     {
         $this->folder = (new \SplFileInfo($folder))->getRealPath();
@@ -18,11 +18,11 @@ class MidiSyxBank
         }
     }
 
-    public function save(string $name, RtMidi\Message $msg): int
+    public function save(string $name, string $data): int
     {
-        $id = $this->name2id($name);
+        $id = $this->searchIdFromName($name);
         if ($id === null) {
-            for ($i = 0; $i < 128; ++$i) {
+            for ($i = 0; $i < self::MAX_SIZE; ++$i) {
                 if (!isset($this->fileMap[$i])) {
                     $id = $i;
                     break;
@@ -35,36 +35,25 @@ class MidiSyxBank
             $this->fileMap[$id] = ['name' => $name, 'path' => $this->folder."/$strId-$name.syx"];
         }
 
-        file_put_contents($this->fileMap[$id]['path'], $msg->toBinString());
+        file_put_contents($this->fileMap[$id]['path'], $data);
 
         return $id;
     }
 
-    public function setBankMSB(int $msb): void
+    public function load(int $id): ?string
     {
-        $this->bankMSB = $msb;
-    }
-
-    public function setBankLSB(int $lsb): void
-    {
-        $this->bankLSB = $lsb;
-    }
-
-    public function load(int $id): ?RtMidi\Message
-    {
-        if ($this->bankLSB !== 0 || $this->bankMSB !== 0 || !isset($this->fileMap[$id])) {
+        if (!isset($this->fileMap[$id])) {
             return null;
         }
+        $data = file_get_contents($this->fileMap[$id]['path']);
 
-        return RtMidi\Message::fromBinString(file_get_contents($this->fileMap[$id]['path']));
+        return $data === false ? null : $data;
     }
 
     private string $folder;
     private array $fileMap = [];
-    private int $bankLSB = 0;
-    private int $bankMSB = 0;
 
-    private function name2id(string $name): ?int
+    private function searchIdFromName(string $name): ?int
     {
         foreach ($this->fileMap as $id => $item) {
             if ($item['name'] === $name) {
