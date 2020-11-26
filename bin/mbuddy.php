@@ -1,3 +1,4 @@
+#!/usr/bin/env php
 <?php
 
 require __DIR__.'/../vendor/autoload.php';
@@ -7,20 +8,34 @@ use \bviguier\MBuddy;
 
 $midiBrowser = new RtMidi\MidiBrowser();
 
-$config = new MBuddy\Config(__DIR__.'/../config.php');
+$config = new MBuddy\Config(__DIR__.'/../config.'.strtolower(PHP_OS_FAMILY).'.php');
 
-/** @var array<MBuddy\Device> $devices */
-$devices = [
-    $impulse = new MBuddy\Device\Impulse(
-        $midiBrowser->openInput($config->get(MBuddy\Config::IMPULSE_IN)),
-        $midiBrowser->openOutput($config->get(MBuddy\Config::IMPULSE_OUT)),
-        new MBuddy\MidiSyxBank($config->get(MBuddy\Config::IMPULSE_BANK_FOLDER))
-    ),
-    $pa50 = new MBuddy\Device\Pa50(
-        $midiBrowser->openInput($config->get(MBuddy\Config::PA50_IN)),
-        $midiBrowser->openOutput($config->get(MBuddy\Config::PA50_OUT)),
-    ),
-];
+try {
+    /** @var array<MBuddy\Device> $devices */
+    $devices = [
+        $impulse = new MBuddy\Device\Impulse(
+            $midiBrowser->openInput($config->get(MBuddy\Config::IMPULSE_IN)),
+            $midiBrowser->openOutput($config->get(MBuddy\Config::IMPULSE_OUT)),
+            new MBuddy\MidiSyxBank($config->get(MBuddy\Config::IMPULSE_BANK_FOLDER))
+        ),
+        $pa50 = new MBuddy\Device\Pa50(
+            $midiBrowser->openInput($config->get(MBuddy\Config::PA50_IN)),
+            $midiBrowser->openOutput($config->get(MBuddy\Config::PA50_OUT)),
+        ),
+    ];
+} catch (RtMidi\Exception\MidiException $exception) {
+    echo "[ERROR] {$exception->getMessage()}\n";
+    echo "Available Inputs:\n";
+    foreach($midiBrowser->availableInputs() as $inputName) {
+        echo " * [IN] '$inputName'\n";
+    }
+    echo "Available Outputs:\n";
+    foreach($midiBrowser->availableOutputs() as $outputName) {
+        echo " * [OUT] '$outputName'\n";
+    }
+
+    exit(1);
+}
 
 $impulse->onPresetSaved($pa50->doSaveExternalPreset());
 $impulse->onMidiEvent($pa50->doPlayEvent());
