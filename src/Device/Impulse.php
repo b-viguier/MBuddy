@@ -59,9 +59,11 @@ class Impulse implements Device
             if ($msg->byte(0) === 0xF0) {
                 $data = $msg->toBinString();
                 $name = trim(substr($data, 7, 8));
-                $prgId = $this->bank->save($name, $data);
 
-                ($this->onPresetSaved)(new Preset(0, 0, $prgId));
+                if(null !== $prgId = $this->bank->save($name, $data)) {
+                    ($this->onPresetSaved)(new Preset(0, 0, $prgId));
+                }
+
             } else {
                 ($this->onMidiEvent)($msg);
             }

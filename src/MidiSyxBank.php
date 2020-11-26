@@ -25,7 +25,7 @@ class MidiSyxBank
         }
     }
 
-    public function save(string $name, string $data): int
+    public function save(string $name, string $data): ?int
     {
         $id = $this->searchIdFromName($name);
         if ($id === null) {
@@ -36,7 +36,7 @@ class MidiSyxBank
                 }
             }
             if ($id === null) {
-                throw new \Exception("Cannot save [$name]: no available slot.");
+                return null;
             }
             $strId = str_pad((string)$id, 3, '0', STR_PAD_LEFT);
             $this->fileMap[$id] = ['name' => $name, 'path' => $this->folder."/$strId-$name.syx"];

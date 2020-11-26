@@ -12,6 +12,11 @@
             "bviguier\\MBuddy\\": "src/"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "bviguier\\tests\\MBuddy\\": "tests/"
+        }
+    },
     "require": {
         "php": ">=7.4",
         "bviguier/php-rtmidi": "dev-main"
