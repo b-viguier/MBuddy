@@ -12,7 +12,8 @@ class Pa50 implements Device
     {
         $this->input = $input;
         $this->output = $output;
-        $this->currentPreset = new Preset(0, 0, 0);
+        $this->currentMSB = 0;
+        $this->currentLSB = 0;
         $this->onExternalPresetLoaded = function(Preset $p): void {};
     }
 
@@ -34,7 +35,7 @@ class Pa50 implements Device
                 self::STATUS_CC | self::CHANNEL_16, self::CC_BANK_MSB, $preset->bankMSB()
             ));
             $this->output->send(RtMidi\Message::fromIntegers(
-                self::STATUS_CC | self::CHANNEL_16, self::CC_BANK_MSB, $preset->bankLSB()
+                self::STATUS_CC | self::CHANNEL_16, self::CC_BANK_LSB, $preset->bankLSB()
             ));
             $this->output->send(RtMidi\Message::fromIntegers(
                 self::STATUS_PC | self::CHANNEL_16, $preset->program()
@@ -57,30 +58,19 @@ class Pa50 implements Device
                 case self::STATUS_CC | self::CHANNEL_16:
                     switch ($msg->byte(1)) {
                         case self::CC_BANK_MSB:
-                            $this->currentPreset = new Preset(
-                                $msg->byte(2),
-                                $this->currentPreset->bankLSB(),
-                                $this->currentPreset->program(),
-                            );
-                            ($this->onExternalPresetLoaded)($this->currentPreset);
+                            $this->currentMSB = $msg->byte(2);
                             break;
                         case self::CC_BANK_LSB:
-                            $this->currentPreset = new Preset(
-                                $this->currentPreset->bankMSB(),
-                                $msg->byte(2),
-                                $this->currentPreset->program(),
-                            );
-                            ($this->onExternalPresetLoaded)($this->currentPreset);
+                            $this->currentLSB = $msg->byte(2);
                             break;
                     }
                     break;
                 case self::STATUS_PC | self::CHANNEL_16:
-                    $this->currentPreset = new Preset(
-                        $this->currentPreset->bankMSB(),
-                        $this->currentPreset->bankLSB(),
+                    ($this->onExternalPresetLoaded)(new Preset(
+                        $this->currentMSB,
+                        $this->currentLSB,
                         $msg->byte(1),
-                    );
-                    ($this->onExternalPresetLoaded)($this->currentPreset);
+                    ));
                     break;
             }
         }
@@ -90,7 +80,8 @@ class Pa50 implements Device
 
     private RtMidi\Input $input;
     private RtMidi\Output $output;
-    private Preset $currentPreset;
+    private int $currentMSB;
+    private int $currentLSB;
     /** @var callable(Preset): void */
     private $onExternalPresetLoaded;
 
