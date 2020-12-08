@@ -6,8 +6,16 @@ require __DIR__.'/../vendor/autoload.php';
 use \bviguier\RtMidi;
 use \bviguier\MBuddy;
 
+$logHandlers = [
+    (new \Monolog\Handler\StreamHandler(STDOUT))
+        ->setFormatter(new \Monolog\Formatter\LineFormatter(
+            "[%datetime%][%channel%](%level_name%): %message% %context% %extra%\n",
+            'H:m:i',
+            true
+        )),
+];
+$cmdLogger = new \Monolog\Logger('MBuddy', $logHandlers);
 $midiBrowser = new RtMidi\MidiBrowser();
-
 $config = new MBuddy\Config(__DIR__.'/../config.'.strtolower(PHP_OS_FAMILY).'.php');
 
 try {
@@ -16,24 +24,26 @@ try {
         $impulse = new MBuddy\Device\Impulse(
             $midiBrowser->openInput($config->get(MBuddy\Config::IMPULSE_IN)),
             $midiBrowser->openOutput($config->get(MBuddy\Config::IMPULSE_OUT)),
-            new MBuddy\MidiSyxBank($config->get(MBuddy\Config::IMPULSE_BANK_FOLDER))
+            new MBuddy\MidiSyxBank($config->get(MBuddy\Config::IMPULSE_BANK_FOLDER)),
+            new \Monolog\Logger('Impulse', $logHandlers),
         ),
         $pa50 = new MBuddy\Device\Pa50(
             $midiBrowser->openInput($config->get(MBuddy\Config::PA50_IN)),
             $midiBrowser->openOutput($config->get(MBuddy\Config::PA50_OUT)),
+            new \Monolog\Logger('Pa50', $logHandlers),
         ),
     ];
 } catch (RtMidi\Exception\MidiException $exception) {
-    echo "[ERROR] {$exception->getMessage()}\n";
-    echo "Available Inputs:\n";
+    $error = "{$exception->getMessage()}\n";
+    $error.= "Available Inputs:\n";
     foreach($midiBrowser->availableInputs() as $inputName) {
-        echo " * [IN] '$inputName'\n";
+        $error.= " * [IN] '$inputName'\n";
     }
-    echo "Available Outputs:\n";
+    $error.= "Available Outputs:\n";
     foreach($midiBrowser->availableOutputs() as $outputName) {
-        echo " * [OUT] '$outputName'\n";
+        $error.= " * [OUT] '$outputName'\n";
     }
-
+    $cmdLogger->critical($error);
     exit(1);
 }
 
@@ -42,7 +52,7 @@ $impulse->onMidiEvent($pa50->doPlayEvent());
 $pa50->onExternalPresetLoaded($impulse->doLoadPreset());
 
 const MSG_LIMIT = 2;
-echo "Running…\n";
+$cmdLogger->notice("Running…");
 while (true) {
     do {
         $activity = false;

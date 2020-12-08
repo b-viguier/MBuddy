@@ -5,16 +5,18 @@ namespace bviguier\MBuddy\Device;
 use bviguier\MBuddy\Device;
 use bviguier\MBuddy\Preset;
 use bviguier\RtMidi;
+use Psr\Log\LoggerInterface;
 
 class Pa50 implements Device
 {
-    public function __construct(RtMidi\Input $input, RtMidi\Output $output)
+    public function __construct(RtMidi\Input $input, RtMidi\Output $output, LoggerInterface $logger)
     {
         $this->input = $input;
         $this->output = $output;
         $this->currentMSB = 0;
         $this->currentLSB = 0;
         $this->onExternalPresetLoaded = function(Preset $p): void {};
+        $this->logger = $logger;
     }
 
     /**
@@ -40,6 +42,7 @@ class Pa50 implements Device
             $this->output->send(RtMidi\Message::fromIntegers(
                 self::STATUS_PC | self::CHANNEL_16, $preset->program()
             ));
+            $this->logger->notice("External Present saved ($preset)");
         };
     }
 
@@ -66,11 +69,13 @@ class Pa50 implements Device
                     }
                     break;
                 case self::STATUS_PC | self::CHANNEL_16:
-                    ($this->onExternalPresetLoaded)(new Preset(
+                    $preset = new Preset(
                         $this->currentMSB,
                         $this->currentLSB,
                         $msg->byte(1),
-                    ));
+                    );
+                    $this->logger->notice("External Present saved ($preset)");
+                    ($this->onExternalPresetLoaded)($preset);
                     break;
             }
         }
@@ -84,6 +89,7 @@ class Pa50 implements Device
     private int $currentLSB;
     /** @var callable(Preset): void */
     private $onExternalPresetLoaded;
+    private LoggerInterface $logger;
 
     private const STATUS_CC = 0xB0;
     private const STATUS_PC = 0xC0;

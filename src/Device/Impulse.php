@@ -6,16 +6,18 @@ use bviguier\MBuddy\Device;
 use bviguier\MBuddy\MidiSyxBank;
 use bviguier\MBuddy\Preset;
 use bviguier\RtMidi;
+use Psr\Log\LoggerInterface;
 
 class Impulse implements Device
 {
-    public function __construct(RtMidi\Input $input, RtMidi\Output $output, MidiSyxBank $syxBank)
+    public function __construct(RtMidi\Input $input, RtMidi\Output $output, MidiSyxBank $syxBank, LoggerInterface $logger)
     {
         $this->input = $input;
         $this->output = $output;
         $this->bank = $syxBank;
         $this->onPresetSaved = function(Preset $preset): void {};
         $this->onMidiEvent = function(RtMidi\Message $msg): void {};
+        $this->logger = $logger;
 
         $this->input->allow(RtMidi\Input::ALLOW_SYSEX);
     }
@@ -31,6 +33,8 @@ class Impulse implements Device
             }
 
             if ($data = $this->bank->load($preset->program())) {
+                $name = self::extractNameFromSysex($data);
+                $this->logger->notice("Preset loaded ({$preset->program()}) '$name'.");
                 $this->output->send(RtMidi\Message::fromBinString($data));
             }
         };
@@ -58,10 +62,12 @@ class Impulse implements Device
             // Sysex handling
             if ($msg->byte(0) === 0xF0) {
                 $data = $msg->toBinString();
-                $name = trim(substr($data, 7, 8));
+                $name = self::extractNameFromSysex($data);
 
                 if(null !== $prgId = $this->bank->save($name, $data)) {
-                    ($this->onPresetSaved)(new Preset(0, 0, $prgId));
+                    $preset = new Preset(0, 0, $prgId);
+                    $this->logger->notice("Preset saved ($preset) '$name'.");
+                    ($this->onPresetSaved)($preset);
                 }
 
             } else {
@@ -72,6 +78,11 @@ class Impulse implements Device
         return $count;
     }
 
+    static private function extractNameFromSysex(string $data): string
+    {
+        return trim(substr($data, 7, 8));
+    }
+
     private RtMidi\Input $input;
     private RtMidi\Output $output;
     private MidiSyxBank $bank;
@@ -79,5 +90,6 @@ class Impulse implements Device
     private $onPresetSaved;
     /** @var callable(RtMidi\Message): void */
     private $onMidiEvent;
+    private LoggerInterface $logger;
 
 }

@@ -6,12 +6,17 @@ use bviguier\MBuddy;
 use bviguier\RtMidi;
 use bviguier\tests\MBuddy\DeviceTest;
 use bviguier\tests\MBuddy\TestUtils;
+use Monolog\Logger;
 
 class Pa50Test extends DeviceTest
 {
     public function createDevice(RtMidi\Input $input, RtMidi\Output $output, string $testId = ''): MBuddy\Device\Pa50
     {
-        return new MBuddy\Device\Pa50($input, $output);
+        return new MBuddy\Device\Pa50(
+            $input,
+            $output,
+            new Logger('null'),
+        );
     }
 
     public function testDoSaveExternalPresetSignature(): void

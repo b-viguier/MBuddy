@@ -6,12 +6,18 @@ use bviguier\MBuddy;
 use bviguier\RtMidi;
 use bviguier\tests\MBuddy\DeviceTest;
 use bviguier\tests\MBuddy\TestUtils;
+use Monolog\Logger;
 
 class ImpulseTest extends DeviceTest
 {
     public function createDevice(RtMidi\Input $input, RtMidi\Output $output, string $testId): MBuddy\Device\Impulse
     {
-        return new MBuddy\Device\Impulse($input, $output, $this->createBank($testId));
+        return new MBuddy\Device\Impulse(
+            $input,
+            $output,
+            $this->createBank($testId),
+            new Logger('null'),
+        );
     }
 
     private function createBank(string $testId): MBuddy\MidiSyxBank
@@ -37,7 +43,8 @@ class ImpulseTest extends DeviceTest
         $impulse = new MBuddy\Device\Impulse(
             new TestUtils\Input(),
             $output = new TestUtils\Output(),
-            $bank = $this->createBank(__METHOD__)
+            $bank = $this->createBank(__METHOD__),
+            new Logger('null'),
         );
         $progId = $bank->save('name', 'data');
         assert($progId !== null);
