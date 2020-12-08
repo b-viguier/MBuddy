@@ -5,5 +5,4 @@ return [
     \bviguier\MBuddy\Config::IMPULSE_OUT => 'Impulse  Impulse ',
     \bviguier\MBuddy\Config::PA50_IN => 'Korg Keyboard USB MIDI Interface',
     \bviguier\MBuddy\Config::PA50_OUT => 'Korg Keyboard USB MIDI Interface',
-    \bviguier\MBuddy\Config::IMPULSE_BANK_FOLDER => __DIR__.'/var',
 ];

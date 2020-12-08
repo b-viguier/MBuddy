@@ -24,7 +24,7 @@ try {
         $impulse = new MBuddy\Device\Impulse(
             $midiBrowser->openInput($config->get(MBuddy\Config::IMPULSE_IN)),
             $midiBrowser->openOutput($config->get(MBuddy\Config::IMPULSE_OUT)),
-            new MBuddy\MidiSyxBank($config->get(MBuddy\Config::IMPULSE_BANK_FOLDER)),
+            new MBuddy\MidiSyxBank(__DIR__ . '/../var'),
             new \Monolog\Logger('Impulse', $logHandlers),
         ),
         $pa50 = new MBuddy\Device\Pa50(

@@ -9,7 +9,7 @@ use bviguier\MBuddy;
 $midiBrowser = new RtMidi\MidiBrowser();
 
 $config = new MBuddy\Config(__DIR__.'/../config.'.strtolower(PHP_OS_FAMILY).'.php');
-$bank = new MBuddy\MidiSyxBank($config->get(MBuddy\Config::IMPULSE_BANK_FOLDER));
+$bank = new MBuddy\MidiSyxBank(__DIR__ . '/../var');
 
 $id = (int) ($argv[1] ?? 0);
 echo "Loading [$id]…\n";

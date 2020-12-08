@@ -8,7 +8,6 @@ class Config
     public const IMPULSE_OUT = 'impulse_out';
     public const PA50_IN = 'pa50_in';
     public const PA50_OUT = 'pa50_out';
-    public const IMPULSE_BANK_FOLDER = 'impulse_bank_folder';
 
     public function __construct(string $filepath)
     {
