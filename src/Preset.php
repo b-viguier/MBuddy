@@ -26,6 +26,11 @@ class Preset
         return $this->program;
     }
 
+    public function __toString(): string
+    {
+        return sprintf("%02X|%02X|%02X", $this->bankMSB, $this->bankLSB, $this->program);
+    }
+
     private int $bankMSB;
     private int $bankLSB;
     private int $program;
