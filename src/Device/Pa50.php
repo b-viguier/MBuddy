@@ -42,7 +42,7 @@ class Pa50 implements Device
             $this->output->send(RtMidi\Message::fromIntegers(
                 self::STATUS_PC | self::CHANNEL_16, $preset->program()
             ));
-            $this->logger->notice("External Present saved ($preset)");
+            $this->logger->notice("External Preset saved ($preset)");
         };
     }
 
@@ -74,7 +74,7 @@ class Pa50 implements Device
                         $this->currentLSB,
                         $msg->byte(1),
                     );
-                    $this->logger->notice("External Present saved ($preset)");
+                    $this->logger->notice("External Preset changed ($preset)");
                     ($this->onExternalPresetLoaded)($preset);
                     break;
             }

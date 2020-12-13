@@ -33,9 +33,9 @@ class Impulse implements Device
             }
 
             if ($data = $this->bank->load($preset->program())) {
-                $name = self::extractNameFromSysex($data);
-                $this->logger->notice("Preset loaded ({$preset->program()}) '$name'.");
-                $this->output->send(RtMidi\Message::fromBinString($data));
+                $patch = Device\Impulse\Patch::fromBinString($data);
+                $this->logger->notice("Preset loaded ($preset}) '{$patch->name()}'.");
+                $this->output->send($patch->toSysexMessage());
             }
         };
     }
@@ -61,12 +61,11 @@ class Impulse implements Device
         for ($count = 0; $count < $limit && $msg = $this->input->pullMessage(); ++$count) {
             // Sysex handling
             if ($msg->byte(0) === 0xF0) {
-                $data = $msg->toBinString();
-                $name = self::extractNameFromSysex($data);
+                $patch = Device\Impulse\Patch::fromSysexMessage($msg);
 
-                if(null !== $prgId = $this->bank->save($name, $data)) {
+                if(null !== $prgId = $this->bank->save($patch->name(), $patch->toBinString())) {
                     $preset = new Preset(0, 0, $prgId);
-                    $this->logger->notice("Preset saved ($preset) '$name'.");
+                    $this->logger->notice("Preset saved ($preset) '{$patch->name()}'.");
                     ($this->onPresetSaved)($preset);
                 }
 
@@ -76,11 +75,6 @@ class Impulse implements Device
         }
 
         return $count;
-    }
-
-    static private function extractNameFromSysex(string $data): string
-    {
-        return trim(substr($data, 7, 8));
     }
 
     private RtMidi\Input $input;

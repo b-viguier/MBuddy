@@ -4,6 +4,7 @@ namespace bviguier\tests\MBuddy\Device;
 
 use bviguier\MBuddy;
 use bviguier\RtMidi;
+use bviguier\tests\MBuddy\Device\Impulse\PatchTest;
 use bviguier\tests\MBuddy\DeviceTest;
 use bviguier\tests\MBuddy\TestUtils;
 use Monolog\Logger;
@@ -46,7 +47,7 @@ class ImpulseTest extends DeviceTest
             $bank = $this->createBank(__METHOD__),
             new Logger('null'),
         );
-        $progId = $bank->save('name', 'data');
+        $progId = $bank->save('name', PatchTest::validSysex());
         assert($progId !== null);
 
         // Can load existing preset
@@ -54,7 +55,7 @@ class ImpulseTest extends DeviceTest
         $msg = array_pop($output->msgStack);
         assert($msg !== null);
         $this->assertEmpty($output->msgStack);
-        $this->assertSame('data', $msg->toBinString());
+        $this->assertSame(PatchTest::validSysex(), $msg->toBinString());
 
         // Cannot load other program
         $impulse->doLoadPreset()(new MBuddy\Preset(0, 0, $progId + 1));
@@ -90,7 +91,7 @@ class ImpulseTest extends DeviceTest
         $presetStack = [];
         /** @var array<RtMidi\Message> $msgStack */
         $msgStack = [];
-        $syxData = chr(0xF0) . 'data';
+        $syxData = PatchTest::validSysex();
         // Arbitrary messages are forwarded
         $input->msgStack[] = RtMidi\Message::fromBinString($syxData);
         $impulse->onPresetSaved(function (MBuddy\Preset $preset) use (&$presetStack): void {
