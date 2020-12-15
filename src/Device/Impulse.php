@@ -10,6 +10,9 @@ use Psr\Log\LoggerInterface;
 
 class Impulse implements Device
 {
+    public const BANK_MSB = 1;
+    public const BANK_LSB = 0;
+
     public function __construct(RtMidi\Input $input, RtMidi\Output $output, MidiSyxBank $syxBank, LoggerInterface $logger)
     {
         $this->input = $input;
@@ -28,7 +31,7 @@ class Impulse implements Device
     public function doLoadPreset(): callable
     {
         return function (Preset $preset): void {
-            if ($preset->bankMSB() !== 0 || $preset->bankLSB() !== 0) {
+            if ($preset->bankMSB() !== self::BANK_MSB || $preset->bankLSB() !== self::BANK_LSB) {
                 return;
             }
 
@@ -64,7 +67,7 @@ class Impulse implements Device
                 $patch = Device\Impulse\Patch::fromSysexMessage($msg);
 
                 if(null !== $prgId = $this->bank->save($patch->name(), $patch->toBinString())) {
-                    $preset = new Preset(0, 0, $prgId);
+                    $preset = new Preset(self::BANK_MSB, self::BANK_LSB, $prgId);
                     $this->logger->notice("Preset saved ($preset) '{$patch->name()}'.");
                     ($this->onPresetSaved)($preset);
                 }

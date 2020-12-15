@@ -51,18 +51,30 @@ class ImpulseTest extends DeviceTest
         assert($progId !== null);
 
         // Can load existing preset
-        $impulse->doLoadPreset()(new MBuddy\Preset(0, 0, $progId));
+        $impulse->doLoadPreset()(new MBuddy\Preset(
+            MBuddy\Device\Impulse::BANK_MSB,
+            MBuddy\Device\Impulse::BANK_LSB,
+            $progId
+        ));
         $msg = array_pop($output->msgStack);
         assert($msg !== null);
         $this->assertEmpty($output->msgStack);
         $this->assertSame(PatchTest::validSysex(), $msg->toBinString());
 
         // Cannot load other program
-        $impulse->doLoadPreset()(new MBuddy\Preset(0, 0, $progId + 1));
+        $impulse->doLoadPreset()(new MBuddy\Preset(
+            MBuddy\Device\Impulse::BANK_MSB,
+            MBuddy\Device\Impulse::BANK_LSB,
+            $progId + 1
+        ));
         $this->assertEmpty($output->msgStack);
 
         // Bank must be 0,0
-        $impulse->doLoadPreset()(new MBuddy\Preset(1, 1, $progId));
+        $impulse->doLoadPreset()(new MBuddy\Preset(
+            MBuddy\Device\Impulse::BANK_MSB + 1,
+            MBuddy\Device\Impulse::BANK_LSB + 1,
+            $progId
+        ));
         $this->assertEmpty($output->msgStack);
     }
 
@@ -106,8 +118,8 @@ class ImpulseTest extends DeviceTest
         $this->assertEmpty($input->msgStack);
         $this->assertEmpty($msgStack);
         $this->assertCount(1, $presetStack);
-        $this->assertSame(0, $presetStack[0]->bankMSB());
-        $this->assertSame(0, $presetStack[0]->bankLSB());
+        $this->assertSame(MBuddy\Device\Impulse::BANK_MSB, $presetStack[0]->bankMSB());
+        $this->assertSame(MBuddy\Device\Impulse::BANK_LSB, $presetStack[0]->bankLSB());
         $this->assertSame(0, $presetStack[0]->program());
     }
 }
