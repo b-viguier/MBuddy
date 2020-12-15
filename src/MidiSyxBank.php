@@ -27,7 +27,7 @@ class MidiSyxBank
 
     public function save(string $name, string $data): ?int
     {
-        $id = $this->searchIdFromName($name);
+        $id = $this->findByName($name);
         if ($id === null) {
             for ($i = 0; $i < self::MAX_SIZE; ++$i) {
                 if (!isset($this->fileMap[$i])) {
@@ -57,11 +57,8 @@ class MidiSyxBank
         return $data === false ? null : $data;
     }
 
-    private string $folder;
-    /** @var array<int,array{name:string,path:string}>  */
-    private array $fileMap = [];
 
-    private function searchIdFromName(string $name): ?int
+    public function findByName(string $name): ?int
     {
         foreach ($this->fileMap as $id => $item) {
             if ($item['name'] === $name) {
@@ -71,4 +68,8 @@ class MidiSyxBank
 
         return null;
     }
+
+    private string $folder;
+    /** @var array<int,array{name:string,path:string}>  */
+    private array $fileMap = [];
 }
