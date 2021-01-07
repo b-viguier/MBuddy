@@ -6,23 +6,26 @@ require __DIR__.'/../vendor/autoload.php';
 use bviguier\RtMidi;
 use bviguier\MBuddy;
 
-$config = new MBuddy\Config(__DIR__.'/../config.'.strtolower(PHP_OS_FAMILY).'.php');
-$bank = new MBuddy\MidiSyxBank(__DIR__ . '/../var');
+$config = MBuddy\Config::fromOsConfigFile();
+$bank = $config->midiSyxBank();
+$log = $config->logger('MBuddy:copy');
 
 $id = (int) ($argv[1] ?? 0);
 $unsafeName = $argv[2] ?? 'New';
 
-echo "Loading [$id]…\n";
+$log->notice("Loading [$id]…");
 if(null === $data = $bank->load($id)) {
-    die("Cannot Load [$id]\n");
+    $log->emergency("Cannot Load [$id]");
+    exit(1);
 }
 
 $patch = MBuddy\Device\Impulse\Patch::fromBinString($data)->withName($unsafeName);
 $safeName = $patch->name();
-echo "Writing [$safeName]…\n";
+$log->notice("Writing [$safeName]…");
 if(null !== $bank->findByName($safeName)) {
-    die("Name [$safeName] already in use\n");
+    $log->emergency("Name [$safeName] already in use");
+    exit(1);
 }
 $newId = $bank->save($patch->name(), $patch->toBinString());
 
-echo "Done: [$id] copied to [$newId][{$patch->name()}]\n";
+$log->notice("Done: [$id] copied to [$newId][{$patch->name()}]");
