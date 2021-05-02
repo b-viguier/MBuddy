@@ -19,26 +19,26 @@ class Pa50Test extends DeviceTest
         );
     }
 
-    public function testDoSaveExternalPresetSignature(): void
+    public function testDoModifySongIdOfCurrentPerformanceSignature(): void
     {
         $pa50 = $this->createDevice(new TestUtils\Input(), new TestUtils\Output());
         TestUtils\FunctionSignature::assertSameSignature(
-            function(MBuddy\Preset $preset): void {},
-            $pa50->doSaveExternalPreset(),
+            function(MBuddy\SongId $songId): void {},
+            $pa50->doModifySongIdOfCurrentPerformance(),
         );
     }
 
-    public function testDoSaveExternalPresetSendsMessages(): void
+    public function testdoModifySongIdOfCurrentPerformanceSendsMessages(): void
     {
         $pa50 = $this->createDevice(new TestUtils\Input(), $output = new TestUtils\Output());
-        $preset = new MBuddy\Preset($msb = 3,$lsb = 4,$prg = 5);
+        $songId = new MBuddy\SongId($id = 5);
 
-        $pa50->doSaveExternalPreset()($preset);
+        $pa50->doModifySongIdOfCurrentPerformance()($songId);
 
         $this->assertCount(3, $output->msgStack);
-        $this->assertEquals($output->msgStack[0], RtMidi\Message::fromIntegers(0xBF, 0x00, $msb));
-        $this->assertEquals($output->msgStack[1], RtMidi\Message::fromIntegers(0xBF, 0x20, $lsb));
-        $this->assertEquals($output->msgStack[2], RtMidi\Message::fromIntegers(0xCF, $prg));
+        $this->assertEquals($output->msgStack[0], RtMidi\Message::fromIntegers(0xBF, 0x00, MBuddy\Device\Pa50::MBUDDY_BANK_MSB));
+        $this->assertEquals($output->msgStack[1], RtMidi\Message::fromIntegers(0xBF, 0x20, MBuddy\Device\Pa50::MBUDDY_BANK_LSB));
+        $this->assertEquals($output->msgStack[2], RtMidi\Message::fromIntegers(0xCF, $id));
     }
 
     public function testDoPlayEventSignature(): void
@@ -61,22 +61,48 @@ class Pa50Test extends DeviceTest
         $this->assertSame($output->msgStack[0], $msg);
     }
 
-    public function testPresetChangesAreNotified(): void
+    public function testSongIdChangesAreNotified(): void
     {
         $pa50 = $this->createDevice($input = new TestUtils\Input(), new TestUtils\Output());
-        $input->msgStack[] = RtMidi\Message::fromIntegers(0xBF, 0x00, $msb = 1);
-        $input->msgStack[] = RtMidi\Message::fromIntegers(0xBF, 0x20, $lsb = 2);
-        $input->msgStack[] = RtMidi\Message::fromIntegers(0xCF, $prg = 3);
-        /** @var array<MBuddy\Preset> $presetStack */
-        $presetStack = [];
+        // This message should be processed
+        $input->msgStack[] = RtMidi\Message::fromIntegers(0xBF, 0x00, MBuddy\Device\Pa50::MBUDDY_BANK_MSB);
+        $input->msgStack[] = RtMidi\Message::fromIntegers(0xBF, 0x20, MBuddy\Device\Pa50::MBUDDY_BANK_LSB);
+        $input->msgStack[] = RtMidi\Message::fromIntegers(0xCF, $expectedId = 3);
+        // Not this one (wrong MSB)
+        $input->msgStack[] = RtMidi\Message::fromIntegers(0xBF, 0x00, MBuddy\Device\Pa50::MBUDDY_BANK_MSB+1);
+        $input->msgStack[] = RtMidi\Message::fromIntegers(0xBF, 0x20, MBuddy\Device\Pa50::MBUDDY_BANK_LSB);
+        $input->msgStack[] = RtMidi\Message::fromIntegers(0xCF, $expectedId + 1);
+        // Not this one (wrong LSB)
+        $input->msgStack[] = RtMidi\Message::fromIntegers(0xBF, 0x00, MBuddy\Device\Pa50::MBUDDY_BANK_MSB);
+        $input->msgStack[] = RtMidi\Message::fromIntegers(0xBF, 0x20, MBuddy\Device\Pa50::MBUDDY_BANK_LSB+1);
+        $input->msgStack[] = RtMidi\Message::fromIntegers(0xCF, $expectedId + 1);
+        // Not this one (missing LSB)
+        $input->msgStack[] = RtMidi\Message::fromIntegers(0xBF, 0x00, MBuddy\Device\Pa50::MBUDDY_BANK_MSB);
+        $input->msgStack[] = RtMidi\Message::fromIntegers(0xCF, $expectedId + 1);
 
-        $pa50->onExternalPresetLoaded(function(MBuddy\Preset $preset) use(&$presetStack): void {
-            $presetStack[] = $preset;
+        /** @var array<MBuddy\SongId> $songsStack */
+        $songsStack = [];
+
+        $pa50->onSongChanged(function(MBuddy\SongId $songId) use(&$songsStack): void {
+            $songsStack[] = $songId;
         });
-        $count = $pa50->process(4);
+        $count = $pa50->process(20);
 
-        $this->assertSame(3, $count);
-        $this->assertCount(1, $presetStack);
-        $this->assertEquals(new MBuddy\Preset($msb, $lsb, $prg), $presetStack[0]);
+        $this->assertSame(11, $count);
+        $this->assertCount(1, $songsStack);
+        $this->assertEquals($expectedId, $songsStack[0]->id());
+    }
+
+    public function testSongsIdModification(): void
+    {
+        $pa50 = $this->createDevice(new TestUtils\Input(), $output = new TestUtils\Output());
+        $songId = new MBuddy\SongId($id = 5);
+
+        $pa50->doModifySongIdOfCurrentPerformance()($songId);
+
+        $this->assertCount(3, $output->msgStack);
+        $this->assertEquals($output->msgStack[0], RtMidi\Message::fromIntegers(0xBF, 0x00, MBuddy\Device\Pa50::MBUDDY_BANK_MSB));
+        $this->assertEquals($output->msgStack[1], RtMidi\Message::fromIntegers(0xBF, 0x20, MBuddy\Device\Pa50::MBUDDY_BANK_LSB));
+        $this->assertEquals($output->msgStack[2], RtMidi\Message::fromIntegers(0xCF, $id));
     }
 }

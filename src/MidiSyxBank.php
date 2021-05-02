@@ -4,8 +4,6 @@ namespace bviguier\MBuddy;
 
 class MidiSyxBank
 {
-    public const MAX_SIZE = 128;
-
     public function __construct(string $folder)
     {
         $path = (new \SplFileInfo($folder))->getRealPath();
@@ -25,26 +23,16 @@ class MidiSyxBank
         }
     }
 
-    public function save(string $name, string $data): ?int
+    public function save(int $id, string $name, string $data): bool
     {
-        $id = $this->findByName($name);
-        if ($id === null) {
-            for ($i = 0; $i < self::MAX_SIZE; ++$i) {
-                if (!isset($this->fileMap[$i])) {
-                    $id = $i;
-                    break;
-                }
-            }
-            if ($id === null) {
-                return null;
-            }
-            $strId = str_pad((string)$id, 3, '0', STR_PAD_LEFT);
-            $this->fileMap[$id] = ['name' => $name, 'path' => $this->folder."/$strId-$name.syx"];
+        if($existingPatch = ($this->fileMap[$id] ?? null) ) {
+            unlink($existingPatch['path']);
         }
 
-        file_put_contents($this->fileMap[$id]['path'], $data);
+        $strId = str_pad((string)$id, 3, '0', STR_PAD_LEFT);
+        $this->fileMap[$id] = ['name' => $name, 'path' => $this->folder."/$strId-$name.syx"];
 
-        return $id;
+        return strlen($data) === file_put_contents($this->fileMap[$id]['path'], $data);
     }
 
     public function load(int $id): ?string
@@ -55,18 +43,6 @@ class MidiSyxBank
         $data = file_get_contents($this->fileMap[$id]['path']);
 
         return $data === false ? null : $data;
-    }
-
-
-    public function findByName(string $name): ?int
-    {
-        foreach ($this->fileMap as $id => $item) {
-            if ($item['name'] === $name) {
-                return $id;
-            }
-        }
-
-        return null;
     }
 
     private string $folder;

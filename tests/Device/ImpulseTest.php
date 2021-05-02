@@ -34,8 +34,8 @@ class ImpulseTest extends DeviceTest
         $impulse = $this->createDevice(new TestUtils\Input(), new TestUtils\Output(), __METHOD__);
 
         TestUtils\FunctionSignature::assertSameSignature(
-            function (MBuddy\Preset $p) {
-            }, $impulse->doLoadPreset()
+            function (MBuddy\SongId $p) {
+            }, $impulse->doLoadSong()
         );
     }
 
@@ -47,34 +47,18 @@ class ImpulseTest extends DeviceTest
             $bank = $this->createBank(__METHOD__),
             new Logger('null'),
         );
-        $progId = $bank->save('name', PatchTest::validSysex());
-        assert($progId !== null);
+        $this->assertTrue($bank->save($id = 1, 'name', PatchTest::validSysex()));
 
-        // Can load existing preset
-        $impulse->doLoadPreset()(new MBuddy\Preset(
-            MBuddy\Device\Impulse::BANK_MSB,
-            MBuddy\Device\Impulse::BANK_LSB,
-            $progId
-        ));
+        // Can load existing SongId
+        $impulse->doLoadSong()(new MBuddy\SongId($id));
+
         $msg = array_pop($output->msgStack);
         assert($msg !== null);
         $this->assertEmpty($output->msgStack);
         $this->assertSame(PatchTest::validSysex(), $msg->toBinString());
 
-        // Cannot load other program
-        $impulse->doLoadPreset()(new MBuddy\Preset(
-            MBuddy\Device\Impulse::BANK_MSB,
-            MBuddy\Device\Impulse::BANK_LSB,
-            $progId + 1
-        ));
-        $this->assertEmpty($output->msgStack);
-
-        // Bank must be 0,0
-        $impulse->doLoadPreset()(new MBuddy\Preset(
-            MBuddy\Device\Impulse::BANK_MSB + 1,
-            MBuddy\Device\Impulse::BANK_LSB + 1,
-            $progId
-        ));
+        // Cannot load other SongId
+        $impulse->doLoadSong()(new MBuddy\SongId($id + 1));
         $this->assertEmpty($output->msgStack);
     }
 
@@ -96,30 +80,41 @@ class ImpulseTest extends DeviceTest
         $this->assertSame([0xFF], $msgStack[0]->toIntegers());
     }
 
-    public function testSysexAreStoredInBank(): void
+    public function testSongModification(): void
     {
         $impulse = $this->createDevice($input = new TestUtils\Input(), new TestUtils\Output(), __METHOD__);
-        /** @var array<MBuddy\Preset> $presetStack */
-        $presetStack = [];
+        /** @var array<MBuddy\SongId> $songsStack */
+        $songsStack = [];
         /** @var array<RtMidi\Message> $msgStack */
         $msgStack = [];
-        $syxData = PatchTest::validSysex();
-        // Arbitrary messages are forwarded
-        $input->msgStack[] = RtMidi\Message::fromBinString($syxData);
-        $impulse->onPresetSaved(function (MBuddy\Preset $preset) use (&$presetStack): void {
-            $presetStack[] = $preset;
+
+        // Record button pressed
+        $input->msgStack[] = RtMidi\Message::fromIntegers(0xB4, 0x75, 0x7F);
+        // Previous button pressed
+        $input->msgStack[] = RtMidi\Message::fromIntegers(0xB4, 0x70, 0x7F);
+        // Next button pressed
+        $input->msgStack[] = RtMidi\Message::fromIntegers(0xB4, 0x71, 0x7F);
+        // Record button release
+        $input->msgStack[] = RtMidi\Message::fromIntegers(0xB4, 0x75, 0x00);
+
+        // Next button pressed
+        $input->msgStack[] = RtMidi\Message::fromIntegers(0xB4, 0x71, 0x7F);
+        // Previous button pressed
+        $input->msgStack[] = RtMidi\Message::fromIntegers(0xB4, 0x70, 0x7F);
+
+        $impulse->onSongIdModified(function (MBuddy\SongId $songId) use (&$songsStack): void {
+            $songsStack[] = $songId;
         });
         $impulse->onMidiEvent(function (RtMidi\Message $msg) use (&$msgStack): void {
             $msgStack[] = $msg;
         });
-        $count = $impulse->process(2);
+        $count = $impulse->process(count($input->msgStack) + 1);
 
-        $this->assertSame(1, $count);
+        $this->assertSame(6, $count);
         $this->assertEmpty($input->msgStack);
         $this->assertEmpty($msgStack);
-        $this->assertCount(1, $presetStack);
-        $this->assertSame(MBuddy\Device\Impulse::BANK_MSB, $presetStack[0]->bankMSB());
-        $this->assertSame(MBuddy\Device\Impulse::BANK_LSB, $presetStack[0]->bankLSB());
-        $this->assertSame(0, $presetStack[0]->program());
+        $this->assertCount(2, $songsStack);
+        $this->assertSame(1, $songsStack[0]->id());
+        $this->assertSame(2, $songsStack[1]->id());
     }
 }

@@ -17,7 +17,6 @@ class MidiSyxBankTest extends TestCase
 
         $this->assertNull($bank->load(0));
         $this->assertNull($bank->load(127));
-        $this->assertNull($bank->findByName('unknown'));
     }
 
     public function testSaveAndLoadData(): void
@@ -27,21 +26,15 @@ class MidiSyxBankTest extends TestCase
 
         $bank = new MBuddy\MidiSyxBank($folder->directory()->getRealPath());
         $this->assertNull($bank->load(0));
-        $this->assertNull($bank->findByName('MyName1'));
 
-        $id1 = $bank->save('MyName1', $data1 = 'my-data1');
-        $id2 = $bank->save('MyName2', $data2 = 'my-data2');
+        $this->assertTrue($bank->save($id1 = 0,'MyName1', $data1 = 'my-data1'));
+        $this->assertTrue($bank->save($id2 = 1, 'MyName2', $data2 = 'my-data2'));
 
-        assert($id1 !== null && $id2 !== null);
-        $this->assertSame(0, $id1);
         $this->assertSame($data1, $bank->load($id1));
-        $this->assertSame($id1, $bank->findByName('MyName1'));
-        $this->assertSame(1, $id2);
         $this->assertSame($data2, $bank->load($id2));
-        $this->assertSame($id2, $bank->findByName('MyName2'));
     }
 
-    public function testUpdateDataByName(): void
+    public function testUpdateDataWithSameId(): void
     {
         $folder = new TestUtils\TempFolder(__METHOD__);
         assert($folder->directory()->getRealPath() !== false);
@@ -49,14 +42,10 @@ class MidiSyxBankTest extends TestCase
         $bank = new MBuddy\MidiSyxBank($folder->directory()->getRealPath());
         $this->assertNull($bank->load(0));
 
-        $id1 = $bank->save($name = 'MyName1', $data1 = 'my-data1');
-        assert($id1 !== null);
-        $this->assertSame(0, $id1);
-        $this->assertSame($data1, $bank->load($id1));
+        $this->assertTrue($bank->save($id = 0, $name = 'MyName1', $data1 = 'my-data1'));
+        $this->assertSame($data1, $bank->load($id));
 
-        $id2 = $bank->save($name, $data2 = 'my-data2');
-        assert($id2 !== null);
-        $this->assertSame($id1, $id2);
-        $this->assertSame($data2, $bank->load($id2));
+        $this->assertTrue($bank->save($id, $name, $data2 = 'my-data2'));
+        $this->assertSame($data2, $bank->load($id));
     }
 }

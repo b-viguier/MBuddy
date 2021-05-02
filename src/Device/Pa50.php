@@ -3,46 +3,48 @@
 namespace bviguier\MBuddy\Device;
 
 use bviguier\MBuddy\Device;
-use bviguier\MBuddy\Preset;
+use bviguier\MBuddy\SongId;
 use bviguier\RtMidi;
 use Psr\Log\LoggerInterface;
 
 class Pa50 implements Device
 {
+    public const MBUDDY_BANK_MSB = 0x01;
+    public const MBUDDY_BANK_LSB = 0x00;
+
     public function __construct(RtMidi\Input $input, RtMidi\Output $output, LoggerInterface $logger)
     {
         $this->input = $input;
         $this->output = $output;
-        $this->currentMSB = 0;
-        $this->currentLSB = 0;
-        $this->onExternalPresetLoaded = function(Preset $p): void {};
+        $this->onSongChanged = function(SongId $id): void {};
         $this->logger = $logger;
     }
 
     /**
-     * @param callable(Preset): void $callback
+     * @param callable(SongId): void $callback
      */
-    public function onExternalPresetLoaded(callable $callback): void
+    public function onSongChanged(callable $callback): void
     {
-        $this->onExternalPresetLoaded = $callback;
+        $this->onSongChanged = $callback;
     }
 
     /**
-     * @return callable(Preset):void
+     * @return callable(SongId):void
      */
-    public function doSaveExternalPreset(): callable
+    public function doModifySongIdOfCurrentPerformance(): callable
     {
-        return function (Preset $preset): void {
+        return function (SongId $songId): void {
             $this->output->send(RtMidi\Message::fromIntegers(
-                self::STATUS_CC | self::CHANNEL_16, self::CC_BANK_MSB, $preset->bankMSB()
+                self::STATUS_CC | self::CHANNEL_16, self::CC_BANK_MSB, self::MBUDDY_BANK_MSB
             ));
             $this->output->send(RtMidi\Message::fromIntegers(
-                self::STATUS_CC | self::CHANNEL_16, self::CC_BANK_LSB, $preset->bankLSB()
+                self::STATUS_CC | self::CHANNEL_16, self::CC_BANK_LSB, self::MBUDDY_BANK_LSB
             ));
             $this->output->send(RtMidi\Message::fromIntegers(
-                self::STATUS_PC | self::CHANNEL_16, $preset->program()
+                self::STATUS_PC | self::CHANNEL_16, $songId->id()
             ));
-            $this->logger->notice("External Preset saved ($preset)");
+            $this->currentSongId = $songId;
+            $this->logger->notice("Modified attached SongID ($songId)");
         };
     }
 
@@ -61,21 +63,22 @@ class Pa50 implements Device
                 case self::STATUS_CC | self::CHANNEL_16:
                     switch ($msg->byte(1)) {
                         case self::CC_BANK_MSB:
-                            $this->currentMSB = $msg->byte(2);
+                            $this->lastMSB = $msg->byte(2);
                             break;
                         case self::CC_BANK_LSB:
-                            $this->currentLSB = $msg->byte(2);
+                            $this->lastLSB = $msg->byte(2);
                             break;
                     }
                     break;
                 case self::STATUS_PC | self::CHANNEL_16:
-                    $preset = new Preset(
-                        $this->currentMSB,
-                        $this->currentLSB,
-                        $msg->byte(1),
-                    );
-                    $this->logger->notice("External Preset changed ($preset)");
-                    ($this->onExternalPresetLoaded)($preset);
+                    if($this->lastMSB !== self::MBUDDY_BANK_MSB || $this->lastLSB !== self::MBUDDY_BANK_LSB) {
+                        $this->logger->notice("Performance ignore");
+                    } else {
+                        $this->currentSongId = new SongId($msg->byte(1));
+                        $this->logger->notice("Song changed ({$this->currentSongId})");
+                        ($this->onSongChanged)($this->currentSongId);
+                    }
+                    $this->lastMSB = $this->lastLSB = null;
                     break;
             }
         }
@@ -85,10 +88,14 @@ class Pa50 implements Device
 
     private RtMidi\Input $input;
     private RtMidi\Output $output;
-    private int $currentMSB;
-    private int $currentLSB;
-    /** @var callable(Preset): void */
-    private $onExternalPresetLoaded;
+
+    private ?int $lastMSB = null;
+    private ?int $lastLSB = null;
+    private ?SongId $currentSongId = null;
+
+    /** @var callable(SongId): void */
+    private $onSongChanged;
+
     private LoggerInterface $logger;
 
     private const STATUS_CC = 0xB0;

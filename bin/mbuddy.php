@@ -29,9 +29,9 @@ try {
     exit(1);
 }
 
-$impulse->onPresetSaved($pa50->doSaveExternalPreset());
+$impulse->onSongIdModified($pa50->doModifySongIdOfCurrentPerformance());
 $impulse->onMidiEvent($pa50->doPlayEvent());
-$pa50->onExternalPresetLoaded($impulse->doLoadPreset());
+$pa50->onSongChanged($impulse->doLoadSong());
 
 const MSG_LIMIT = 2;
 $cmdLogger->notice("Running…");
