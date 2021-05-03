@@ -72,7 +72,7 @@ class Pa50 implements Device
                     break;
                 case self::STATUS_PC | self::CHANNEL_16:
                     if($this->lastMSB !== self::MBUDDY_BANK_MSB || $this->lastLSB !== self::MBUDDY_BANK_LSB) {
-                        $this->logger->notice("Performance ignore");
+                        $this->logger->notice("Performance ignored");
                     } else {
                         $this->currentSongId = new SongId($msg->byte(1));
                         $this->logger->notice("Song changed ({$this->currentSongId})");

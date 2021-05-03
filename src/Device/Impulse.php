@@ -35,14 +35,14 @@ class Impulse implements Device
                     return;
                 }
                 if(null === $patch = Device\Impulse\Patch::fromBinString($data)) {
-                    $this->logger->error("Failed to create song ($songId}).");
+                    $this->logger->error("Failed to create song ($songId).");
                     return;
                 }
                 $patch = $patch->withId($songId->id());
-                $this->logger->notice("Song created ($songId}) '{$patch->name()}'.");
+                $this->logger->notice("Song created ($songId) '{$patch->name()}'.");
             } else {
                 if(null === $patch = Device\Impulse\Patch::fromBinString($data)) {
-                    $this->logger->error("Failed to load song ($songId}).");
+                    $this->logger->error("Failed to load song ($songId)).");
                     return;
                 }
                 $this->logger->notice("Song loaded ($songId}) '{$patch->name()}'.");
