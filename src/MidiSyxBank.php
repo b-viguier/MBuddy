@@ -29,7 +29,7 @@ class MidiSyxBank
             unlink($existingPatch['path']);
         }
 
-        $strId = str_pad((string)$id, 3, '0', STR_PAD_LEFT);
+        $strId = str_pad((string)$id, 2, '0', STR_PAD_LEFT);
         $this->fileMap[$id] = ['name' => $name, 'path' => $this->folder."/$strId-$name.syx"];
 
         return strlen($data) === file_put_contents($this->fileMap[$id]['path'], $data);
