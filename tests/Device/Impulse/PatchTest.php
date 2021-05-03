@@ -26,6 +26,17 @@ class PatchTest extends TestCase
         $this->assertSame('Name', $patchCopy->name());
     }
 
+    public function testId(): void
+    {
+        $patch = Patch::fromBinString(self::validSysex());
+        assert(null !== $patch);
+        $patchCopy = $patch->withId(2)->withName('test');
+
+        $this->assertNotSame($patch->songId()->id(), $patchCopy->songId()->id());
+        $this->assertSame(2, $patchCopy->songId()->id());
+        $this->assertSame($patchCopy->fullname(), '02test  ');
+    }
+
     public function testNameTooLong(): void
     {
         $patch = Patch::fromBinString(self::validSysex());

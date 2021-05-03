@@ -61,7 +61,7 @@ class Patch
 
     public function withId(int $id): self
     {
-        $id = str_pad((string)($id % (10 ** self::ID_LENGTH)), self::ID_LENGTH);
+        $id = str_pad((string)($id % (10 ** self::ID_LENGTH)), self::ID_LENGTH, '0', STR_PAD_LEFT);
 
         return new self(substr_replace($this->data, $id, self::FULLNAME_OFFSET, self::ID_LENGTH));
     }
