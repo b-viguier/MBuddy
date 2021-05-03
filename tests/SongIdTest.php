@@ -58,7 +58,8 @@ class SongIdTest extends TestCase
     {
         yield [6, 5];
         yield [99, 98];
-        yield [1, 1];
+        yield [1, 0];
+        yield [0, 0];
     }
 
     /**

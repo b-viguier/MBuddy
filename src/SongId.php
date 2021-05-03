@@ -34,7 +34,7 @@ class SongId
 
     public function previous(): self
     {
-        return $this->id > 1 ? new self($this->id - 1) : $this;
+        return $this->id >= 1 ? new self($this->id - 1) : $this;
     }
 
     public function __toString(): string
