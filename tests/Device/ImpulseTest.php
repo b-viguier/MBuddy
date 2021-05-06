@@ -69,15 +69,18 @@ class ImpulseTest extends DeviceTest
         $msgStack = [];
         // Arbitrary messages are forwarded
         $input->msgStack[] = RtMidi\Message::fromIntegers(0xFF);
+        // Even Hold pedal
+        $input->msgStack[] = RtMidi\Message::fromIntegers(0xB4, 0x40, 0x7F);
         $impulse->onMidiEvent(function (RtMidi\Message $msg) use (&$msgStack): void {
             $msgStack[] = $msg;
         });
-        $count = $impulse->process(2);
+        $count = $impulse->process(3);
 
-        $this->assertSame(1, $count);
+        $this->assertSame(2, $count);
         $this->assertEmpty($input->msgStack);
-        $this->assertCount(1, $msgStack);
+        $this->assertCount(2, $msgStack);
         $this->assertSame([0xFF], $msgStack[0]->toIntegers());
+        $this->assertSame([0xB4, 0x40, 0x7F], $msgStack[1]->toIntegers());
     }
 
     public function testSongModification(): void

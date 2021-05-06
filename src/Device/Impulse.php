@@ -91,6 +91,8 @@ class Impulse implements Device
                                 $this->handleSongIdModification(false);
                             }
                             break;
+                        default:
+                            ($this->onMidiEvent)($msg);
                     }
                     break;
                 default:
