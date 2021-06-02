@@ -45,7 +45,7 @@ class Impulse implements Device
                     $this->logger->error("Failed to load song ($songId)).");
                     return;
                 }
-                $this->logger->notice("Song loaded ($songId}) '{$patch->name()}'.");
+                $this->logger->notice("Song loaded ($songId) '{$patch->name()}'.");
             }
             $this->currentSongId = $songId;
             $this->output->send($patch->toSysexMessage());

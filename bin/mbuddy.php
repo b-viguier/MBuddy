@@ -14,6 +14,7 @@ try {
     $devices = [
         $impulse = $config->deviceImpulse(),
         $pa50 = $config->devicePa50(),
+        $ipad = $config->deviceIPad(),
     ];
 } catch (RtMidi\Exception\MidiException $exception) {
     $error = "{$exception->getMessage()}\n";
@@ -31,7 +32,10 @@ try {
 
 $impulse->onSongIdModified($pa50->doModifySongIdOfCurrentPerformance());
 $impulse->onMidiEvent($pa50->doPlayEvent());
-$pa50->onSongChanged($impulse->doLoadSong());
+$pa50->onSongChanged(function(MBuddy\SongId $songId) use($impulse, $ipad) :void {
+    $impulse->doLoadSong()($songId);
+    $ipad->doLoadSong()($songId);
+});
 
 const MSG_LIMIT = 2;
 $cmdLogger->notice("Running…");

@@ -12,6 +12,8 @@ class Config
     public const IMPULSE_OUT = 'impulse_out';
     public const PA50_IN = 'pa50_in';
     public const PA50_OUT = 'pa50_out';
+    public const IPAD_IN = 'ipad_in';
+    public const IPAD_OUT = 'ipad_out';
 
     /**
      * @param array<string,string> $config
@@ -63,6 +65,15 @@ class Config
             );
     }
 
+    public function deviceIPad(): Device\IPad
+    {
+        return $this->deviceIPad ?? $this->deviceIPad = new Device\IPad(
+                $this->midiBrowser()->openInput($this->get(self::IPAD_IN)),
+                $this->midiBrowser()->openOutput($this->get(self::IPAD_OUT)),
+                $this->logger('IPad'),
+            );
+    }
+
     /** @var array<string,string> */
     private array $config = [];
     private RtMidi\MidiBrowser $midiBrowser;
@@ -72,6 +83,7 @@ class Config
     private MidiSyxBank $midiSyxBank;
     private Device\Impulse $deviceImpulse;
     private Device\Pa50 $devicePa50;
+    private Device\IPad $deviceIPad;
 
     private function logHandler(): Monolog\Handler\HandlerInterface
     {
