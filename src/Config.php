@@ -49,8 +49,8 @@ class Config
     public function deviceImpulse(): Device\Impulse
     {
         return $this->deviceImpulse ?? $this->deviceImpulse = new Device\Impulse(
-                $this->midiBrowser()->openInput($this->get(self::IMPULSE_IN)),
-                $this->midiBrowser()->openOutput($this->get(self::IMPULSE_OUT)),
+                $this->midiBrowser()->openInput($this->getInputName(self::IMPULSE_IN)),
+                $this->midiBrowser()->openOutput($this->getOutputName(self::IMPULSE_OUT)),
                 $this->midiSyxBank(),
                 $this->logger('Impulse'),
             );
@@ -59,8 +59,8 @@ class Config
     public function devicePa50(): Device\Pa50
     {
         return $this->devicePa50 ?? $this->devicePa50 = new Device\Pa50(
-                $this->midiBrowser()->openInput($this->get(self::PA50_IN)),
-                $this->midiBrowser()->openOutput($this->get(self::PA50_OUT)),
+                $this->midiBrowser()->openInput($this->getInputName(self::PA50_IN)),
+                $this->midiBrowser()->openOutput($this->getOutputName(self::PA50_OUT)),
                 $this->logger('Pa50'),
             );
     }
@@ -68,8 +68,8 @@ class Config
     public function deviceIPad(): Device\IPad
     {
         return $this->deviceIPad ?? $this->deviceIPad = new Device\IPad(
-                $this->midiBrowser()->openInput($this->get(self::IPAD_IN)),
-                $this->midiBrowser()->openOutput($this->get(self::IPAD_OUT)),
+                $this->midiBrowser()->openInput($this->getInputName(self::IPAD_IN)),
+                $this->midiBrowser()->openOutput($this->getOutputName(self::IPAD_OUT)),
                 $this->logger('IPad'),
             );
     }
@@ -105,5 +105,29 @@ class Config
         }
 
         return $this->config[$paramName];
+    }
+
+    private function getInputName(string $paramName): string
+    {
+        return $this->searchClosestName($this->get($paramName), $this->midiBrowser()->availableInputs());
+    }
+
+    private function getOutputName(string $paramName): string
+    {
+        return $this->searchClosestName($this->get($paramName), $this->midiBrowser()->availableOutputs());
+    }
+
+    /**
+     * @param array<string>  $haystack
+     */
+    private function searchClosestName(string $needle, array $haystack): string
+    {
+        foreach ($haystack as $entry) {
+            if (strpos($entry, $needle) !== false) {
+                return $entry;
+            }
+        }
+
+        return $needle;
     }
 }

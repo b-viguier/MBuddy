@@ -43,8 +43,8 @@ class ConfigTest extends TestCase
             Config::IMPULSE_OUT => 'deviceOutput',
         ]);
         $browser = $config->midiBrowser();
-        $input = $browser->openVirtualInput('deviceOutput');
-        $output = $browser->openVirtualOutput('deviceInput');
+        $input = $browser->openVirtualInput('deviceOutput-123');
+        $output = $browser->openVirtualOutput('deviceInput-456');
 
         $this->assertInstanceOf(Device\Impulse::class, $device = $config->deviceImpulse());
         $this->assertSame($device, $config->deviceImpulse());
@@ -66,8 +66,8 @@ class ConfigTest extends TestCase
             Config::PA50_OUT => 'deviceOutput',
         ]);
         $browser = $config->midiBrowser();
-        $input = $browser->openVirtualInput('deviceOutput');
-        $output = $browser->openVirtualOutput('deviceInput');
+        $input = $browser->openVirtualInput('deviceOutput-123');
+        $output = $browser->openVirtualOutput('deviceInput-456');
 
         $this->assertInstanceOf(Device\Pa50::class, $device = $config->devicePa50());
         $this->assertSame($device, $config->devicePa50());
