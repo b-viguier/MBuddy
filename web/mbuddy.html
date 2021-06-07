@@ -13,133 +13,27 @@
 </head>
 <body>
 <div class="container-fluid">
-    <nav class="navbar fixed-top navbar-light bg-light navbar-expand">
-        <span class="navbar-brand mb-0 h1">MBuddy</span>
-        <span id="status-loading" class="menu-status navbar-text text-primary">
-            <i class="fas fa-hourglass-half"></i> Initializing MIDI device…
-        </span>
-        <span id="status-error" class="menu-status navbar-text text-danger" style="display: none;">
-            <i class="fas fa-exclamation-circle"></i>
-        </span>
-        <span id="menu-midi" class="form-inline">
-            <div class="form-group">
-                <label for="midi-inputs">Input</label>
-                <select class="form-control" id="midi-inputs">
-                </select>
-          </div>
-            <div class="form-group">
-                <label for="midi-inputs">Output</label>
-                <select class="form-control" id="midi-outputs">
-                </select>
-          </div>
-        </span>
-        <span class="form-inline">
-            <button type="button" class="btn btn-dark" data-toggle="modal" data-target="#exampleModal">
-                Songs…
-            </button>
-        </span>
-    </nav>
-
     <div class="row">
         <img id="score-img" src="..." class="img-fluid">
     </div>
-
-    <!-- Modal -->
-    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    Hello World
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary">Save changes</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
 </div>
 
 <script src="js/jquery-3.5.1.slim.min.js"></script>
 <script src="js/bootstrap.bundle.min.js"></script>
 
 <script>
-
-    function criticalError(txt) {
-        $('.menu-status').hide();
-        var errorElmt = $('#status-error');
-        console.log(errorElmt);
-        errorElmt.show();
-        errorElmt.append(txt);
-    }
-
-    window.onerror = function (msg, url, lineNo, columnNo, error) {
-        var message = [
-            'Message: ' + msg,
-            'URL: ' + url,
-            'Line: ' + lineNo,
-            'Column: ' + columnNo,
-            'Error object: ' + JSON.stringify(error)
-        ].join(' - ');
-
-        criticalError(message);
-        return false;
-    };
-
     var score = document.getElementById('score-img');
 
-    function midiPortToSelect(midiPorts, selectElmt) {
-        selectElmt.append("<option selected='selected' value='0'>None</option>");
-        midiPorts.forEach(function (port) {
-            selectElmt.append("<option value='" + port.id + "'>" + port.name + "</option>");
-        });
-    }
+    var host = "ws://" + window.location.hostname + ":12380";
 
+    var socket = new WebSocket(host);
 
-    function onMIDIMessage(event) {
-        // Assume receiving only ProgramChange
-        var id = (event.data[1] < 10 ? '0' : '') + event.data[1];
+    socket.onmessage = function(e) {
+        const data = atob(e.data);
+        var id = (data.charCodeAt(1) < 10 ? '0' : '') + data.charCodeAt(1);
 
         score.setAttribute('src', 'scores/' + id + '.png');
-    }
-
-    if (navigator.requestMIDIAccess == undefined) {
-        criticalError('No Midi Support');
-    } else {
-        navigator.requestMIDIAccess({sysex: true}).then(
-            function (midiAccess) {
-                $('.menu-status').hide();
-
-                var inputsSelect = $('#midi-inputs');
-                midiPortToSelect(midiAccess.inputs, inputsSelect);
-                var currentMidiInput = null;
-                inputsSelect.on("change", function (value, other) {
-                    if (currentMidiInput) {
-                        currentMidiInput.onmidimessage = null;
-                    }
-                    var newId = $(this).val();
-                    if (newId === '0') {
-                        currentMidiInput = null;
-                        return;
-                    }
-                    currentMidiInput = midiAccess.inputs.get(newId);
-                    currentMidiInput.onmidimessage = onMIDIMessage;
-                });
-
-                midiPortToSelect(midiAccess.outputs, $('#midi-outputs'));
-            },
-            criticalError
-        );
-    }
-
-
+    };
 </script>
 </body>
 </html>

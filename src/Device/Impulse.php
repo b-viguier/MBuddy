@@ -120,6 +120,7 @@ class Impulse implements Device
     private const STATUS_SYSEX = 0xF0;
     private const STATUS_CC = 0xB0;
     private const CHANNEL_5 = 0x04;
+    private const BUTTON_SYNC = 0x74;
     private const BUTTON_REC = 0x75;
     private const BUTTON_PREV = 0x70;
     private const BUTTON_NEXT = 0x71;

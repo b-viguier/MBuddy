@@ -14,8 +14,13 @@ try {
     $devices = [
         $impulse = $config->deviceImpulse(),
         $pa50 = $config->devicePa50(),
-        $ipad = $config->deviceIPad(),
     ];
+    $cmdLogger->info("Looking for iPad device…");
+    if($ipad = $config->deviceIPad()) {
+        $cmdLogger->info("iPad found");
+    } else {
+        $cmdLogger->info("No iPad");
+    }
 } catch (RtMidi\Exception\MidiException $exception) {
     $error = "{$exception->getMessage()}\n";
     $error.= "Available Inputs:\n";
@@ -32,10 +37,10 @@ try {
 
 $impulse->onSongIdModified($pa50->doModifySongIdOfCurrentPerformance());
 $impulse->onMidiEvent($pa50->doPlayEvent());
-$pa50->onSongChanged(function(MBuddy\SongId $songId) use($impulse, $ipad) :void {
+$pa50->onSongChanged($ipad ? function (MBuddy\SongId $songId) use ($impulse, $ipad): void {
     $impulse->doLoadSong()($songId);
     $ipad->doLoadSong()($songId);
-});
+} : $impulse->doLoadSong());
 
 const MSG_LIMIT = 2;
 $cmdLogger->notice("Running…");

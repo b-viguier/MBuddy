@@ -2,6 +2,7 @@
 
 namespace bviguier\MBuddy;
 
+use bviguier\MBuddy\WebSocket;
 use bviguier\RtMidi;
 use Monolog;
 use Psr\Log;
@@ -12,8 +13,6 @@ class Config
     public const IMPULSE_OUT = 'impulse_out';
     public const PA50_IN = 'pa50_in';
     public const PA50_OUT = 'pa50_out';
-    public const IPAD_IN = 'ipad_in';
-    public const IPAD_OUT = 'ipad_out';
 
     /**
      * @param array<string,string> $config
@@ -65,13 +64,19 @@ class Config
             );
     }
 
-    public function deviceIPad(): Device\IPad
+    public function deviceIPad(): ?Device\IPad
     {
-        return $this->deviceIPad ?? $this->deviceIPad = new Device\IPad(
-                $this->midiBrowser()->openInput($this->getInputName(self::IPAD_IN)),
-                $this->midiBrowser()->openOutput($this->getOutputName(self::IPAD_OUT)),
+        if ($this->deviceIPad) {
+            return $this->deviceIPad;
+        }
+        if ($server = WebSocket\Server::createFromClient(getHostByName(getHostName()), 12380, 20)) {
+            return $this->deviceIPad = new Device\IPad(
+                new WebSocket\Output($server),
                 $this->logger('IPad'),
             );
+        }
+
+        return null;
     }
 
     /** @var array<string,string> */
@@ -83,7 +88,7 @@ class Config
     private MidiSyxBank $midiSyxBank;
     private Device\Impulse $deviceImpulse;
     private Device\Pa50 $devicePa50;
-    private Device\IPad $deviceIPad;
+    private ?Device\IPad $deviceIPad = null;
 
     private function logHandler(): Monolog\Handler\HandlerInterface
     {

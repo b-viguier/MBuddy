@@ -9,20 +9,15 @@ use Psr\Log\LoggerInterface;
 
 class IPad implements Device
 {
-    public function __construct(RtMidi\Input $input, RtMidi\Output $output, LoggerInterface $logger)
+    public function __construct(RtMidi\Output $output, LoggerInterface $logger)
     {
-        $this->input = $input;
         $this->output = $output;
         $this->logger = $logger;
     }
 
     public function process(int $limit): int
     {
-        for ($count = 0; $count < $limit && $msg = $this->input->pullMessage(); ++$count) {
-            // Pull messages if any
-        }
-
-        return $count;
+        return 0;
     }
 
     /**
@@ -39,7 +34,6 @@ class IPad implements Device
         };
     }
 
-    private RtMidi\Input $input;
     private RtMidi\Output $output;
     private LoggerInterface $logger;
 

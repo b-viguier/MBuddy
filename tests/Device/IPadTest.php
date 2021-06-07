@@ -13,7 +13,6 @@ class IPadTest extends DeviceTest
     public function createDevice(RtMidi\Input $input, RtMidi\Output $output, string $testId = ''): MBuddy\Device\IPad
     {
         return new MBuddy\Device\IPad(
-            $input,
             $output,
             new Logger('null'),
         );
@@ -40,5 +39,15 @@ class IPadTest extends DeviceTest
         assert($msg !== null);
         $this->assertEmpty($output->msgStack);
         $this->assertSame([0xCF, $id], $msg->toIntegers());
+    }
+
+    public function testLessMessagesThanTheLimit(): void
+    {
+        $this->markTestSkipped('iPad does not support input yet');
+    }
+
+    public function testMoreMessagesThanTheLimit(): void
+    {
+        $this->markTestSkipped('iPad does not support input yet');
     }
 }
