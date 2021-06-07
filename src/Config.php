@@ -13,6 +13,7 @@ class Config
     public const IMPULSE_OUT = 'impulse_out';
     public const PA50_IN = 'pa50_in';
     public const PA50_OUT = 'pa50_out';
+    public const MBUDDY_HOST = 'host';
 
     /**
      * @param array<string,string> $config
@@ -69,7 +70,7 @@ class Config
         if ($this->deviceIPad) {
             return $this->deviceIPad;
         }
-        if ($server = WebSocket\Server::createFromClient(getHostByName(getHostName()), 12380, 20)) {
+        if ($server = WebSocket\Server::createFromClient($this->get(self::MBUDDY_HOST), 12380, 20)) {
             return $this->deviceIPad = new Device\IPad(
                 new WebSocket\Output($server),
                 $this->logger('IPad'),
