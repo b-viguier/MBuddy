@@ -7,14 +7,22 @@
     <link rel="stylesheet" href="css/fontawesome.min.css" crossorigin="anonymous">
 
     <style>
+        .overlay {
+            position:absolute;
+            width: 100%;
+        }
     </style>
 
     <title>MBuddy</title>
 </head>
 <body>
-<div class="container-fluid">
+<div class="container-fluid truc">
     <div class="row">
-        <img id="score-img" src="..." class="img-fluid">
+        <img id="score-img" src="scores/01.png" class="img-fluid">
+        <div class="row overlay justify-content-between">
+            <button type="button" class="btn btn-dark col-1" onclick="previous()">&lt;&lt;</button>
+            <button type="button" class="btn btn-dark col-1" onclick="next()">&gt;&gt;</button>
+        </div>
     </div>
 </div>
 
@@ -22,7 +30,8 @@
 <script src="js/bootstrap.bundle.min.js"></script>
 
 <script>
-    var score = document.getElementById('score-img');
+    var scoreImg = document.getElementById('score-img');
+    var currentId = 1;
 
     var host = "ws://" + window.location.hostname + ":12380";
 
@@ -30,10 +39,23 @@
 
     socket.onmessage = function(e) {
         const data = atob(e.data);
-        var id = (data.charCodeAt(1) < 10 ? '0' : '') + data.charCodeAt(1);
-
-        score.setAttribute('src', 'scores/' + id + '.png');
+        changeScore(data.charCodeAt(1));
     };
+
+    function changeScore(id) {
+        currentId = id;
+        var txtId = (currentId < 10 ? '0' : '') + currentId;
+        scoreImg.setAttribute('src', 'scores/' + txtId + '.png');
+    }
+
+    function next() {
+        changeScore(currentId+1);
+    }
+
+    function previous() {
+        changeScore(currentId-1);
+    }
+
 </script>
 </body>
 </html>
