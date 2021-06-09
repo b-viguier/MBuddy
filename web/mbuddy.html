@@ -7,25 +7,28 @@
     <link rel="stylesheet" href="css/fontawesome.min.css" crossorigin="anonymous">
 
     <style>
-        .overlay {
-            position:absolute;
-            width: 100%;
+        .back {
+            background-size: cover !important;
+            background-image: url("scores/01.png");
+            min-height: 100vh;
         }
     </style>
 
     <title>MBuddy</title>
 </head>
 <body>
-<div class="container-fluid truc">
+<div id="score-img" class="back">
+<div class="container-fluid">
     <div class="row">
-        <img id="score-img" src="scores/01.png" class="img-fluid">
-        <div class="row overlay justify-content-between">
-            <button type="button" class="btn btn-dark col-1" onclick="previous()">&lt;&lt;</button>
-            <button type="button" class="btn btn-dark col-1" onclick="next()">&gt;&gt;</button>
+        <div class="col-sm-1 p-0">
+        <button type="button" class="btn btn-dark" onclick="previous()">&lt;&lt;</button>
+        </div>
+        <div class="col-sm-1 p-0 offset-sm-10">
+        <button type="button" class="btn btn-dark" onclick="next()">&gt;&gt;</button>
         </div>
     </div>
 </div>
-
+</div>
 <script src="js/jquery-3.5.1.slim.min.js"></script>
 <script src="js/bootstrap.bundle.min.js"></script>
 
@@ -45,7 +48,7 @@
     function changeScore(id) {
         currentId = id;
         var txtId = (currentId < 10 ? '0' : '') + currentId;
-        scoreImg.setAttribute('src', 'scores/' + txtId + '.png');
+        scoreImg.style.backgroundImage = "url('scores/" + txtId + ".png')";
     }
 
     function next() {
