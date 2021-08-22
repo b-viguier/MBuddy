@@ -21,6 +21,7 @@ class Config
     public function __construct(array $config)
     {
         $this->config = $config;
+        $this->playlist = Playlist::fromFile(__DIR__ . '/../var/playlist.php');
     }
 
     static public function fromOsConfigFile(): self
@@ -80,6 +81,11 @@ class Config
         return null;
     }
 
+    public function playlist(): Playlist
+    {
+        return $this->playlist;
+    }
+
     /** @var array<string,string> */
     private array $config = [];
     private RtMidi\MidiBrowser $midiBrowser;
@@ -90,6 +96,7 @@ class Config
     private Device\Impulse $deviceImpulse;
     private Device\Pa50 $devicePa50;
     private ?Device\IPad $deviceIPad = null;
+    private Playlist $playlist;
 
     private function logHandler(): Monolog\Handler\HandlerInterface
     {

@@ -17,6 +17,8 @@ class Impulse implements Device
         $this->bank = $syxBank;
         $this->onSongIdModified = function(SongId $preset): void {};
         $this->onMidiEvent = function(RtMidi\Message $msg): void {};
+        $this->onNext = function(): void {};
+        $this->onPrevious = function(): void {};
         $this->logger = $logger;
 
         $this->input->allow(RtMidi\Input::ALLOW_SYSEX);
@@ -68,6 +70,22 @@ class Impulse implements Device
         $this->onMidiEvent = $callback;
     }
 
+    /**
+     * @param callable():void $callback
+     */
+    public function onNextPressed(callable $callback): void
+    {
+        $this->onNext = $callback;
+    }
+
+    /**
+     * @param callable():void $callback
+     */
+    public function onPreviousPressed(callable $callback): void
+    {
+        $this->onPrevious = $callback;
+    }
+
     public function process(int $limit): int
     {
         for ($count = 0; $count < $limit && $msg = $this->input->pullMessage(); ++$count) {
@@ -82,12 +100,12 @@ class Impulse implements Device
                             $this->isRecBtnPressed = $msg->byte(2) !== 0;
                             break;
                         case self::BUTTON_NEXT:
-                            if($msg->byte(2) !== 0) {
+                            if($msg->byte(2) === 0) {
                                 $this->handleSongIdModification(true);
                             }
                             break;
                         case self::BUTTON_PREV:
-                            if($msg->byte(2) !== 0) {
+                            if($msg->byte(2) === 0) {
                                 $this->handleSongIdModification(false);
                             }
                             break;
@@ -114,6 +132,10 @@ class Impulse implements Device
     private $onSongIdModified;
     /** @var callable(RtMidi\Message): void */
     private $onMidiEvent;
+    /** @var callable(): void */
+    private $onNext;
+    /** @var callable(): void */
+    private $onPrevious;
 
     private LoggerInterface $logger;
 
@@ -143,6 +165,8 @@ class Impulse implements Device
     private function handleSongIdModification(bool $isNext): void
     {
         if(!$this->isRecBtnPressed) {
+            $isNext ? ($this->onNext)() : ($this->onPrevious)();
+
             return;
         }
 

@@ -37,10 +37,26 @@ try {
 
 $impulse->onSongIdModified($pa50->doModifySongIdOfCurrentPerformance());
 $impulse->onMidiEvent($pa50->doPlayEvent());
-$pa50->onSongChanged($ipad ? function (MBuddy\SongId $songId) use ($impulse, $ipad): void {
-    $impulse->doLoadSong()($songId);
+$impulse->onNextPressed(function() use($config): void {
+    if($config->playlist()->next()) {
+        $config->devicePa50()->doChangeSong($config->playlist()->current());
+    }
+});
+$impulse->onPreviousPressed(function() use($config): void {
+    if($config->playlist()->previous()) {
+        $config->devicePa50()->doChangeSong($config->playlist()->current());
+    }
+});
+
+$impulseDoLoadSong = $impulse->doLoadSong();
+$onSongChanged = function(MBuddy\SongId $songId) use($config, $impulseDoLoadSong): void {
+    $impulseDoLoadSong($songId);
+    $config->playlist()->at($songId);
+};
+$pa50->onSongChanged($ipad ? function (MBuddy\SongId $songId) use ($onSongChanged, $ipad): void {
+    $onSongChanged($songId);
     $ipad->doLoadSong()($songId);
-} : $impulse->doLoadSong());
+} : $onSongChanged);
 
 const MSG_LIMIT = 2;
 $cmdLogger->notice("Running…");

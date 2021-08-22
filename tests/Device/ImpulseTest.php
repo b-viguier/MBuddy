@@ -94,9 +94,9 @@ class ImpulseTest extends DeviceTest
         // Record button pressed
         $input->msgStack[] = RtMidi\Message::fromIntegers(0xB4, 0x75, 0x7F);
         // Previous button pressed
-        $input->msgStack[] = RtMidi\Message::fromIntegers(0xB4, 0x70, 0x7F);
+        $input->msgStack[] = RtMidi\Message::fromIntegers(0xB4, 0x70, 0x00);
         // Next button pressed
-        $input->msgStack[] = RtMidi\Message::fromIntegers(0xB4, 0x71, 0x7F);
+        $input->msgStack[] = RtMidi\Message::fromIntegers(0xB4, 0x71, 0x00);
         // Record button release
         $input->msgStack[] = RtMidi\Message::fromIntegers(0xB4, 0x75, 0x00);
 
