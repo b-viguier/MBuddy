@@ -7,8 +7,8 @@ $root = $argv[1];
 $outDir = __DIR__ . '/../web/scores/';
 
 echo "Scanning $root\n";
-foreach (glob($root . '[0-9][0-9]*') as $folder) {
-    $files = glob($folder . "/*.mscz");
+foreach (glob($root . '[0-9][0-9]*') ?: [] as $folder) {
+    $files = glob($folder . "/*.mscz") ?: [];
     if(count($files)!== 1) {
         echo "Skip $folder\n";
         continue;

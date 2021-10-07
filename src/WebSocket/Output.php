@@ -13,12 +13,12 @@ class Output implements \bviguier\RtMidi\Output
 
     public function name(): string
     {
-        return 'websocket';
+        return 'WS Output';
     }
 
     public function send(Message $message): void
     {
-        $this->server->send(base64_encode($message->toBinString()));
+        $this->server->sendBinary($message->toBinString());
     }
 
     private Server $server;

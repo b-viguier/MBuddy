@@ -36,13 +36,21 @@
     var scoreImg = document.getElementById('score-img');
     var currentId = 1;
 
-    var host = "ws://" + window.location.hostname + ":12380";
+    var host = "ws://" + window.location.hostname + ":12380/websocket";
 
     var socket = new WebSocket(host);
+    socket.binaryType = "arraybuffer";
 
     socket.onmessage = function(e) {
-        const data = atob(e.data);
-        changeScore(data.charCodeAt(1));
+        if(e.data instanceof ArrayBuffer) {
+            // binary frame
+            const bytes = new Uint8Array(e.data);
+            changeScore(bytes[1]);
+        } else {
+            // text frame
+            console.log(e.data);
+        }
+
     };
 
     function changeScore(id) {

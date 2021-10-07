@@ -66,24 +66,25 @@ class Config
             );
     }
 
-    public function deviceIPad(): ?Device\IPad
+    public function deviceIPad(): Device\IPad
     {
-        if ($this->deviceIPad) {
-            return $this->deviceIPad;
-        }
-        if ($server = WebSocket\Server::createFromClient($this->get(self::MBUDDY_HOST), 12380, 20)) {
-            return $this->deviceIPad = new Device\IPad(
-                new WebSocket\Output($server),
-                $this->logger('IPad'),
-            );
-        }
-
-        return null;
+        return $this->deviceIPad ?? $this->deviceIPad = new Device\IPad(
+            new WebSocket\Output($this->server()),
+            $this->logger('IPad'),
+        );
     }
 
     public function playlist(): Playlist
     {
         return $this->playlist;
+    }
+
+    public function server(): WebSocket\Server
+    {
+        return $this->server ?? $this->server = new WebSocket\Server(
+            $this->get(self::MBUDDY_HOST),
+            12380
+        );
     }
 
     /** @var array<string,string> */
@@ -95,8 +96,9 @@ class Config
     private MidiSyxBank $midiSyxBank;
     private Device\Impulse $deviceImpulse;
     private Device\Pa50 $devicePa50;
-    private ?Device\IPad $deviceIPad = null;
+    private Device\IPad $deviceIPad;
     private Playlist $playlist;
+    private WebSocket\Server $server;
 
     private function logHandler(): Monolog\Handler\HandlerInterface
     {

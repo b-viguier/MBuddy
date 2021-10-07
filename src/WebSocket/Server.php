@@ -2,53 +2,105 @@
 
 namespace bviguier\MBuddy\WebSocket;
 
+use Amp\Http\Server\HttpServer;
+use Amp\Http\Server\Request;
+use Amp\Http\Server\Response;
+use Amp\Http\Server\Router;
+use Amp\Http\Server\StaticContent\DocumentRoot;
+use Amp\Log\ConsoleFormatter;
+use Amp\Log\StreamHandler;
+use Amp\Loop;
+use Amp\Promise;
+use Amp\Success;
+use Amp\Websocket\Client;
+use Amp\Websocket\Message;
+use Amp\Websocket\Server\ClientHandler;
+use Amp\Websocket\Server\Gateway;
+use Amp\Websocket\Server\Websocket;
+use Monolog\Logger;
+use function Amp\ByteStream\getStdout;
+
 class Server
 {
-    static public function createFromClient(string $address, int $port, int $timeout): ?self
+    public function __construct(string $address, int $port)
     {
-        $server = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
-        socket_set_option($server, SOL_SOCKET, SO_REUSEADDR, 1);
-        socket_bind($server, $address, $port);
-        socket_listen($server);
-        socket_set_nonblock($server);
-        $maxTime = time() + $timeout;
-        while (time() <= $maxTime && false === $client = socket_accept($server)) {
-            usleep(100000);
-        }
-        if ($client === false) {
-            return null;
-        }
+        $this->websocket = new Websocket(new class($this->readBuffer) implements ClientHandler {
+            /** @var array<string> */
+            private array $readBuffer = [];
 
-        // Send WebSocket handshake headers.
-        $request = socket_read($client, 5000);
-        preg_match('#Sec-WebSocket-Key: (.*)\r\n#', $request, $matches);
-        $key = base64_encode(pack(
-            'H*',
-            sha1($matches[1].'258EAFA5-E914-47DA-95CA-C5AB0DC85B11')
-        ));
-        $headers = "HTTP/1.1 101 Switching Protocols\r\n";
-        $headers .= "Upgrade: websocket\r\n";
-        $headers .= "Connection: Upgrade\r\n";
-        $headers .= "Sec-WebSocket-Version: 13\r\n";
-        $headers .= "Sec-WebSocket-Accept: $key\r\n\r\n";
-        socket_write($client, $headers, strlen($headers));
+            /**
+             * @param array<string> $readBuffer
+             */
+            public function __construct(array &$readBuffer) {
+                $this->readBuffer = &$readBuffer;
+            }
 
-        return new self($server, $client);
+            public function handleHandshake(Gateway $gateway, Request $request, Response $response): Promise
+            {
+                return new Success($response);
+            }
+
+            public function handleClient(Gateway $gateway, Client $client, Request $request, Response $response): Promise
+            {
+                // @phpstan-ignore-next-line
+                return \Amp\call(function () use ($client): \Generator {
+                    while ($message = yield $client->receive()) {
+                        \assert($message instanceof Message);
+                        $this->readBuffer[] = yield $message->buffer();
+                    }
+                });
+            }
+        });
+
+        Loop::run(function() use($address, $port): void {
+            $sockets = [\Amp\Socket\Server::listen("$address:$port")];
+
+            $router = new Router();
+            $router->addRoute('GET', '/websocket', $this->websocket);
+            $router->setFallback(new DocumentRoot(__DIR__ . '/../../web'));
+
+            $logHandler = new StreamHandler(getStdout());
+            $logHandler->setFormatter(new ConsoleFormatter());
+            $logger = new Logger('server');
+            $logger->pushHandler($logHandler);
+
+            $server = new HttpServer($sockets, $router, $logger);
+
+            $server->start();
+            Loop::stop();
+        });
+    }
+
+    public function tick(int $count = 1): void
+    {
+        Loop::run(function() use($count) {
+            $wait = function(string $watcherId, $count) use(&$wait) {
+                if($count <= 0) {
+                    Loop::stop();
+                } else {
+                    Loop::defer($wait, $count-1);
+                }
+            };
+            $wait('', $count);
+        });
+    }
+
+    public function read(): ?string
+    {
+        return array_pop($this->readBuffer);
     }
 
     public function send(string $message): void
     {
-        socket_write($this->client, chr(129).chr(strlen($message)).$message);
+        $this->websocket->broadcast($message);
     }
 
-    /** @var resource */
-    private $server;
-    /** @var resource */
-    private $client;
-
-    private function __construct($server, $client)
+    public function sendBinary(string $message): void
     {
-        $this->server = $server;
-        $this->client = $client;
+        $this->websocket->broadcastBinary($message);
     }
+
+    private Websocket $websocket;
+    /** @var array<string> */
+    public array $readBuffer = [];
 }
