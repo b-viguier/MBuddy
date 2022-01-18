@@ -1,0 +1,124 @@
+[
+  {
+    "class" : "View",
+    "attributes" : {
+      "background_color" : "RGBA(1.000000,1.000000,1.000000,1.000000)",
+      "tint_color" : "RGBA(0.000000,0.478000,1.000000,1.000000)",
+      "enabled" : true,
+      "border_color" : "RGBA(0.000000,0.000000,0.000000,1.000000)",
+      "flex" : ""
+    },
+    "frame" : "{{0, 0}, {1024, 768}}",
+    "selected" : false,
+    "nodes" : [
+      {
+        "class" : "ImageView",
+        "attributes" : {
+          "class" : "ImageView",
+          "name" : "score_image",
+          "uuid" : "9A96AE17-944E-4D87-A673-2696134C437F",
+          "frame" : "{{462, 334}, {100, 100}}",
+          "background_color" : "RGBA(0.797170,0.797170,0.797170,1.000000)"
+        },
+        "frame" : "{{0, 0}, {1024, 768}}",
+        "selected" : false,
+        "nodes" : [
+
+        ]
+      },
+      {
+        "class" : "Button",
+        "attributes" : {
+          "font_size" : 18,
+          "title" : "",
+          "name" : "previous_button",
+          "alpha" : 0.5,
+          "class" : "Button",
+          "action" : "on_previous_button_pressed",
+          "frame" : "{{472, 368}, {80, 32}}",
+          "uuid" : "866B55FC-6EFA-4010-AAD7-00DE35652D2C"
+        },
+        "frame" : "{{0, 144}, {160, 472}}",
+        "selected" : true,
+        "nodes" : [
+
+        ]
+      },
+      {
+        "class" : "Button",
+        "attributes" : {
+          "font_size" : 15,
+          "image_name" : "iob:levels_24",
+          "title" : "",
+          "name" : "mix_button",
+          "corner_radius" : 2,
+          "border_width" : 2,
+          "alpha" : 0.5,
+          "class" : "Button",
+          "action" : "on_mix_button_pressed",
+          "frame" : "{{472, 368}, {80, 32}}",
+          "background_color" : "RGBA(0.745283,0.745283,0.745283,1.000000)",
+          "uuid" : "963A4B29-6508-41C6-83CB-13E2BB812D0F"
+        },
+        "frame" : "{{970, 714}, {48, 48}}",
+        "selected" : false,
+        "nodes" : [
+
+        ]
+      },
+      {
+        "class" : "Button",
+        "attributes" : {
+          "font_size" : 15,
+          "uuid" : "866B55FC-6EFA-4010-AAD7-00DE35652D2C",
+          "name" : "next_button",
+          "alpha" : 0.5,
+          "class" : "Button",
+          "action" : "on_next_button_pressed",
+          "frame" : "{{472, 368}, {80, 32}}",
+          "title" : ""
+        },
+        "frame" : "{{872, 140}, {152, 476}}",
+        "selected" : false,
+        "nodes" : [
+
+        ]
+      },
+      {
+        "class" : "Button",
+        "attributes" : {
+          "font_size" : 15,
+          "uuid" : "AC39CB99-A5DC-4241-879B-93FA360062F6",
+          "name" : "title_button",
+          "action" : "on_title_button_pressed",
+          "class" : "Button",
+          "frame" : "{{472, 368}, {80, 32}}",
+          "title" : ""
+        },
+        "frame" : "{{224, 0}, {583, 132}}",
+        "selected" : false,
+        "nodes" : [
+
+        ]
+      },
+      {
+        "class" : "Label",
+        "attributes" : {
+          "font_size" : 10,
+          "text" : "",
+          "font_name" : "<System>",
+          "name" : "info_label",
+          "class" : "Label",
+          "alignment" : "left",
+          "frame" : "{{437, 368}, {150, 32}}",
+          "uuid" : "3D3E512E-C1FA-4AE6-A91A-2FDAE529BF0C"
+        },
+        "frame" : "{{0, 729}, {216, 39}}",
+        "selected" : false,
+        "nodes" : [
+
+        ]
+      }
+    ]
+  }
+]
