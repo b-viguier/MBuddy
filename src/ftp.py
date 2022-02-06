@@ -1,4 +1,4 @@
-'''FTP server for src (iOS)
+'''FTP server for Pythonista (iOS)
 
 You can use this to exchange files with a Mac/PC or a file management app on the same device (e.g. Transmit).
 
