@@ -7,6 +7,7 @@ class VoicePicker(ui.View):
         super(VoicePicker, self).__init__(args, kwargs)
         self.initial_voice_ids = None
         self.current_voice = ('', '', '')
+        self.current_path = ('', '')
         self.on_changed = lambda *args: None
 
     @staticmethod
@@ -15,6 +16,7 @@ class VoicePicker(ui.View):
         instance.initial_voice_ids = current if current else instance.initial_voice_ids
         if instance.initial_voice_ids:
             instance.current_voice = motif.id2voices[instance.initial_voice_ids[0]][instance.initial_voice_ids[1]][instance.initial_voice_ids[2]]
+            instance.current_path = instance.current_voice
             instance.__fill_categories()
             instance.__fill_sub_categories()
             instance.__fill_programs()
@@ -33,15 +35,18 @@ class VoicePicker(ui.View):
         self['ok_button'].action = self.on_ok_clicked
 
     def on_category_selected(self, sender):
+        self.current_path = (self.__current_item('categories_view'), '')
         self.__fill_sub_categories()
+        self.__fill_programs()
         self['programs_view'].data_source.items = []
 
     def on_sub_category_selected(self, sender):
+        self.current_path = (self.current_path[0], self.__current_item('sub_categories_view'), '', '')
         self.__fill_programs()
 
     def on_program_selected(self, sender):
-        category = self.__current_item('categories_view')
-        sub_category = self.__current_item('sub_categories_view')
+        category = self.current_path[0]
+        sub_category = self.current_path[1]
         program = self.__current_item('programs_view')
 
         if category is not None and sub_category is not None and program is not None:
@@ -68,19 +73,21 @@ class VoicePicker(ui.View):
         } for cat in motif.voices2id.keys()]
 
     def __fill_sub_categories(self):
-        category = self.__current_item('categories_view')
+        category = self.current_path[0]
+        display_indicator = category == self.current_voice[0]
         self['sub_categories_view'].data_source.items = [{
             'title': sub_cat,
-            'accessory_type': 'disclosure_indicator' if sub_cat != self.current_voice[1] else 'detail_disclosure_button'
+            'accessory_type': 'disclosure_indicator' if not display_indicator or sub_cat != self.current_voice[1] else 'detail_disclosure_button'
         } for sub_cat in motif.voices2id[category].keys()]
 
     def __fill_programs(self):
-        category = self.__current_item('categories_view')
-        sub_category = self.__current_item('sub_categories_view')
+        category = self.current_path[0]
+        sub_category = self.current_path[1]
+        display_indicator = category == self.current_voice[0] and sub_category == self.current_voice[1]
         self['programs_view'].data_source.items = [{
             'title': prg,
-            'accessory_type': 'none' if prg != self.current_voice[2] else 'detail_button'
-        } for prg in motif.voices2id[category][sub_category].keys()]
+            'accessory_type': 'none' if not display_indicator or prg != self.current_voice[2] else 'detail_button'
+        } for prg in motif.voices2id[category][sub_category].keys()] if sub_category != '' else []
 
 
 if __name__ == '__main__':
