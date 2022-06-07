@@ -23,9 +23,35 @@ class Block(object):
     def address(self):
         return tuple(self.msg[7:10])
 
+    def size(self):
+        return  self.msg[5] * 128 + self.msg[6]
+
     def get_data(self, offset, size=1):
+        data_size = self.size()
+        if not (0 <= offset < data_size) or not (0 <= (offset + size - 1) < data_size):
+            raise ValueError("Invalid data read")
         data = self.msg[10 + offset:10 + offset + size]
         return data[0] if size == 1 else tuple(data)
+
+    def set_data(self, offset, data):
+        data_size = self.size()
+        if not (0 <= offset < data_size):
+            raise ValueError("Invalid data write")
+        if type(data) == int:
+            if not 0 <= data <= 127:
+                raise ValueError("Invalid data write value")
+            self.msg[10 + offset] = data
+        else:
+            if not 0 <= (offset + len(data) - 1) < data_size:
+                raise ValueError("Invalid data write length")
+            for index, value in enumerate(data):
+                if not 0 <= value <= 127:
+                    raise ValueError("Invalid data write value")
+                self.msg[10 + offset + index] = value
+
+    def set_data_boolean_mask(self, offset, mask, state):
+        current = self.get_data(offset)
+        self.set_data(offset, mask | current if state else (mask ^ 0b11111111) & current)
 
     def get_msg(self):
         checksum = 128 - sum(self.msg[5:-2]) % 128
@@ -35,10 +61,10 @@ class Block(object):
 
 class MasterHeaderBlock(Block):
     def __init__(self, msg, master_id):
-        if master_id < 0 or master_id > 127:
-            super().__init__(msg, (0x0E, 0x7F, 0), 0)
-        else:
+        if 0 <= master_id <= 127:
             super().__init__(msg, (0x0E, 0x70, master_id), 0)
+        else:
+            super().__init__(msg, (0x0E, 0x7F, 0), 0)
 
     def get_master_id(self):
         return self.address()[2]
@@ -51,10 +77,10 @@ class MasterHeaderBlock(Block):
 
 class MasterFooterBlock(Block):
     def __init__(self, msg, master_id):
-        if master_id < 0 or master_id > 127:
-            super().__init__(msg, (0x0F, 0x7F, 0), 0)
-        else:
+        if 0 <= master_id <= 127:
             super().__init__(msg, (0x0F, 0x70, master_id), 0)
+        else:
+            super().__init__(msg, (0x0F, 0x7F, 0), 0)
 
     def print(self):
         print('end')
@@ -65,23 +91,40 @@ class MasterCommonBlock(Block):
         super().__init__(msg, (0x33, 0x00, 0x00), 0x1F)
 
     def get_title(self):
-        return ''.join(map(chr, self.get_data(0x00, 20)))
+        return ''.join(map(chr, self.get_data(0x00, 20))).split('\x00', 1)[0]
+
+    def set_title(self, title):
+        self.set_data(0x00, title.ljust(20, '\x00').encode()[0:20])
+        return self
 
     def get_mode(self):
         return Motif.MasterMode(self.get_data(0x19))
 
+    def set_mode(self, mode):
+        return self.get_data(0x19, Motif.MasterMode(mode))
+
     def get_bank_program(self):
         return self.get_data(0x1A, 3)
 
-    def get_zones_enabled(self):
+    def set_bank_program(self, voice):
+        if len(voice) != 3:
+            raise ValueError("Invalid bank/program")
+        self.set_data(0x1A, voice)
+        return self
+
+    def are_zones_enabled(self):
         return True if self.get_data(0x1D) else False
+
+    def enable_zones(self, state):
+        self.set_data(0x1D, 0x1 if state else 0x0)
+        return self
 
     def print(self):
         print({
             'title': self.get_title(),
             'mode': self.get_mode(),
             'bank_program': self.get_bank_program(),
-            'zones_enabled' : self.get_zones_enabled(),
+            'zones_enabled': self.are_zones_enabled(),
         })
 
 
@@ -93,46 +136,106 @@ class MasterZone(Block):
         return self.address()[1]
 
     def get_transmit_channel(self):
-        return 0b00001111 & self.get_data(0)
+        return 0b00001111 & self.get_data(0x0)
+
+    def set_transmit_channel(self, channel):
+        if not 0 <= channel < 16:
+            raise ValueError("Invalid Midi Channel")
+        self.set_data(0, (self.get_data(0x0) & 0b11110000) | channel)
+        return self
 
     def is_transmit_enabled(self):
         return True if 0b00010000 & self.get_data(0x0) else False
 
+    def enable_transmit(self, state):
+        self.set_data_boolean_mask(0x0, 0b00010000, state)
+        return self
+
     def is_internal_enabled(self):
         return True if 0b00100000 & self.get_data(0x0) else False
+
+    def enable_internal(self, state):
+        self.set_data_boolean_mask(0x0, 0b00100000, state)
+        return self
 
     def get_transpose_octave(self):
         return self.get_data(0x1) - 0x40
 
+    def set_transpose_octave(self, shift):
+        self.set_data(0x1, 0x40 + shift)
+        return self
+
     def get_transpose_semitone(self):
         return self.get_data(0x2) - 0x40
+
+    def set_transpose_semitone(self, shift):
+        self.set_data(0x2, shift + 0x40)
+        return self
 
     def get_note_low(self):
         return self.get_data(0x3)
 
+    def set_note_low(self, note):
+        self.set_data(0x3, note)
+        return self
+
     def get_note_high(self):
         return self.get_data(0x4)
+
+    def set_note_high(self, note):
+        self.set_data(0x4, note)
+        return self
 
     def get_volume(self):
         return self.get_data(0x6)
 
+    def set_volume(self, volume):
+        self.set_data(0x6, volume)
+        return self
+
     def get_pan(self):
         return self.get_data(0x7)
+
+    def set_pan(self, pan):
+        self.set_data(0x7, pan)
+        return self
 
     def get_bank_program(self):
         return self.get_data(0x8, 3)
 
+    def set_bank_program(self, voice):
+        if len(voice) != 3:
+            raise ValueError("Invalid bank/program")
+        self.set_data(0x3, voice)
+        return self
+
     def is_internal_bank_select_enabled(self):
         return True if self.get_data(0xB) & 0b00000001 else False
+
+    def enable_internal_bank_select(self, state):
+        self.set_data_boolean_mask(0xB, 0b00000001, state)
+        return self
 
     def is_internal_program_change_enabled(self):
         return True if self.get_data(0xB) & 0b00000010 else False
 
+    def enable_internal_program_change(self, state):
+        self.set_data_boolean_mask(0xB, 0b00000010, state)
+        return self
+
     def is_transmit_bank_select_enabled(self):
         return True if self.get_data(0xB) & 0b00001000 else False
 
+    def enable_transmit_bank_select(self, state):
+        self.set_data_boolean_mask(0xB, 0b00001000, state)
+        return self
+
     def is_transmit_program_change_enabled(self):
         return True if self.get_data(0xB) & 0b00010000 else False
+
+    def enable_transmit_program_change(self, state):
+        self.set_data_boolean_mask(0xB, 0b00010000, state)
+        return self
 
     def print(self):
         print({
@@ -152,6 +255,7 @@ class MasterZone(Block):
             'transmit_bank_select_enabled': self.is_transmit_bank_select_enabled(),
             'transmit_program_change_enabled': self.is_transmit_program_change_enabled(),
         })
+
 
 class Dump(object):
     def __init__(self, blocks):
@@ -192,10 +296,10 @@ class MasterDump(object):
 
     @staticmethod
     def get_dump_request(master_id):
-        if master_id < 0 or master_id > 127:
-            return Dump.get_dump_request((0x0E, 0x7F, 0))
-        else:
+        if 0 <= master_id <= 127:
             return Dump.get_dump_request((0x0E, 0x70, master_id))
+        else:
+            return Dump.get_dump_request((0x0E, 0x7F, 0))
 
     def get_dump(self):
         return map(lambda block: block.get_msg(), self.blocks)
@@ -207,7 +311,7 @@ class MasterDump(object):
         return self.blocks[1]
 
     def get_zone_block(self, zone):
-        if zone < 0 or zone > 7:
+        if not 0 <= zone <= 7:
             raise ValueError("Invalid Zone id")
         return self.blocks[2 + zone]
 
