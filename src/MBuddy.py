@@ -5,6 +5,9 @@ from MidiSocket import MidiSocket
 import SelectBox
 import State
 
+COLOR_RED = (1, 0, 0, 0.5)
+COLOR_GREEN = (0, 1, 0, 0.5)
+
 stageOrder = (
     1,  # I Wish
     10, # Love Foolosophy
@@ -36,6 +39,21 @@ def on_mix_button_pressed(sender):
     v.present(style='fullscreen', orientations='landscape', hide_close_button=False, hide_title_bar=True)
     v.wait_modal()
     current_state.to_file(filepath=preset_path(current_song_id))
+
+
+def on_network_button_pressed(sender):
+    global midi_socket
+    if midi_socket.is_blocked():
+        mbuddy['network_button'].background_color = COLOR_GREEN
+        midi_socket.try_reconnect()
+    else:
+        mbuddy['network_button'].background_color = COLOR_RED
+        midi_socket.disconnect()
+
+
+def on_network_error(error):
+    print(error)
+    mbuddy['network_button'].background_color = COLOR_RED
 
 
 def on_previous_button_pressed(sender):
@@ -87,7 +105,7 @@ def preset_path(song_id):
 
 
 mbuddy = ui.load_view()
-midi_socket = MidiSocket()
+midi_socket = MidiSocket(on_error=on_network_error)
 scores = sorted(os.listdir('scores'))
 current_state = State.SongState.from_default()
 current_song_id = -1
