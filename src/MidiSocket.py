@@ -1,6 +1,7 @@
 import socket
 from time import sleep
 
+
 class MidiSocket(object):
     def __init__(self, port_in=8321, port_out=8123, on_error=None):
         self.__socket_input = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -52,7 +53,8 @@ class MidiSocket(object):
 
     def send_song_change(self, song_id):
         self.__send_motif_param([0x0A, 0x00, 0x00], [song_id])
-        sleep(0.5)
+        sleep(1)    # To be sure the song is loaded before to trigger next event
+        self.__send_midi([0xFA])
 
     def on_song_change(self, callback):
         pass
