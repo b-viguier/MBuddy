@@ -61,7 +61,7 @@ class PartEditor(ui.View):
         self.state.set_upper_note(new_note)
 
     def on_tune_pressed(self, sender):
-        new_tune = SelectBox.select(range(-24, 25), self.state.tune() + 24) - 24
+        new_tune = SelectBox.select(range(-24, 25), self.state.tune() + 24)[0] - 24
         self.state.set_tune(new_tune)
         self['tune_button'].title = str(new_tune)
 
@@ -83,7 +83,7 @@ class PartEditor(ui.View):
     @staticmethod
     def __select_note(current_midi_note):
         named_notes = PartEditor.__named_notes()
-        list_id = SelectBox.select(named_notes, current_midi_note - State.PartState.MIDI_NOTE_C2)
+        list_id = SelectBox.select(named_notes, current_midi_note - State.PartState.MIDI_NOTE_C2)[0]
         return State.PartState.MIDI_NOTE_C2 + list_id
 
     @staticmethod

@@ -8,28 +8,10 @@ import State
 COLOR_RED = (1, 0, 0, 0.5)
 COLOR_GREEN = (0, 1, 0, 0.5)
 
-stageOrder = (
-    1,  # I Wish
-    10, # Love Foolosophy
-    20, # Street Life
-    2,  # Too Young to Die
-    9,  # Midnight
-    15, # 1975
-    16, # Get Into My Groove
-    24, # Georgy Porgy
-    23, # Somebody else's Guy
-    21, # Work to do
-    22, # Never Too Much
-    7,  # Good Times
-    13, # Love Got in the Way
-    4,  # Sledgehammer
-    12, # I feel it commin'
-)
-
 
 def current_stage_index():
     try:
-        return stageOrder.index(current_song_id+1)
+        return stage_order.index(current_song_id)
     except ValueError:
         return -1
 
@@ -59,17 +41,33 @@ def on_network_error(error):
 
 def on_previous_button_pressed(sender):
     stage_index = current_stage_index()
-    load_song(current_song_id - 1 if stage_index == -1 else stageOrder[max(0, stage_index - 1)]-1)
+    if stage_index >= 0:
+        load_song(stage_order[max(0, stage_index - 1)])
 
 
 def on_next_button_pressed(sender):
     stage_index = current_stage_index()
-    load_song(current_song_id + 1 if stage_index == -1 else stageOrder[min(len(stageOrder) - 1, stage_index + 1)]-1)
+    if stage_index >= 0:
+        load_song(stage_order[min(len(stage_order) - 1, stage_index + 1)])
 
 
 def on_title_button_pressed(sender):
-    global current_song_id, scores
-    load_song(SelectBox.select(scores, current_song_id))
+    global current_song_id, scores, stage_order
+
+    ordered_scores = []
+    for song_id in stage_order:
+        ordered_scores.append(scores[song_id])
+    (ordered_id, ordered_scores) = SelectBox.select(ordered_scores, current_stage_index(), True)
+
+    stage_order = []
+    for song_name in ordered_scores:
+        stage_order.append(scores.index(song_name))
+
+    with open('stage_order.py', 'w') as file:
+        file.write(str(stage_order))
+
+    if ordered_id >= 0:
+        load_song(stage_order[ordered_id])
 
 
 @ui.in_background
@@ -97,6 +95,14 @@ mbuddy = ui.load_view()
 midi_socket = MidiSocket(on_error=on_network_error)
 scores = sorted(os.listdir('scores'))
 current_song_id = -1
+
+stage_order = [];
+if os.path.exists('stage_order.py'):
+    with open('stage_order.py') as file:
+        stage_order = eval(file.read())
+if len(stage_order) != len(scores):
+    stage_order = range(0, len(scores));
+
 load_song(0)
 
 
