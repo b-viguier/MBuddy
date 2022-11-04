@@ -8,6 +8,13 @@ import State
 COLOR_RED = (1, 0, 0, 0.5)
 COLOR_GREEN = (0, 1, 0, 0.5)
 
+BUTTON_PREV = 0x70
+BUTTON_NEXT = 0x71
+BUTTON_STOP = 0x72
+BUTTON_PLAY = 0x73
+BUTTON_LOOP = 0x74
+BUTTON_REC = 0x75
+
 
 def current_stage_index():
     try:
@@ -53,6 +60,7 @@ def on_next_button_pressed(sender):
 
 def on_title_button_pressed(sender):
     global current_song_id, scores, stage_order
+    stop_midi_loop()
 
     ordered_scores = []
     for song_id in stage_order:
@@ -68,6 +76,48 @@ def on_title_button_pressed(sender):
 
     if ordered_id >= 0:
         load_song(stage_order[ordered_id])
+
+    start_midi_loop()
+
+
+def on_midi_message(msg):
+    # CC message
+    if len(msg) != 3 or msg[0] & 0xF0 != 0xB0:
+        return
+
+    # Button must be pressed
+    if msg[2] == 0:
+        return
+
+    if msg[1] == BUTTON_PREV:
+        on_previous_button_pressed(None)
+    elif msg[1] == BUTTON_NEXT:
+        on_next_button_pressed(None)
+    elif msg[1] == BUTTON_STOP:
+        load_song(stage_order[0])
+
+
+@ui.in_background
+def midi_loop():
+    global midi_socket, is_midi_loop_running
+    midi_socket.poll_input()
+    if is_midi_loop_running:
+        ui.delay(midi_loop, 0.1)
+
+
+is_midi_loop_running = False
+
+
+def start_midi_loop():
+    global is_midi_loop_running
+    is_midi_loop_running = True
+    midi_loop()
+
+
+def stop_midi_loop():
+    global is_midi_loop_running
+    is_midi_loop_running = False
+    ui.cancel_delays()
 
 
 @ui.in_background
@@ -90,20 +140,25 @@ def load_song(new_song_id):
     spinner.stop()
     mbuddy.remove_subview(spinner)
 
+class MyView (ui.View):
+    def will_close(self):
+        stop_midi_loop()
+
 
 mbuddy = ui.load_view()
-midi_socket = MidiSocket(on_error=on_network_error)
+midi_socket = MidiSocket(on_error=on_network_error, on_midi_event=on_midi_message)
 scores = sorted(os.listdir('scores'))
 current_song_id = -1
 
-stage_order = [];
+stage_order = []
 if os.path.exists('stage_order.py'):
     with open('stage_order.py') as file:
         stage_order = eval(file.read())
 if len(stage_order) != len(scores):
-    stage_order = range(0, len(scores));
+    stage_order = range(0, len(scores))
 
-load_song(0)
+load_song(stage_order[0])
+start_midi_loop()
 
 
 mbuddy.present(style='fullscreen', orientations='landscape', hide_close_button=False, hide_title_bar=True)

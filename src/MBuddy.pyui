@@ -2,6 +2,7 @@
   {
     "class" : "View",
     "attributes" : {
+      "custom_class" : "MyView",
       "background_color" : "RGBA(1.000000,1.000000,1.000000,1.000000)",
       "tint_color" : "RGBA(0.000000,0.478000,1.000000,1.000000)",
       "enabled" : true,
@@ -30,13 +31,13 @@
         "class" : "Button",
         "attributes" : {
           "font_size" : 18,
-          "uuid" : "866B55FC-6EFA-4010-AAD7-00DE35652D2C",
+          "title" : "",
           "name" : "previous_button",
           "alpha" : 0.5,
           "class" : "Button",
           "action" : "on_previous_button_pressed",
           "frame" : "{{472, 368}, {80, 32}}",
-          "title" : ""
+          "uuid" : "866B55FC-6EFA-4010-AAD7-00DE35652D2C"
         },
         "frame" : "{{0, 144}, {160, 472}}",
         "selected" : false,
@@ -70,13 +71,13 @@
         "class" : "Button",
         "attributes" : {
           "font_size" : 15,
-          "title" : "",
+          "uuid" : "866B55FC-6EFA-4010-AAD7-00DE35652D2C",
           "name" : "next_button",
           "alpha" : 0.5,
           "class" : "Button",
           "action" : "on_next_button_pressed",
           "frame" : "{{472, 368}, {80, 32}}",
-          "uuid" : "866B55FC-6EFA-4010-AAD7-00DE35652D2C"
+          "title" : ""
         },
         "frame" : "{{872, 140}, {152, 476}}",
         "selected" : false,
@@ -88,12 +89,12 @@
         "class" : "Button",
         "attributes" : {
           "font_size" : 15,
-          "title" : "",
+          "uuid" : "AC39CB99-A5DC-4241-879B-93FA360062F6",
           "name" : "title_button",
           "action" : "on_title_button_pressed",
           "class" : "Button",
           "frame" : "{{472, 368}, {80, 32}}",
-          "uuid" : "AC39CB99-A5DC-4241-879B-93FA360062F6"
+          "title" : ""
         },
         "frame" : "{{224, 0}, {583, 132}}",
         "selected" : false,
