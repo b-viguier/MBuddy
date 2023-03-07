@@ -2,12 +2,13 @@
   {
     "class" : "View",
     "attributes" : {
-      "custom_class" : "MyView",
-      "background_color" : "RGBA(1.000000,1.000000,1.000000,1.000000)",
       "tint_color" : "RGBA(0.000000,0.478000,1.000000,1.000000)",
       "enabled" : true,
+      "flex" : "",
+      "name" : "MBuddy",
       "border_color" : "RGBA(0.000000,0.000000,0.000000,1.000000)",
-      "flex" : ""
+      "custom_class" : "MyView",
+      "background_color" : "RGBA(1.000000,1.000000,1.000000,1.000000)"
     },
     "frame" : "{{0, 0}, {1024, 768}}",
     "selected" : false,
@@ -49,13 +50,13 @@
         "class" : "Button",
         "attributes" : {
           "background_color" : "RGBA(0.745283,0.745283,0.745283,1.000000)",
-          "image_name" : "iob:levels_24",
+          "image_name" : "iob:archive_32",
           "frame" : "{{472, 368}, {80, 32}}",
           "font_size" : 15,
           "title" : "",
-          "action" : "on_mix_button_pressed",
+          "action" : "on_archive_button_pressed",
           "alpha" : 0.5,
-          "name" : "mix_button",
+          "name" : "sync_button",
           "corner_radius" : 2,
           "border_width" : 2,
           "uuid" : "963A4B29-6508-41C6-83CB-13E2BB812D0F",
@@ -136,7 +137,51 @@
           "border_width" : 2,
           "class" : "Button"
         },
-        "frame" : "{{4, 4}, {48, 48}}",
+        "frame" : "{{6, 6}, {48, 48}}",
+        "selected" : false,
+        "nodes" : [
+
+        ]
+      },
+      {
+        "class" : "Button",
+        "attributes" : {
+          "background_color" : "RGBA(1.000000,1.000000,0.031250,1.000000)",
+          "image_name" : "iob:alert_circled_32",
+          "frame" : "{{472, 368}, {80, 32}}",
+          "font_size" : 15,
+          "title" : "",
+          "action" : "on_panic_button_pressed",
+          "alpha" : 0.5,
+          "name" : "panic_button",
+          "corner_radius" : 2,
+          "uuid" : "7FBE16BC-0A11-4D36-8434-8699A0E370E4",
+          "border_width" : 2,
+          "class" : "Button"
+        },
+        "frame" : "{{970, 6}, {48, 48}}",
+        "selected" : false,
+        "nodes" : [
+
+        ]
+      },
+      {
+        "class" : "Button",
+        "attributes" : {
+          "background_color" : "RGBA(0.731132,0.731132,0.731132,1.000000)",
+          "image_name" : "iob:document_text_32",
+          "frame" : "{{472, 368}, {80, 32}}",
+          "font_size" : 15,
+          "title" : "",
+          "action" : "on_log_button_pressed",
+          "alpha" : 0.5,
+          "name" : "log_button",
+          "corner_radius" : 2,
+          "uuid" : "7FBE16BC-0A11-4D36-8434-8699A0E370E4",
+          "border_width" : 2,
+          "class" : "Button"
+        },
+        "frame" : "{{62, 6}, {48, 48}}",
         "selected" : false,
         "nodes" : [
 

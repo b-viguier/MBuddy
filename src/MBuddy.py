@@ -1,19 +1,13 @@
 import ui
 import os
+import log
 from MixView import MixView
-from MidiSocket import MidiSocket
+import MidiSocket as ms
 import SelectBox
 import State
 
 COLOR_RED = (1, 0, 0, 0.5)
 COLOR_GREEN = (0, 1, 0, 0.5)
-
-BUTTON_PREV = 0x70
-BUTTON_NEXT = 0x71
-BUTTON_STOP = 0x72
-BUTTON_PLAY = 0x73
-BUTTON_LOOP = 0x74
-BUTTON_REC = 0x75
 
 
 def current_stage_index():
@@ -24,7 +18,7 @@ def current_stage_index():
 
 
 def on_mix_button_pressed(sender):
-    print('Mix settings disabled')
+    log.dbg('Mix settings disabled')
     # v = MixView(state=current_state)
     # v.present(style='fullscreen', orientations='landscape', hide_close_button=False, hide_title_bar=True)
     # v.wait_modal()
@@ -41,8 +35,13 @@ def on_network_button_pressed(sender):
         midi_socket.disconnect()
 
 
+def on_panic_button_pressed(sender):
+    global midi_socket
+    midi_socket.send_panic()
+
+
 def on_network_error(error):
-    print(error)
+    log.dbg(repr(error))
     mbuddy['network_button'].background_color = COLOR_RED
 
 
@@ -80,21 +79,19 @@ def on_title_button_pressed(sender):
     start_midi_loop()
 
 
-def on_midi_message(msg):
-    # CC message
-    if len(msg) != 3 or msg[0] & 0xF0 != 0xB0:
-        return
-
-    # Button must be pressed
-    if msg[2] == 0:
-        return
-
-    if msg[1] == BUTTON_PREV:
+def on_impulse_button_pressed(button):
+    global midi_socket, stage_order
+    if button == ms.BUTTON_PREV:
         on_previous_button_pressed(None)
-    elif msg[1] == BUTTON_NEXT:
+    elif button == ms.BUTTON_NEXT:
         on_next_button_pressed(None)
-    elif msg[1] == BUTTON_STOP:
+    elif button == ms.BUTTON_STOP:
         load_song(stage_order[0])
+
+
+def on_volume_received(channel, volume):
+    global midi_socket
+    midi_socket.send_master_volume_init(channel, volume)
 
 
 @ui.in_background
@@ -140,13 +137,53 @@ def load_song(new_song_id):
     spinner.stop()
     mbuddy.remove_subview(spinner)
 
+
+@ui.in_background
+def on_archive_button_pressed(sender):
+    stop_midi_loop()
+    global midi_socket
+    spinner = ui.ActivityIndicator()
+    spinner.style = ui.ACTIVITY_INDICATOR_STYLE_GRAY
+    spinner.center = mbuddy.center
+    spinner.start()
+    mbuddy.add_subview(spinner)
+
+    for channel in range(0, 16):
+        midi_socket.request_current_mix_volume(channel)
+
+    spinner.stop()
+    mbuddy.remove_subview(spinner)
+    start_midi_loop()
+
+
+def on_log_button_pressed(sender):
+    global mbuddy
+    if mbuddy['logview'] is None:
+        mbuddy.add_subview(ui.TextView(frame=(0, 60, 200, 900), name='logview'))
+        mbuddy['logview'].editable = False
+        mbuddy['logview'].border_width = 2
+
+        def print_in_view(msg):
+            global mbuddy
+            mbuddy['logview'].text = mbuddy['logview'].text + msg + "\n"
+
+        log.set_callback(print_in_view)
+    else:
+        mbuddy.remove_subview(mbuddy['logview'])
+        log.set_callback(None)
+
+
 class MyView (ui.View):
     def will_close(self):
         stop_midi_loop()
 
 
 mbuddy = ui.load_view()
-midi_socket = MidiSocket(on_error=on_network_error, on_midi_event=on_midi_message)
+midi_socket = ms.MidiSocket(
+    on_error=on_network_error,
+    on_impulse_event=on_impulse_button_pressed,
+    on_volume_event=on_volume_received
+)
 scores = sorted(os.listdir('scores'))
 current_song_id = -1
 

@@ -1,13 +1,20 @@
 import socket
 from time import sleep
 
+BUTTON_PREV = 0x70
+BUTTON_NEXT = 0x71
+BUTTON_STOP = 0x72
+BUTTON_PLAY = 0x73
+BUTTON_LOOP = 0x74
+BUTTON_REC = 0x75
 
 class MidiSocket(object):
-    def __init__(self, port_in=8321, port_out=8123, on_error=None, on_midi_event=None):
+    def __init__(self, port_in=8321, port_out=8123, on_error=None, on_impulse_event=None, on_volume_event=None):
         self.__socket_input = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.__socket_output = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.__on_error = on_error
-        self.__on_midi_event = on_midi_event
+        self.__on_impulse_event = on_impulse_event
+        self.__on_volume_event = on_volume_event
         self.__is_blocked = False
 
         if self.__on_error is None:
@@ -15,10 +22,15 @@ class MidiSocket(object):
                 print(reason)
             self.__on_error = on_error
 
-        if self.__on_midi_event is None:
-            def on_midi_event(msg):
-                print(msg)
-            self.__on_midi_event = on_midi_event
+        if self.__on_impulse_event is None:
+            def on_impulse_event(btn):
+                print(btn)
+            self.__on_impulse_event = on_impulse_event
+
+        if self.__on_volume_event is None:
+            def on_volume_event(channel, volume):
+                print(channel, volume)
+            self.__on_volume_event = on_volume_event
 
         IPADDR = '127.0.0.1'
         self.__socket_input.bind((IPADDR, port_in))
@@ -60,9 +72,17 @@ class MidiSocket(object):
         self.__send_motif_param([0x32, channel, 0x06], [volume])  # Master Init value
         self.__send_motif_param([0x37, channel, 0x0E], [volume])  # Mix
 
+    def request_current_mix_volume(self, channel):
+        self.__request_motif_param([0x37, channel, 0x0E])  # Mix
+
+    def send_master_volume_init(self, channel, volume):
+        self.__send_motif_param([0x32, channel, 0x06], [volume])  # Master Init value
+
     def send_song_change(self, song_id):
+        # Change current master
         self.__send_motif_param([0x0A, 0x00, 0x00], [song_id])
         sleep(1)    # To be sure the song is loaded before to trigger next event
+        # Trigger "Play" so the Motif's sequencer sends Sysex to Impulse
         self.__send_midi([0xFA])
 
     def send_lower_note(self, channel, note):
@@ -90,6 +110,14 @@ class MidiSocket(object):
         else:
             self.__send_motif_param([0x37, channel, 0x04], [8 if enabled else 0x7F])
 
+    def send_panic(self):
+        CHANNEL_MODE_MSG = 0xB0
+        for channel in range(0, 16):
+            # All Notes Off
+            self.__send_midi([CHANNEL_MODE_MSG + channel, 0x7B, 0x00])
+            # All Sounds Off
+            self.__send_midi([CHANNEL_MODE_MSG + channel, 0x78, 0x00])
+
     def __send_midi(self, msg):
         if self.__is_blocked:
             return
@@ -102,6 +130,27 @@ class MidiSocket(object):
 
     def __send_motif_param(self, address, value):
         self.__send_midi([0xF0, 0x43, 0x10, 0x7F, 0x03, *address, *value, 0xF7])
+
+    def __request_motif_param(self, address):
+        self.__send_midi([0xF0, 0x43, 0x30, 0x7F, 0x03, *address, 0xF7])
+
+    def __on_midi_event(self, msg):
+        # CC message
+        if len(msg) == 3 and msg[0] & 0xF0 == 0xB0:
+            # Button must be pressed
+            if msg[2] == 0:
+                return
+
+            if msg[1] in (BUTTON_PREV, BUTTON_NEXT, BUTTON_STOP, BUTTON_REC, BUTTON_PLAY, BUTTON_LOOP):
+                self.__on_impulse_event(msg[1])
+
+        # Volume synchronization
+        elif msg[:5] == [0xF0, 0x43, 0x10, 0x7F, 0x03]:
+            # Mix Volume
+            if msg[5] == 0x37 and msg[7] == 0x0E:
+                channel = msg[6]
+                volume = msg[8]
+                self.__on_volume_event(channel, volume)
 
 
 if __name__ == '__main__':
