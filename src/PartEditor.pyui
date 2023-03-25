@@ -2,37 +2,17 @@
   {
     "class" : "View",
     "attributes" : {
-      "custom_class" : "PartEditor",
       "tint_color" : "RGBA(0.000000,0.478000,1.000000,1.000000)",
-      "background_color" : "RGBA(0.544811,0.544811,0.544811,1.000000)",
       "enabled" : true,
+      "flex" : "",
+      "name" : "PartEditor",
       "border_color" : "RGBA(0.000000,0.000000,0.000000,1.000000)",
-      "flex" : ""
+      "custom_class" : "PartEditor",
+      "background_color" : "RGBA(0.544811,0.544811,0.544811,1.000000)"
     },
-    "frame" : "{{0, 0}, {1000, 80}}",
+    "frame" : "{{0, 0}, {500, 80}}",
     "selected" : false,
     "nodes" : [
-      {
-        "class" : "Slider",
-        "attributes" : {
-          "frame" : "{{-2, 123}, {200, 34}}",
-          "flex" : "W",
-          "name" : "volume_slider",
-          "continuous" : false,
-          "border_color" : "RGBA(0.000000,0.000000,0.000000,1.000000)",
-          "value" : 0.5,
-          "border_width" : 1,
-          "class" : "Slider",
-          "background_color" : "RGBA(0.905660,0.905660,0.905660,1.000000)",
-          "corner_radius" : 17,
-          "uuid" : "C0FD7D10-7AC9-4067-86A4-DC8220F6FC3A"
-        },
-        "frame" : "{{722, 21}, {196, 34}}",
-        "selected" : false,
-        "nodes" : [
-
-        ]
-      },
       {
         "class" : "Label",
         "attributes" : {
@@ -51,43 +31,7 @@
           "corner_radius" : 1,
           "class" : "Label"
         },
-        "frame" : "{{181, 6}, {381, 68}}",
-        "selected" : false,
-        "nodes" : [
-
-        ]
-      },
-      {
-        "class" : "Switch",
-        "attributes" : {
-          "name" : "enable_switch",
-          "corner_radius" : 15,
-          "value" : true,
-          "border_width" : 0,
-          "class" : "Switch",
-          "frame" : "{{265, 45}, {51, 31}}",
-          "uuid" : "F0E9B5EE-2BCA-4A8D-B0EF-0D70F210041C"
-        },
-        "frame" : "{{46, 24}, {51, 31}}",
-        "selected" : false,
-        "nodes" : [
-
-        ]
-      },
-      {
-        "class" : "Button",
-        "attributes" : {
-          "font_size" : 15,
-          "title" : "",
-          "name" : "note_lower_button",
-          "corner_radius" : 8,
-          "border_width" : 2,
-          "class" : "Button",
-          "frame" : "{{251, 44}, {80, 32}}",
-          "background_color" : "RGBA(1.000000,0.906250,0.906250,1.000000)",
-          "uuid" : "BA57FB11-8534-472A-BC45-4BFC370022C9"
-        },
-        "frame" : "{{570, 6}, {68, 68}}",
+        "frame" : "{{46, 6}, {448, 68}}",
         "selected" : false,
         "nodes" : [
 
@@ -110,46 +54,7 @@
           "uuid" : "70C030BB-A4EB-47EC-A961-166AD40B23DE",
           "class" : "Label"
         },
-        "frame" : "{{6, 23}, {32, 32}}",
-        "selected" : false,
-        "nodes" : [
-
-        ]
-      },
-      {
-        "class" : "Button",
-        "attributes" : {
-          "font_size" : 15,
-          "frame" : "{{251, 44}, {80, 32}}",
-          "uuid" : "BA57FB11-8534-472A-BC45-4BFC370022C9",
-          "name" : "voice_button",
-          "corner_radius" : 8,
-          "border_width" : 2,
-          "class" : "Button",
-          "background_color" : "RGBA(1.000000,0.906250,0.906250,1.000000)",
-          "image_name" : "iob:filing_32",
-          "title" : ""
-        },
-        "frame" : "{{105, 6}, {68, 68}}",
-        "selected" : false,
-        "nodes" : [
-
-        ]
-      },
-      {
-        "class" : "Button",
-        "attributes" : {
-          "font_size" : 15,
-          "uuid" : "BA57FB11-8534-472A-BC45-4BFC370022C9",
-          "name" : "note_upper_button",
-          "corner_radius" : 8,
-          "border_width" : 2,
-          "class" : "Button",
-          "frame" : "{{251, 44}, {80, 32}}",
-          "background_color" : "RGBA(1.000000,0.906250,0.906250,1.000000)",
-          "title" : ""
-        },
-        "frame" : "{{646, 6}, {68, 68}}",
+        "frame" : "{{6, 22}, {32, 32}}",
         "selected" : false,
         "nodes" : [
 
@@ -160,15 +65,14 @@
         "attributes" : {
           "font_size" : 15,
           "title" : "",
-          "name" : "tune_button",
+          "name" : "voice_button",
           "corner_radius" : 8,
-          "border_width" : 2,
+          "border_width" : 0,
           "class" : "Button",
           "frame" : "{{251, 44}, {80, 32}}",
-          "background_color" : "RGBA(1.000000,0.906250,0.906250,1.000000)",
           "uuid" : "BA57FB11-8534-472A-BC45-4BFC370022C9"
         },
-        "frame" : "{{926, 6}, {68, 68}}",
+        "frame" : "{{46, 6}, {448, 68}}",
         "selected" : false,
         "nodes" : [
 

@@ -32,13 +32,13 @@
         "class" : "Button",
         "attributes" : {
           "font_size" : 18,
-          "title" : "",
+          "uuid" : "866B55FC-6EFA-4010-AAD7-00DE35652D2C",
           "name" : "previous_button",
           "alpha" : 0.5,
           "class" : "Button",
           "action" : "on_previous_button_pressed",
           "frame" : "{{472, 368}, {80, 32}}",
-          "uuid" : "866B55FC-6EFA-4010-AAD7-00DE35652D2C"
+          "title" : ""
         },
         "frame" : "{{0, 144}, {160, 472}}",
         "selected" : false,
@@ -62,7 +62,7 @@
           "uuid" : "963A4B29-6508-41C6-83CB-13E2BB812D0F",
           "class" : "Button"
         },
-        "frame" : "{{970, 714}, {48, 48}}",
+        "frame" : "{{914, 714}, {48, 48}}",
         "selected" : false,
         "nodes" : [
 
@@ -72,13 +72,13 @@
         "class" : "Button",
         "attributes" : {
           "font_size" : 15,
-          "uuid" : "866B55FC-6EFA-4010-AAD7-00DE35652D2C",
+          "title" : "",
           "name" : "next_button",
           "alpha" : 0.5,
           "class" : "Button",
           "action" : "on_next_button_pressed",
           "frame" : "{{472, 368}, {80, 32}}",
-          "title" : ""
+          "uuid" : "866B55FC-6EFA-4010-AAD7-00DE35652D2C"
         },
         "frame" : "{{872, 140}, {152, 476}}",
         "selected" : false,
@@ -90,12 +90,12 @@
         "class" : "Button",
         "attributes" : {
           "font_size" : 15,
-          "uuid" : "AC39CB99-A5DC-4241-879B-93FA360062F6",
+          "title" : "",
           "name" : "title_button",
           "action" : "on_title_button_pressed",
           "class" : "Button",
           "frame" : "{{472, 368}, {80, 32}}",
-          "title" : ""
+          "uuid" : "AC39CB99-A5DC-4241-879B-93FA360062F6"
         },
         "frame" : "{{224, 0}, {583, 132}}",
         "selected" : false,
@@ -182,6 +182,28 @@
           "class" : "Button"
         },
         "frame" : "{{62, 6}, {48, 48}}",
+        "selected" : false,
+        "nodes" : [
+
+        ]
+      },
+      {
+        "class" : "Button",
+        "attributes" : {
+          "background_color" : "RGBA(0.745283,0.745283,0.745283,1.000000)",
+          "image_name" : "iob:levels_24",
+          "frame" : "{{472, 368}, {80, 32}}",
+          "font_size" : 15,
+          "title" : "",
+          "action" : "on_mix_button_pressed",
+          "alpha" : 0.5,
+          "name" : "mix_button",
+          "corner_radius" : 2,
+          "border_width" : 2,
+          "uuid" : "963A4B29-6508-41C6-83CB-13E2BB812D0F",
+          "class" : "Button"
+        },
+        "frame" : "{{970, 714}, {48, 48}}",
         "selected" : false,
         "nodes" : [
 
