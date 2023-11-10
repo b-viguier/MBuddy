@@ -5,6 +5,8 @@ declare(strict_types=1);
 const DST_HOST = 'http://192.168.1.25:8080/MBuddy/web/sync.php';
 const ROOT = __DIR__ . '/../';
 const SRC = [
+    'composer.json',
+    'composer.lock',
     'web/',
 ];
 
