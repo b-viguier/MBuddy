@@ -5,7 +5,8 @@
         "amphp/amp": "^2.6",
         "amphp/http-server": "^2.1",
         "amphp/http-server-static-content": "^1",
-        "amphp/websocket-server": "^2"
+        "amphp/websocket-server": "^2",
+        "amphp/http-server-router": "^1"
     },
     "autoload": {
         "psr-4": {
