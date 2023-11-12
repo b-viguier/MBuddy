@@ -44,13 +44,9 @@ Amp\Loop::run(function () {
     $server = new \Amp\Http\Server\HttpServer(
         $sockets,
         Amp\Http\Server\Middleware\stack($router, new \Amp\Http\Server\Middleware\ExceptionMiddleware()),
-        new class() extends \Psr\Log\AbstractLogger {
-            public function log($level, $message, array $context = []): void
-            {
-                echo $message."\n";
-                !$context ?: var_dump($context);
-            }
-        },
+        new \Bveing\Mbuddy\Infrastructure\UdpLogger(
+            new \Amp\Socket\SocketAddress('192.168.1.11', 8484)
+        ),
         (new \Amp\Http\Server\Options)->withDebugMode(),
     );
 

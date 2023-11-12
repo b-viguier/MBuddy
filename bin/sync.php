@@ -8,6 +8,7 @@ const SRC = [
     'composer.json',
     'composer.lock',
     'web/',
+    'src/',
 ];
 
 
