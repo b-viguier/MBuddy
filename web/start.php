@@ -42,6 +42,25 @@ Amp\Loop::run(function () {
         }),
     );
 
+    $router->addRoute(
+        'GET',
+        '/midi',
+        new \Amp\Http\Server\RequestHandler\CallableRequestHandler(function (\Amp\Http\Server\Request $request) {
+            /** @var \Amp\Socket\EncryptableSocket $out */
+            $out = yield \Amp\Socket\connect("udp://127.0.0.1:8123");
+            /** @var  $in */
+            $in = \Amp\Socket\DatagramSocket::bind('udp://127.0.0.1:8321');
+
+            yield $out->write(pack("C*", 0b10010000, 0b0001000,0b01111111));
+            [,$data] = yield $in->receive();
+            $bytes = unpack("C*", $data);
+
+            return new \Amp\Http\Server\Response(\Amp\Http\Status::OK, [
+                "content-type" => "text/plain; charset=utf-8",
+            ], implode(",", $bytes));
+        }),
+    );
+
     // Asynchronous FileSystem incompatible with PhpWin
     $fileSystem = new \Amp\File\Filesystem(new \Amp\File\Driver\BlockingDriver());
 
