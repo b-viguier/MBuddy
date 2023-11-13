@@ -5,6 +5,10 @@ declare(strict_types=1);
 require __DIR__.'/../vendor/autoload.php';
 
 Amp\Loop::run(function () {
+    $logger = yield \Bveing\Mbuddy\Infrastructure\UdpLogger::create(
+        new \Amp\Socket\SocketAddress('192.168.1.11', 8484)
+    );
+
     $sockets = [
         \Amp\Socket\Server::listen("0.0.0.0:8383"),
     ];
@@ -61,9 +65,7 @@ Amp\Loop::run(function () {
     $server = new \Amp\Http\Server\HttpServer(
         $sockets,
         Amp\Http\Server\Middleware\stack($router, new \Amp\Http\Server\Middleware\ExceptionMiddleware()),
-        new \Bveing\Mbuddy\Infrastructure\UdpLogger(
-            new \Amp\Socket\SocketAddress('192.168.1.11', 8484)
-        ),
+        $logger,
         (new \Amp\Http\Server\Options)->withDebugMode(),
     );
 

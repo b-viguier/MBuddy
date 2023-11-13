@@ -5,45 +5,30 @@ declare(strict_types=1);
 namespace Bveing\Mbuddy\Infrastructure;
 
 use Amp\Socket\SocketAddress;
-use Amp\Loop;
+use Amp\Socket\EncryptableSocket;
+use Amp\Promise;
 
 class UdpLogger extends \Psr\Log\AbstractLogger
 {
-    /** @var resource */
-    private $socket;
+    /**
+     * @return Promise<UdpLogger>
+     */
+    public static function create(
+        SocketAddress $socketAddress,
+    ): Promise {
+        return \Amp\call(fn() => new self(
+            yield \Amp\Socket\connect('udp://'.$socketAddress->toString()),
+        ));
+    }
 
     public function __construct(
-        SocketAddress $socketAddress,
+        private EncryptableSocket $socket,
     ) {
-        if (!$this->socket = \stream_socket_client(
-            'udp://'.$socketAddress->toString(),
-            $errno,
-            $errstr,
-            0,
-            STREAM_CLIENT_ASYNC_CONNECT,
-        )) {
-            throw new \Exception(
-                \sprintf(
-                    "Connection to %s failed: [Error #%d] %s",
-                    $socketAddress->toString(),
-                    $errno,
-                    $errstr,
-                ),
-            );
-        }
     }
 
     public function log($level, \Stringable|string $message, array $context = []): void
     {
-        Loop::onWritable(
-            $this->socket,
-            function (string $watcherId, $socket, $data) {
-                @\fwrite(
-                    $this->socket,
-                    $data,
-                );
-                Loop::disable($watcherId);
-            },
+        $this->socket->write(
             \sprintf(
                 "[%s]:\t%s\n",
                 $level,
