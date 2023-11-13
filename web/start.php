@@ -21,6 +21,23 @@ Amp\Loop::run(function () {
         }),
     );
 
+    /** @var \Amp\Http\Server\HttpServer|null $server */
+    $server = null;
+
+    $router->addRoute(
+        'GET',
+        '/stop',
+        new \Amp\Http\Server\RequestHandler\CallableRequestHandler(function (\Amp\Http\Server\Request $request) use(&$server) {
+            assert($server);
+            yield $server->stop();
+            yield \Amp\delay(1000);
+            Amp\Loop::stop();
+            return new \Amp\Http\Server\Response(\Amp\Http\Status::OK, [
+                "content-type" => "text/plain; charset=utf-8",
+            ], "Stop");
+        }),
+    );
+
     // Asynchronous FileSystem incompatible with PhpWin
     $fileSystem = new \Amp\File\Filesystem(new \Amp\File\Driver\BlockingDriver());
 
@@ -62,3 +79,5 @@ Amp\Loop::run(function () {
     }
 
 });
+
+echo "Server stopped\n";
