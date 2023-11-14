@@ -6,7 +6,38 @@ require __DIR__.'/../vendor/autoload.php';
 
 Amp\Loop::run(function () {
     $logger = yield \Bveing\Mbuddy\Infrastructure\UdpLogger::create(
-        new \Amp\Socket\SocketAddress('192.168.1.11', 8484)
+        new \Amp\Socket\SocketAddress('192.168.1.11', 8484),
+    );
+
+    $websocket = new Amp\Websocket\Server\Websocket(
+        new class($logger) implements \Amp\Websocket\Server\ClientHandler {
+            public function __construct(private \Psr\Log\LoggerInterface $logger)
+            {
+            }
+            public function handleHandshake(
+                \Amp\Websocket\Server\Gateway $gateway,
+                \Amp\Http\Server\Request $request,
+                \Amp\Http\Server\Response $response,
+            ): Amp\Promise {
+                return new \Amp\Success($response);
+            }
+
+            public function handleClient(
+                \Amp\Websocket\Server\Gateway $gateway,
+                \Amp\Websocket\Client $client,
+                \Amp\Http\Server\Request $request,
+                \Amp\Http\Server\Response $response,
+            ): \Amp\Promise {
+                return \Amp\call(function() use ($gateway, $client): \Generator {
+                    while ($message = yield $client->receive()) {
+                        $string = yield $message->buffer();
+                        $this->logger->info($string);
+                        $gateway->broadcast($string);
+                    }
+                });
+            }
+
+        },
     );
 
     $sockets = [
@@ -25,21 +56,26 @@ Amp\Loop::run(function () {
         }),
     );
 
+    $router->addRoute('GET', '/websocket', $websocket);
+
     /** @var \Amp\Http\Server\HttpServer|null $server */
     $server = null;
 
     $router->addRoute(
         'GET',
         '/stop',
-        new \Amp\Http\Server\RequestHandler\CallableRequestHandler(function (\Amp\Http\Server\Request $request) use(&$server) {
-            assert($server);
-            yield $server->stop();
-            yield \Amp\delay(1000);
-            Amp\Loop::stop();
-            return new \Amp\Http\Server\Response(\Amp\Http\Status::OK, [
-                "content-type" => "text/plain; charset=utf-8",
-            ], "Stop");
-        }),
+        new \Amp\Http\Server\RequestHandler\CallableRequestHandler(
+            function (\Amp\Http\Server\Request $request) use (&$server) {
+                assert($server);
+                yield $server->stop();
+                yield \Amp\delay(1000);
+                Amp\Loop::stop();
+
+                return new \Amp\Http\Server\Response(\Amp\Http\Status::OK, [
+                    "content-type" => "text/plain; charset=utf-8",
+                ], "Stop");
+            },
+        ),
     );
 
     $router->addRoute(
@@ -51,8 +87,8 @@ Amp\Loop::run(function () {
             /** @var  $in */
             $in = \Amp\Socket\DatagramSocket::bind('udp://127.0.0.1:8321');
 
-            yield $out->write(pack("C*", 0b10010000, 0b0001000,0b01111111));
-            [,$data] = yield $in->receive();
+            yield $out->write(pack("C*", 0b10010000, 0b0001000, 0b01111111));
+            [, $data] = yield $in->receive();
             $bytes = unpack("C*", $data);
 
             return new \Amp\Http\Server\Response(\Amp\Http\Status::OK, [
