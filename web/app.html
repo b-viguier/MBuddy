@@ -27,10 +27,28 @@
 
 <script>
     var host = "ws://" + window.location.hostname + ":8383/websocket";
-
     var socket = new WebSocket(host);
     socket.binaryType = "arraybuffer";
 
+    socket.onopen = function() {
+        window.onerror = function(message, url, lineNumber) {
+            socket.send(message + " at " + url + ":" + lineNumber);
+            return true;
+        };
+
+        console.log = function (msg) {
+            socket.send(msg);
+        };
+        console.warn = function (msg) {
+            socket.send(msg);
+        };
+        console.error = function (msg) {
+            socket.send(msg);
+        };
+    }
+</script>
+
+<script>
     socket.onmessage = function(e) {
         if(e.data instanceof ArrayBuffer) {
             // binary frame
