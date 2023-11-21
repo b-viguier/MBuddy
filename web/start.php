@@ -5,40 +5,12 @@ declare(strict_types=1);
 require __DIR__.'/../vendor/autoload.php';
 
 Amp\Loop::run(function () {
-    $logger = yield \Bveing\Mbuddy\Infrastructure\UdpLogger::create(
+    $logger = yield \Bveing\MBuddy\Infrastructure\UdpLogger::create(
         new \Amp\Socket\SocketAddress('192.168.1.11', 8484),
     );
 
-    $websocket = new Amp\Websocket\Server\Websocket(
-        new class($logger) implements \Amp\Websocket\Server\ClientHandler {
-            public function __construct(private \Psr\Log\LoggerInterface $logger)
-            {
-            }
-            public function handleHandshake(
-                \Amp\Websocket\Server\Gateway $gateway,
-                \Amp\Http\Server\Request $request,
-                \Amp\Http\Server\Response $response,
-            ): Amp\Promise {
-                return new \Amp\Success($response);
-            }
-
-            public function handleClient(
-                \Amp\Websocket\Server\Gateway $gateway,
-                \Amp\Websocket\Client $client,
-                \Amp\Http\Server\Request $request,
-                \Amp\Http\Server\Response $response,
-            ): \Amp\Promise {
-                return \Amp\call(function() use ($gateway, $client): \Generator {
-                    while ($message = yield $client->receive()) {
-                        $string = yield $message->buffer();
-                        $this->logger->info($string);
-                        $gateway->broadcast($string);
-                    }
-                });
-            }
-
-        },
-    );
+    $webSocketHandler = new \Bveing\MBuddy\Infrastructure\Ui\AmpWebsocket('ws://localhost:8383/websocket', $logger);
+    $websocket = new Amp\Websocket\Server\Websocket($webSocketHandler);
 
     $sockets = [
         \Amp\Socket\Server::listen("0.0.0.0:8383"),
@@ -94,6 +66,23 @@ Amp\Loop::run(function () {
             return new \Amp\Http\Server\Response(\Amp\Http\Status::OK, [
                 "content-type" => "text/plain; charset=utf-8",
             ], implode(",", $bytes));
+        }),
+    );
+
+    $app = new \Bveing\MBuddy\App\TestPage($webSocketHandler);
+
+    $router->addRoute(
+        'GET',
+        '/app',
+        new \Amp\Http\Server\RequestHandler\CallableRequestHandler(function (\Amp\Http\Server\Request $request) use($app) {
+
+            return new \Amp\Http\Server\Response(
+                \Amp\Http\Status::OK,
+                [
+                    "content-type" => "text/html; charset=utf-8",
+                ],
+                $app->render(),
+            );
         }),
     );
 

@@ -10,7 +10,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Bveing\\Mbuddy\\": "src/"
+            "Bveing\\MBuddy\\": "src/"
         }
     }
 }

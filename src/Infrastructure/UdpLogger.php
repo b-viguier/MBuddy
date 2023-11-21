@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Bveing\Mbuddy\Infrastructure;
+namespace Bveing\MBuddy\Infrastructure;
 
 use Amp\Socket\SocketAddress;
 use Amp\Socket\EncryptableSocket;
