@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Bveing\MBuddy\Ui;
 
 use Bveing\MBuddy\Ui\RemoteDom\Renderer;
+use Bveing\MBuddy\Ui\Component\Internal\Id;
 
 class Page implements RemoteDom\Updater, RemoteDom\Renderer, WebsocketListener
 {
@@ -72,7 +73,7 @@ class Page implements RemoteDom\Updater, RemoteDom\Renderer, WebsocketListener
     }
 
     public function jsEventSender(
-        string $componentId,
+        Id $componentId,
         string $eventId,
         \Closure $onEvent,
         string $jsEventSerializer,
@@ -82,16 +83,16 @@ class Page implements RemoteDom\Updater, RemoteDom\Renderer, WebsocketListener
         return $this;
     }
 
-    public function jsUpdater(string $componentId, string $jsUpdater): Renderer
+    public function jsUpdater(Id $componentId, string $jsUpdater): Renderer
     {
         $this->jsUpdaters[] = func_get_args();
 
         return $this;
     }
 
-    public function update(string $componentId, string $value): RemoteDom\Updater
+    public function update(Id $componentId, string $value): RemoteDom\Updater
     {
-        $this->websocket->send(json_encode([$componentId, $value]));
+        $this->websocket->send(json_encode([(string)$componentId, $value]));
 
         return $this;
     }
@@ -124,7 +125,7 @@ class Page implements RemoteDom\Updater, RemoteDom\Renderer, WebsocketListener
         $js = '';
 
         foreach ($this->jsSenders as [$componentId, $eventId, $onEvent, $jsEventSerializer]) {
-            $this->phpListeners[$componentId][$eventId] = $onEvent;
+            $this->phpListeners[(string)$componentId][$eventId] = $onEvent;
 
             $js .= <<<JS
                 document.getElementById('{$componentId}').addEventListener('{$eventId}', function(event) {

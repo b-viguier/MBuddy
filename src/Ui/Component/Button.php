@@ -9,14 +9,13 @@ use Bveing\MBuddy\Ui\Component;
 
 class Button implements Component
 {
-    private string $id;
+    private Component\Internal\Id $id;
 
     public function __construct(
         private string $label,
         private \Closure $onClick,
-        string $id = null,
     ) {
-        $this->id = $id ?? uniqid('button_');
+        $this->id = new Component\Internal\Id(self::class);
     }
 
     public function render(RemoteDom\Renderer $renderer, RemoteDom\Updater $updater): string

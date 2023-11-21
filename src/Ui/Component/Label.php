@@ -9,14 +9,13 @@ use Bveing\MBuddy\Ui\RemoteDom;
 
 class Label implements Component
 {
-    private string $id;
+    private Component\Internal\Id $id;
     private RemoteDom\Updater $domUpdater;
 
     public function __construct(
         private string $label,
-        string $id = null,
     ) {
-        $this->id = $id ?? uniqid('label_');
+        $this->id = new Component\Internal\Id(self::class);
         $this->domUpdater = new RemoteDom\NullUpdater();
     }
     public function render(RemoteDom\Renderer $renderer, RemoteDom\Updater $updater): string
