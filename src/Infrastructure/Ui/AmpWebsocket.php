@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Bveing\MBuddy\Infrastructure\Ui;
 
 use Bveing\MBuddy\Ui\Websocket;
-use Bveing\MBuddy\Ui\WebsocketListener;
 use Amp\Websocket\Server\ClientHandler;
 use Amp\Promise;
 use Amp\Websocket\Server\Gateway;
@@ -19,17 +18,18 @@ use Psr\Log\LoggerInterface;
 class AmpWebsocket implements Websocket, ClientHandler
 {
     private ?Client $client = null;
-    private ?WebsocketListener $listener = null;
+    private Websocket\Listener $listener;
 
     public function __construct(
-        private string $uri,
+        private string $path,
         private LoggerInterface $logger,
     ) {
+        $this->listener = new Websocket\NullListener();
     }
 
-    public function getUri(): string
+    public function getPath(): string
     {
-        return $this->uri;
+        return $this->path;
     }
 
     public function send(string $message): void
@@ -39,7 +39,7 @@ class AmpWebsocket implements Websocket, ClientHandler
         $this->logger->debug('Sent message: '.$message);
     }
 
-    public function setListener(WebsocketListener $listener): void
+    public function setListener(Websocket\Listener $listener): void
     {
         $this->listener = $listener;
     }
@@ -75,9 +75,7 @@ class AmpWebsocket implements Websocket, ClientHandler
             while ($message = yield $this->client->receive()) {
                 $data = yield $message->buffer();
                 $this->logger->debug('Received message: '.$data);
-                if ($this->listener !== null) {
-                    $this->listener->onMessage($data);
-                }
+                $this->listener->onMessage($data);
             }
         } catch (\Amp\Websocket\ClosedException $e) {
             $this->logger->debug('Client Closed');

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Bveing\MBuddy\Ui;
+namespace Bveing\MBuddy\Ui\Websocket;
 
-interface WebsocketListener
+interface Listener
 {
     public function onMessage(string $message): void;
 }

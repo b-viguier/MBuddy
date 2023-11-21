@@ -9,8 +9,8 @@ Amp\Loop::run(function () {
         new \Amp\Socket\SocketAddress('192.168.1.11', 8484),
     );
 
-    $webSocketHandler = new \Bveing\MBuddy\Infrastructure\Ui\AmpWebsocket('ws://localhost:8383/websocket', $logger);
-    $websocket = new Amp\Websocket\Server\Websocket($webSocketHandler);
+    $websocket = new \Bveing\MBuddy\Infrastructure\Ui\AmpWebsocket('/websocket', $logger);
+    $websocketServer = new Amp\Websocket\Server\Websocket($websocket);
 
     $sockets = [
         \Amp\Socket\Server::listen("0.0.0.0:8383"),
@@ -28,7 +28,7 @@ Amp\Loop::run(function () {
         }),
     );
 
-    $router->addRoute('GET', '/websocket', $websocket);
+    $router->addRoute('GET', $websocket->getPath(), $websocketServer);
 
     /** @var \Amp\Http\Server\HttpServer|null $server */
     $server = null;
@@ -69,7 +69,7 @@ Amp\Loop::run(function () {
         }),
     );
 
-    $app = new \Bveing\MBuddy\App\TestPage($webSocketHandler);
+    $app = new \Bveing\MBuddy\App\TestPage($websocket);
 
     $router->addRoute(
         'GET',

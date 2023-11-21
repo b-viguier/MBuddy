@@ -6,8 +6,9 @@ namespace Bveing\MBuddy\Ui;
 
 use Bveing\MBuddy\Ui\RemoteDom\Renderer;
 use Bveing\MBuddy\Ui\Component\Internal\Id;
+use Bveing\MBuddy\Ui\Websocket\Listener;
 
-class Page implements RemoteDom\Updater, RemoteDom\Renderer, WebsocketListener
+class Page implements RemoteDom\Updater, RemoteDom\Renderer, Listener
 {
     private array $jsSenders = [];
     private array $jsUpdaters = [];
@@ -38,7 +39,9 @@ class Page implements RemoteDom\Updater, RemoteDom\Renderer, WebsocketListener
                 <title>{$this->title}</title>
                 
                 <script>
-                    var MBuddySocket = new WebSocket('{$this->websocket->getUri()}');
+                    var MBuddySocket = new WebSocket(
+                        "ws://" + window.location.hostname + ":" + window.location.port + '{$this->websocket->getPath()}'
+                    );
                     MBuddySocket.binaryType = "arraybuffer";
                 
                     MBuddySocket.onopen = function() {
