@@ -71,12 +71,21 @@ class AmpWebsocket implements Websocket, ClientHandler
 
     private function receiveLoop(): \Generator
     {
-        while ($message = yield $this->client->receive()) {
-            $data = yield $message->buffer();
-            $this->logger->debug('Received message: '.$data);
-            if ($this->listener !== null) {
-                $this->listener->onMessage($data);
+        try {
+            while ($message = yield $this->client->receive()) {
+                $data = yield $message->buffer();
+                $this->logger->debug('Received message: '.$data);
+                if ($this->listener !== null) {
+                    $this->listener->onMessage($data);
+                }
             }
+        } catch (\Amp\Websocket\ClosedException $e) {
+            $this->logger->debug('Client Closed');
+        } catch (\Throwable $e) {
+            $this->logger->error('Error in receive loop: '.$e->getMessage());
+        } finally {
+            $this->logger->debug('Client disconnected');
+            $this->client = null;
         }
     }
 }
