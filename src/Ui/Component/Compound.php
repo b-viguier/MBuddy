@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Bveing\MBuddy\Ui\Component;
 
 use Bveing\MBuddy\Ui\Component;
-use Bveing\MBuddy\Ui\RemoteDom;
+use Bveing\MBuddy\Ui\JsEventBus;
 
 class Compound implements Component
 {
@@ -16,11 +16,11 @@ class Compound implements Component
     ) {
         $this->htmlComponents = $htmlComponents;
     }
-    public function render(RemoteDom\Renderer $renderer, RemoteDom\Updater $updater): string
+    public function render(JsEventBus $jsEventBus): string
     {
         $html = '';
         foreach ($this->htmlComponents as $htmlComponent) {
-            $html .= $htmlComponent->render($renderer, $updater);
+            $html .= $htmlComponent->render($jsEventBus);
         }
 
         return $html;

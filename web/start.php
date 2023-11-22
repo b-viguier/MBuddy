@@ -69,7 +69,7 @@ Amp\Loop::run(function () {
         }),
     );
 
-    $app = new \Bveing\MBuddy\App\TestPage($websocket);
+    $app = new \Bveing\MBuddy\App\TestPage($websocket, $logger);
 
     $router->addRoute(
         'GET',

@@ -6,11 +6,17 @@ namespace Bveing\MBuddy\Ui\Component;
 
 use Bveing\MBuddy\Ui\RemoteDom;
 use Bveing\MBuddy\Ui\Component;
+use Bveing\MBuddy\Ui\JsEventBus;
 
 class Button implements Component
 {
+    private const CLICK_EVENT = 'click';
+
     private Component\Internal\Id $id;
 
+    /**
+     * @param \Closure(string $value):void $onClick
+     */
     public function __construct(
         private string $label,
         private \Closure $onClick,
@@ -18,21 +24,16 @@ class Button implements Component
         $this->id = new Component\Internal\Id(self::class);
     }
 
-    public function render(RemoteDom\Renderer $renderer, RemoteDom\Updater $updater): string
+    public function render(JsEventBus $jsEventBus): string
     {
-        $renderer->jsEventSender(
-            componentId: $this->id,
-            eventId: 'click',
-            onEvent: fn(string $data) => ($this->onClick)(),
-            jsEventSerializer: <<<JS
-                function(event) {
-                    return '';
-                }
-                JS,
-        );
+        $jsEventBus->addUpEventListener($this->id, self::CLICK_EVENT, $this->onClick);
 
         return <<<HTML
-            <button id="{$this->id}">{$this->label}</button>
+            <button id="{$this->id}"
+                onclick="{$jsEventBus->renderSendUpEvent($this->id, self::CLICK_EVENT, '')}"
+                >
+                {$this->label}
+            </button>
             HTML;
     }
 }

@@ -6,39 +6,41 @@ namespace Bveing\MBuddy\Ui\Component;
 
 use Bveing\MBuddy\Ui\Component;
 use Bveing\MBuddy\Ui\RemoteDom;
+use Bveing\MBuddy\Ui\JsEventBus;
 
 class Label implements Component
 {
+    private const VALUE_EVENT = 'value';
     private Component\Internal\Id $id;
-    private RemoteDom\Updater $domUpdater;
+    private ?JsEventBus $jsEventBus = null;
+
+    private const JS_SET_LABEL_FUNC = <<<JS
+        function(value) {
+            this.innerHTML = value;
+        }
+        JS;
 
     public function __construct(
         private string $label,
     ) {
         $this->id = new Component\Internal\Id(self::class);
-        $this->domUpdater = new RemoteDom\NullUpdater();
     }
-    public function render(RemoteDom\Renderer $renderer, RemoteDom\Updater $updater): string
+    public function render(JsEventBus $jsEventBus): string
     {
-        $renderer->jsUpdater(
-            componentId: $this->id,
-            jsUpdater: <<<JS
-                function(element, value) {
-                    element.innerHTML = value;
-                }
-                JS,
-        );
-        $this->domUpdater = $updater;
+        $this->jsEventBus = $jsEventBus;
 
         return <<<HTML
             <span id="{$this->id}">{$this->label}</span>
+            <script>
+                {$jsEventBus->renderDownEventListener($this->id, self::VALUE_EVENT, self::JS_SET_LABEL_FUNC)}
+            </script>
             HTML;
     }
 
     public function setLabel(string $label): self
     {
         $this->label = $label;
-        $this->domUpdater->update($this->id, $label);
+        $this->jsEventBus?->sendDownEvent($this->id, self::VALUE_EVENT, $label);
 
         return $this;
     }
