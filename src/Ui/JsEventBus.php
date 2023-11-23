@@ -69,7 +69,7 @@ class JsEventBus implements Websocket\Listener
     {
         return <<<JS
                 (function(event) {
-                    MBuddySocket.send(JSON.stringify(['{$componentId}', '{$eventId}', {$jsValue} ]));
+                    MBuddySocket.send(JSON.stringify(['{$componentId}', '{$eventId}', '{$jsValue}' ]));
                 })()
             JS;
     }
