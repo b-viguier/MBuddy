@@ -19,18 +19,19 @@ class Button implements Component
      */
     public function __construct(
         private string $label,
-        private \Closure $onClick,
+        \Closure $onClick,
+        private JsEventBus $jsEventBus,
     ) {
         $this->id = new Component\Internal\Id(self::class);
+
+        $this->jsEventBus->addUpEventListener($this->id, self::CLICK_EVENT, $onClick);
     }
 
-    public function render(JsEventBus $jsEventBus): string
+    public function render(): string
     {
-        $jsEventBus->addUpEventListener($this->id, self::CLICK_EVENT, $this->onClick);
-
         return <<<HTML
             <button id="{$this->id}"
-                onclick="{$jsEventBus->renderSendUpEvent($this->id, self::CLICK_EVENT, '')}"
+                onclick="{$this->jsEventBus->renderSendUpEvent($this->id, self::CLICK_EVENT, '')}"
                 >
                 {$this->label}
             </button>

@@ -16,11 +16,11 @@ class Compound implements Component
     ) {
         $this->htmlComponents = $htmlComponents;
     }
-    public function render(JsEventBus $jsEventBus): string
+    public function render(): string
     {
         $html = '';
         foreach ($this->htmlComponents as $htmlComponent) {
-            $html .= $htmlComponent->render($jsEventBus);
+            $html .= $htmlComponent->render();
         }
 
         return $html;

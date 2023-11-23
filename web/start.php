@@ -69,7 +69,9 @@ Amp\Loop::run(function () {
         }),
     );
 
-    $app = new \Bveing\MBuddy\App\TestPage($websocket, $logger);
+    $jsEventBus = new \Bveing\MBuddy\Ui\JsEventBus($websocket, $logger);
+    $main = new \Bveing\MBuddy\App\TestComponent($jsEventBus);
+    $app = new \Bveing\MBuddy\Ui\SinglePageApp("MBuddy", $main, $jsEventBus);
 
     $router->addRoute(
         'GET',

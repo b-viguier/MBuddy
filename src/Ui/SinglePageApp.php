@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Bveing\MBuddy\Ui;
 
-class Page
+class SinglePageApp
 {
     public function __construct(
         private string $title,
-        private JsEventBus $jsEventBus,
         private Component $body,
+        private JsEventBus $jsEventBus,
     ) {
     }
 
@@ -29,7 +29,7 @@ class Page
                 {$this->jsEventBus->renderMain()}
             </head>
             <body>
-            {$this->body->render($this->jsEventBus)}
+            {$this->body->render()}
             </body>
             </html>
             HTML;

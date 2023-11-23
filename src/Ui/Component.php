@@ -8,5 +8,5 @@ use Bveing\MBuddy\Ui\RemoteDom;
 
 interface Component
 {
-    public function render(JsEventBus $jsEventBus): string;
+    public function render(): string;
 }
