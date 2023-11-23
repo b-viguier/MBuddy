@@ -31,6 +31,42 @@ class TestComponent implements Component
 
     public function render(): string
     {
-        return $this->body->render();
+        return <<<HTML
+            <div class="w-100 h-100 p-3 mx-auto d-flex flex-column text-center">
+              <div class="row flex-grow-1">
+                <div class="col-sm align-self-center">
+                  1
+                </div>
+                <div class="col-sm">
+                  2
+                </div>
+                <div class="col-sm">
+                  3
+                </div>
+              </div>
+              <div class="row flex-grow-1">
+                <div class="col-sm">
+                  4
+                </div>
+                <div class="col-sm">
+                  {$this->body->render()}
+                </div>
+                <div class="col-sm">
+                  6
+                </div>
+              </div>
+              <div class="row flex-grow-1">
+                <div class="col-sm">
+                  7
+                </div>
+                <div class="col-sm">
+                  8
+                </div>
+                <div class="col-sm">
+                  <i class="bi bi-sun-fill"></i>
+                </div>
+              </div>
+            </div>
+            HTML;
     }
 }

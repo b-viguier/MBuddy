@@ -28,7 +28,7 @@ class Label implements Component
     public function render(): string
     {
         return <<<HTML
-            <span id="{$this->id}">{$this->label}</span>
+            <label id="{$this->id}">{$this->label}</label>
             <script>
                 {$this->jsEventBus->renderDownEventListener($this->id, self::VALUE_EVENT, self::JS_SET_LABEL_FUNC)}
             </script>

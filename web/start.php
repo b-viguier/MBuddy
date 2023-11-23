@@ -18,16 +18,6 @@ Amp\Loop::run(function () {
 
     $router = new Amp\Http\Server\Router;
 
-    $router->addRoute(
-        'GET',
-        '/',
-        new \Amp\Http\Server\RequestHandler\CallableRequestHandler(function (\Amp\Http\Server\Request $request) {
-            return new \Amp\Http\Server\Response(\Amp\Http\Status::OK, [
-                "content-type" => "text/plain; charset=utf-8",
-            ], "Hello, World!");
-        }),
-    );
-
     $router->addRoute('GET', $websocket->getPath(), $websocketServer);
 
     /** @var \Amp\Http\Server\HttpServer|null $server */
@@ -75,7 +65,7 @@ Amp\Loop::run(function () {
 
     $router->addRoute(
         'GET',
-        '/app',
+        '/',
         new \Amp\Http\Server\RequestHandler\CallableRequestHandler(function (\Amp\Http\Server\Request $request) use($app) {
 
             return new \Amp\Http\Server\Response(
@@ -96,17 +86,7 @@ Amp\Loop::run(function () {
         __DIR__.'/',
         $fileSystem,
     );
-    $router->addRoute(
-        'GET',
-        '/scores/{name}',
-        $documentRoot,
-    );
-    $router->addRoute(
-        'GET',
-        '/app.html',
-        $documentRoot,
-    );
-
+    $router->setFallback($documentRoot);
 
     $server = new \Amp\Http\Server\HttpServer(
         $sockets,

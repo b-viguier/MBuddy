@@ -30,7 +30,7 @@ class Button implements Component
     public function render(): string
     {
         return <<<HTML
-            <button id="{$this->id}"
+            <button type="button" class="btn btn-primary" id="{$this->id}"
                 onclick="{$this->jsEventBus->renderSendUpEvent($this->id, self::CLICK_EVENT, '')}"
                 >
                 {$this->label}
