@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace Bveing\MBuddy\Ui\Component;
 
 use Bveing\MBuddy\Ui\Component;
-use Bveing\MBuddy\Ui\RemoteDom;
 use Bveing\MBuddy\Ui\JsEventBus;
+use Bveing\MBuddy\Ui\Id;
 
 class Label implements Component
 {
     private const VALUE_EVENT = 'value';
-    private Component\Internal\Id $id;
+    private Id $id;
 
     private const JS_SET_LABEL_FUNC = <<<JS
         function(value) {
@@ -23,7 +23,7 @@ class Label implements Component
         private string $label,
         private JsEventBus $jsEventBus,
     ) {
-        $this->id = new Component\Internal\Id(self::class);
+        $this->id = new Id(self::class);
     }
     public function render(): string
     {

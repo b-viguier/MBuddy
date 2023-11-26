@@ -2,11 +2,8 @@
 
 declare(strict_types=1);
 
-namespace Bveing\MBuddy\Ui\Component\Internal;
+namespace Bveing\MBuddy\Ui;
 
-/**
- * @internal
- */
 class Id implements \Stringable
 {
     private string $id;

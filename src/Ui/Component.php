@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Bveing\MBuddy\Ui;
 
-use Bveing\MBuddy\Ui\RemoteDom;
 
 interface Component
 {

@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace Bveing\MBuddy\Ui\Component;
 
-use Bveing\MBuddy\Ui\RemoteDom;
 use Bveing\MBuddy\Ui\Component;
 use Bveing\MBuddy\Ui\JsEventBus;
+use Bveing\MBuddy\Ui\Id;
 
 class Button implements Component
 {
     private const CLICK_EVENT = 'click';
 
-    private Component\Internal\Id $id;
+    private Id $id;
 
     /**
      * @param \Closure(string $value):void $onClick
@@ -22,7 +22,7 @@ class Button implements Component
         \Closure $onClick,
         private JsEventBus $jsEventBus,
     ) {
-        $this->id = new Component\Internal\Id(self::class);
+        $this->id = new Id(self::class);
 
         $this->jsEventBus->addUpEventListener($this->id, self::CLICK_EVENT, $onClick);
     }
