@@ -60,7 +60,7 @@ Amp\Loop::run(function () {
     );
 
     $jsEventBus = new \Bveing\MBuddy\Ui\JsEventBus($websocket, $logger);
-    $main = new \Bveing\MBuddy\App\TestComponent($jsEventBus);
+    $main = new \Bveing\MBuddy\App\Ui\Main($jsEventBus);
     $app = new \Bveing\MBuddy\Ui\SinglePageApp("MBuddy", $main, $jsEventBus);
 
     $router->addRoute(
