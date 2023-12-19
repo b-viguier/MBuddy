@@ -10,7 +10,7 @@ class DumpRequest implements \Stringable
     private const SYSEX_FOOTER = 0xF7;
     private string $binaryString;
 
-    public function __construct(Address $address)
+    public function __construct(private Address $address)
     {
         $this->binaryString = pack(
             'C*',
@@ -25,5 +25,10 @@ class DumpRequest implements \Stringable
     public function __toString(): string
     {
         return $this->binaryString;
+    }
+
+    public function getAddress(): Address
+    {
+        return $this->address;
     }
 }

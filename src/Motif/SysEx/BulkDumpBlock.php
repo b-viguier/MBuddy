@@ -23,11 +23,12 @@ class BulkDumpBlock implements \Stringable
         array $data,
     ): self {
         assert($byteCount === count($data));
+        assert(array_keys($data) === range(0, $byteCount - 1));
 
         return new self($address, $data);
     }
 
-    static public function fomBinaryString(string $binaryString): self
+    static public function fromBinaryString(string $binaryString): self
     {
         $bytes = unpack('C*', $binaryString);
 
@@ -93,5 +94,23 @@ class BulkDumpBlock implements \Stringable
     public function getData(): array
     {
         return $this->data;
+    }
+
+    static public function matchBulkHeaderBlock(string $data, Address $address): bool
+    {
+        static $sysexPrefix = null;
+        if (null === $sysexPrefix) {
+            $sysexPrefix = pack('C*', ...[...self::SYSEX_HEADER, 0, 0]);
+        }
+
+        if (!str_starts_with($data, $sysexPrefix)) {
+            return false;
+        }
+
+        $offset = strlen($sysexPrefix);
+
+        return $address->h() === ord($data[$offset + 1])
+            && $address->m() === ord($data[$offset + 2])
+            && $address->l() === ord($data[$offset + 3]);
     }
 }
