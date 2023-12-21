@@ -12,5 +12,8 @@
         "psr-4": {
             "Bveing\\MBuddy\\": "src/"
         }
+    },
+    "require-dev": {
+        "bviguier/php-rtmidi": "dev-main"
     }
 }
