@@ -30,7 +30,7 @@ class BulkDumpBlock implements \Stringable
 
     static public function fromBinaryString(string $binaryString): self
     {
-        $bytes = unpack('C*', $binaryString);
+        $bytes = array_values(unpack('C*', $binaryString));
 
         if (count($bytes) < self::MIN_FIXED_SIZE) {
             throw new \InvalidArgumentException('Invalid BulkDump size');
@@ -48,12 +48,13 @@ class BulkDumpBlock implements \Stringable
             throw new \InvalidArgumentException('Wrong BulkDump size');
         }
 
-        $data = array_slice($bytes, self::OFFSET_DATA, $dataByteCount);
+        $checkSumData = array_slice($bytes, self::OFFSET_BYTE_COUNT_MSB, -2);
         $checksum = $bytes[self::OFFSET_DATA + $dataByteCount];
-        if ((array_sum($data) + $checksum) % 128 !== 0) {
+        if ((array_sum($checkSumData) + $checksum) % 128 !== 0) {
             throw new \InvalidArgumentException('Invalid Checksum');
         }
 
+        $data = array_slice($bytes, self::OFFSET_DATA, $dataByteCount);
         $address = array_slice($bytes, self::OFFSET_ADDRESS, 3);
 
         return new self(new Address(...$address), $data);
@@ -109,8 +110,8 @@ class BulkDumpBlock implements \Stringable
 
         $offset = strlen($sysexPrefix);
 
-        return $address->h() === ord($data[$offset + 1])
-            && $address->m() === ord($data[$offset + 2])
-            && $address->l() === ord($data[$offset + 3]);
+        return $address->h() === ord($data[$offset + 0])
+            && $address->m() === ord($data[$offset + 1])
+            && $address->l() === ord($data[$offset + 2]);
     }
 }

@@ -24,7 +24,7 @@ class ParameterChange implements \Stringable
 
     static public function fomBinaryString(string $binaryString): self
     {
-        $bytes = unpack('C*', $binaryString);
+        $bytes = array_values(unpack('C*', $binaryString));
 
         if (count($bytes) < self::MIN_FIXED_SIZE) {
             throw new \InvalidArgumentException('Invalid BulkDump size');

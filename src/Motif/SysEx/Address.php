@@ -12,8 +12,8 @@ class Address
         private int $l,
     ) {
         assert(0x00 <= $h && $h <= 0x47);
-        assert(0x00 < $m && $m < 0x80);
-        assert(0x00 < $l && $l < 0x80);
+        assert(0x00 <= $m && $m < 0x80);
+        assert(0x00 <= $l && $l < 0x80);
     }
 
     public function h(): int

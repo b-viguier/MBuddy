@@ -86,7 +86,7 @@ class Master
 
         return new self(
             id: $masterId,
-            name: trim(pack('A20', ...array_slice($commonData, 0, 20))),
+            name: trim(pack('C20', ...array_slice($commonData, 0, 20))),
             mode: $commonData[0x19],
             program: new Program($commonData[0x1A], $commonData[0x1B], $commonData[0x1C]),
             zoneEnabled: (bool)$commonData[0x1D],
@@ -178,7 +178,7 @@ class Master
         return $this->zone7;
     }
 
-    public function getBulkDumpBlocks(): \iterable
+    public function getBulkDumpBlocks(): iterable
     {
         $masterAddress = $this->id->isEditBuffer()
             ? [0x7F, 0x0]
