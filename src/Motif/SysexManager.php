@@ -13,8 +13,11 @@ class SysexManager
     /** @var list<SysEx\BulkDumpBlock> */
     private array $blocksBuffer = [];
 
-    /** @var array<string,Deferred> */
-    private array $deferred = [];
+    /** @var array<string,Deferred<list<SysEx\BulkDumpBlock>>> */
+    private array $deferredDump = [];
+
+    /** @var array<string,Deferred<SysEx\ParameterChange>> */
+    private array $deferredParam = [];
 
     public function __construct(
         private MidiDriver $midiDriver,
@@ -23,11 +26,14 @@ class SysexManager
         $this->midiDriver->setListener([$this, 'onMessage']);
     }
 
+    /**
+     * @return Promise<list<SysEx\BulkDumpBlock>>
+     */
     public function requestDump(SysEx\DumpRequest $request): Promise
     {
         //TODO: race timeout
         $deferred = new Deferred();
-        $this->deferred[$request->getAddress()->toBinaryString()] = $deferred;
+        $this->deferredDump[$request->getAddress()->toBinaryString()] = $deferred;
 
         $this->midiDriver->send((string)$request->toSysex());
 
@@ -42,17 +48,20 @@ class SysexManager
     {
         $promises = [];
         foreach ($blocks as $block) {
-            $promises[] = $this->midiDriver->send((string)$block);
+            $promises[] = $this->midiDriver->send((string)$block->toSysEx());
         }
 
         return Promise\all($promises);
     }
 
+    /**
+     * @return Promise<SysEx\ParameterChange>
+     */
     public function requestParameter(SysEx\ParameterRequest $request): Promise
     {
         //TODO: race timeout
         $deferred = new Deferred();
-        $this->deferred[$request->getAddress()->toBinaryString()] = $deferred;
+        $this->deferredParam[$request->getAddress()->toBinaryString()] = $deferred;
 
         $this->midiDriver->send((string)$request->toSysex());
 
@@ -61,7 +70,7 @@ class SysexManager
 
     public function sendParameter(SysEx\ParameterChange $change): void
     {
-        $this->midiDriver->send((string)$change);
+        $this->midiDriver->send((string)$change->toSysEx());
     }
 
     public function onMessage(string $message): bool
@@ -72,10 +81,10 @@ class SysexManager
         }
 
         switch ($sysex->getDeviceNumber()) {
-            case Sysex\BulkDumpBlock::DEVICE_NUMBER:
-                $this->handleBulkDumpBlock(Sysex\BulkDumpBlock::fromSysex($sysex));
+            case SysEx\BulkDumpBlock::DEVICE_NUMBER:
+                $this->handleBulkDumpBlock(SysEx\BulkDumpBlock::fromSysEx($sysex));
                 break;
-            case Sysex\ParameterChange::DEVICE_NUMBER:
+            case SysEx\ParameterChange::DEVICE_NUMBER:
                 $this->handleParameterChange(SysEx\ParameterChange::fromSysex($sysex));
                 break;
             default:
@@ -99,9 +108,9 @@ class SysexManager
                 $this->blocksBuffer[] = $block;
 
                 $deferredKey = $block->getAddress()->toBinaryString();
-                $deferred = $this->deferred[$deferredKey];
+                $deferred = $this->deferredDump[$deferredKey];
                 $buffer = $this->blocksBuffer;
-                unset($this->deferred[$deferredKey], $buffer);
+                unset($this->deferredDump[$deferredKey], $buffer);
                 $this->blocksBuffer = [];
 
                 $deferred->resolve($this->blocksBuffer);
@@ -118,8 +127,8 @@ class SysexManager
     private function handleParameterChange(SysEx\ParameterChange $change): void
     {
         $deferredKey = $change->getAddress()->toBinaryString();
-        $deferred = $this->deferred[$deferredKey];
-        unset($this->deferred[$deferredKey]);
+        $deferred = $this->deferredParam[$deferredKey];
+        unset($this->deferredParam[$deferredKey]);
         $deferred->resolve($change);
     }
 }

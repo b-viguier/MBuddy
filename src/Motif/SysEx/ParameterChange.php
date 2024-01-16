@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Bveing\MBuddy\Motif\SysEx;
 
-use Bveing\MBuddy\Motif\Sysex;
+use Bveing\MBuddy\Motif\SysEx;
 
 class ParameterChange
 {
@@ -15,6 +15,9 @@ class ParameterChange
     private const MIN_FIXED_SIZE = 4;
 
 
+    /**
+     * @param list<int> $data
+     */
     public static function create(
         Address $address,
         array $data,
@@ -22,13 +25,13 @@ class ParameterChange
         return new self($address, $data);
     }
 
-    public static function fromSysex(Sysex $sysex): self
+    public static function fromSysex(SysEx $sysex): self
     {
         if ($sysex->getDeviceNumber() !== self::DEVICE_NUMBER) {
             throw new \InvalidArgumentException('Invalid Device Number');
         }
 
-        $bytes = array_values(unpack('C*', $sysex->getData()));
+        $bytes = $sysex->getBytes();
 
         if (count($bytes) < self::MIN_FIXED_SIZE) {
             throw new \InvalidArgumentException('Invalid BulkDump size');
@@ -40,16 +43,20 @@ class ParameterChange
         return new self(new Address(...$address), $data);
     }
 
+    /**
+     * @param list<int> $data
+     */
     private function __construct(
         private Address $address,
         private array $data,
     ) {
-        assert(array_reduce($data, fn($carry, $item) => $carry && is_int($item), true));
+        assert(array_keys($data) === range(0, count($this->data) - 1));
+        assert(array_reduce($data, fn($carry, $byte) => $carry && is_int($byte) && 0 <= $byte && $byte < 256, true));
     }
 
-    public function toSysex(): Sysex
+    public function toSysEx(): SysEx
     {
-        return Sysex::fromData(
+        return SysEx::fromData(
             self::DEVICE_NUMBER,
             pack(
                 'C*',
@@ -64,6 +71,9 @@ class ParameterChange
         return $this->address;
     }
 
+    /**
+     * @return list<int>
+     */
     public function getData(): array
     {
         return $this->data;

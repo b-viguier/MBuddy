@@ -4,22 +4,22 @@ declare(strict_types=1);
 
 namespace Bveing\MBuddy\Motif\SysEx;
 
-use Bveing\MBuddy\Motif\Sysex;
+use Bveing\MBuddy\Motif\SysEx;
 
 class ParameterRequest
 {
     public const DEVICE_NUMBER = 0x30;
-    private Sysex $sysex;
+    private SysEx $sysex;
 
     public function __construct(private Address $address)
     {
-        $this->sysex = Sysex::fromData(
+        $this->sysex = SysEx::fromData(
             self::DEVICE_NUMBER,
             $address->toBinaryString(),
         );
     }
 
-    public function toSysex(): Sysex
+    public function toSysex(): SysEx
     {
         return $this->sysex;
     }

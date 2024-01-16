@@ -31,6 +31,9 @@ class Address
         return $this->l;
     }
 
+    /**
+     * @return array{int, int, int}
+     */
     public function toArray(): array
     {
         return [$this->h, $this->m, $this->l];

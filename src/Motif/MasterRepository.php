@@ -35,17 +35,22 @@ class MasterRepository
         );
     }
 
+    /**
+     * @return Promise<array<array-key,int>>
+     */
     public function set(Master $master): Promise
     {
         return $this->sysexManager->sendDump($master->getBulkDumpBlocks());
     }
 
+    /**
+     * @return Promise<MasterId>
+     */
     public function getCurrentMasterId(): Promise
     {
         return call(function() {
-            /** @var SysEx\ParameterChange $parameterChange */
             $parameterChange = yield $this->sysexManager->requestParameter(
-                new ParameterRequest(new Sysex\Address(0x0A, 0x00, 0x00))
+                new ParameterRequest(new SysEx\Address(0x0A, 0x00, 0x00))
             );
 
             return MasterId::fromInt($parameterChange->getData()[0]);

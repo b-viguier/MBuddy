@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Bveing\MBuddy\Motif\SysEx;
 
-use Bveing\MBuddy\Motif\Sysex;
+use Bveing\MBuddy\Motif\SysEx;
 
 class BulkDumpBlock
 {
@@ -19,13 +19,15 @@ class BulkDumpBlock
     private const FOOTER_BLOCK_ID = 0x0F;
 
 
+    /**
+     * @param list<int> $data
+     */
     public static function create(
         int $byteCount,
         Address $address,
         array $data,
     ): self {
         assert($byteCount === count($data));
-        assert(array_keys($data) === range(0, $byteCount - 1));
 
         return new self($address, $data);
     }
@@ -54,13 +56,13 @@ class BulkDumpBlock
         return $this->address->h() === self::FOOTER_BLOCK_ID;
     }
 
-    public static function fromSysex(Sysex $sysex): self
+    public static function fromSysEx(SysEx $sysex): self
     {
         if ($sysex->getDeviceNumber() !== self::DEVICE_NUMBER) {
             throw new \InvalidArgumentException('Invalid Device Number');
         }
 
-        $bytes = array_values(unpack('C*', $sysex->getData()));
+        $bytes = $sysex->getBytes();
 
         if (count($bytes) < self::MIN_FIXED_SIZE) {
             throw new \InvalidArgumentException('Invalid BulkDump size');
@@ -83,14 +85,17 @@ class BulkDumpBlock
         return new self(new Address(...$address), $data);
     }
 
+    /**
+     * @param list<int> $data
+     */
     private function __construct(
         private Address $address,
         private array $data,
     ) {
-        assert(array_reduce($data, fn($carry, $item) => $carry && is_int($item), true));
+        assert(array_reduce($data, fn($carry, $byte) => $carry && is_int($byte) && 0 <= $byte && $byte < 256, true));
     }
 
-    public function toSysex(): Sysex
+    public function toSysEx(): SysEx
     {
         $byteCount = count($this->data);
         $msg = [
@@ -102,12 +107,12 @@ class BulkDumpBlock
 
         $checksum = 128 - (array_sum($msg) % 128);
 
-        return Sysex::fromBinaryString(
+        return SysEx::fromBinaryString(
             pack('C*', ...[
                 ...$msg,
                 $checksum,
             ]),
-        );
+        ) ?? throw new \RuntimeException('Cannot create SysEx');
     }
 
     public function getAddress(): Address
@@ -115,6 +120,9 @@ class BulkDumpBlock
         return $this->address;
     }
 
+    /**
+     * @return list<int>
+     */
     public function getData(): array
     {
         return $this->data;

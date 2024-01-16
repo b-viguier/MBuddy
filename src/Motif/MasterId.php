@@ -34,6 +34,9 @@ class MasterId
         return $this->id;
     }
 
+    /**
+     * @return iterable<self>
+     */
     public static function getAll(): iterable
     {
         for ($i = 0; $i <= 127; $i++) {

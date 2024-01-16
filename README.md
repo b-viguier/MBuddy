@@ -16,3 +16,8 @@ composer install-tools
 ```
 composer cs-fix
 ```
+
+### Static analysis
+```
+composer phpstan
+```

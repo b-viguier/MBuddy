@@ -79,6 +79,7 @@ class Master
         $masterId = match ($headerAddress->m()) {
             0x70 => MasterId::fromInt($headerAddress->l()),
             0x7F => MasterId::editBuffer(),
+            default => throw new \RuntimeException('Invalid MasterId'),
         };
 
         assert($commonBlock->getAddress()->toArray() === [0x33, 0x00, 0x00]);
@@ -178,6 +179,9 @@ class Master
         return $this->zone7;
     }
 
+    /**
+     * @return iterable<SysEx\BulkDumpBlock>
+     */
     public function getBulkDumpBlocks(): iterable
     {
         $masterAddress = $this->id->isEditBuffer()
@@ -186,12 +190,15 @@ class Master
 
         yield SysEx\BulkDumpBlock::createHeaderBlock(...$masterAddress);
 
+        $name = unpack('A20', str_pad($this->name, 20));
+        assert(is_array($name));
+
         // Common block
         yield SysEx\BulkDumpBlock::create(
             byteCount: 0x1F,
             address: new SysEx\Address(0x33, 0x00, 0x00),
             data: [
-                ...unpack('A20', str_pad($this->name, 20)),
+                ...$name,
                 ...[0x00, 0x00, 0x00, 0x00, 0x00], // Reserved
                 0x19 => $this->mode,
                 0x1A => $this->program->getBankMsb(),
@@ -218,8 +225,8 @@ class Master
     public static function getDumpRequest(MasterId $id): SysEx\DumpRequest
     {
         $address = $id->isEditBuffer()
-            ? new Sysex\Address(0x0E, 0x7F, 0x00)
-            : new Sysex\Address(0x0E, 0x70, $id->toInt());
+            ? new SysEx\Address(0x0E, 0x7F, 0x00)
+            : new SysEx\Address(0x0E, 0x70, $id->toInt());
 
         return new SysEx\DumpRequest($address);
     }

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Bveing\MBuddy\Motif;
 
-class Sysex implements \Stringable
+class SysEx implements \Stringable
 {
     private const MIN_FIXED_SIZE = 6;
     private const SYSEX_PREFIX = "\xF0\x43";
@@ -38,9 +38,14 @@ class Sysex implements \Stringable
         return new self($binary);
     }
 
-    public function getData(): string
+    /**
+     * @return list<int>
+     */
+    public function getBytes(): array
     {
-        return substr($this->sysexMsg, 5, -1);
+        return array_values(
+            unpack('C*', substr($this->sysexMsg, 5, -1)) ?: throw new \RuntimeException('Cannot unpack SysEx'),
+        );
     }
 
     public function getDeviceNumber(): int
@@ -51,7 +56,13 @@ class Sysex implements \Stringable
     public static function fromData(int $deviceNumber, string $data): self
     {
         assert($deviceNumber >= 0x00 && $deviceNumber < 0xF0);
-        assert(array_reduce(unpack('C*', $data), fn($carry, $item) => $carry && $item < 0xF0, true));
+        assert(
+            array_reduce(
+                unpack('C*', $data) ?: throw new \RuntimeException('Invalid binary data'),
+                fn($carry, $byte) => $carry && $byte < 0xF0,
+                true,
+            ),
+        );
 
         return new self(self::SYSEX_PREFIX.chr($deviceNumber).self::MODEL_ID.$data.self::SYSEX_SUFFIX);
     }
