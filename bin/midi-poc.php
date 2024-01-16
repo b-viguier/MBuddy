@@ -9,22 +9,13 @@ Amp\Loop::run(function() {
     $input = $browser->openInput("WIDI Jack Bluetooth");
     $output = $browser->openOutput("WIDI Jack Bluetooth");
 
+    $logger = new \Bveing\MBuddy\Infrastructure\ConsoleLogger();
+
     $driver = new \Bveing\MBuddy\Infrastructure\Motif\MidiDriver\RtMidi($input, $output);
-    $repository = new \Bveing\MBuddy\Motif\MasterRepository($driver);
+    $sysexManager = new \Bveing\MBuddy\Motif\SysexManager($driver, $logger);
+    $repository = new \Bveing\MBuddy\Motif\MasterRepository($sysexManager);
 
-    $repository->get(\Bveing\MBuddy\Motif\MasterId::editBuffer(), function(\Bveing\MBuddy\Motif\Master $master) {
-        display($master);
-    });
+    $master = yield $repository->get(\Bveing\MBuddy\Motif\MasterId::fromInt(0));
 
-    $repository->get(\Bveing\MBuddy\Motif\MasterId::fromInt(3), function(\Bveing\MBuddy\Motif\Master $master) {
-        display($master);
-    });
-
-    $repository->get(\Bveing\MBuddy\Motif\MasterId::fromInt(5), function(\Bveing\MBuddy\Motif\Master $master) {
-        display($master);
-    });
+    $logger->info("Master: [{$master->getName()}]");
 });
-
-function display(\Bveing\MBuddy\Motif\Master $master) {
-    echo "Master: [{$master->getName()}]\n";
-}

@@ -4,9 +4,15 @@ declare(strict_types=1);
 
 namespace Bveing\MBuddy\Motif;
 
+use Amp\Promise;
+
 interface MidiDriver
 {
-    public function send(string $message): void;
+    /**
+     * @param string $message
+     * @return Promise<int>
+     */
+    public function send(string $message): Promise;
 
     public function setListener(callable $listener): void;
 

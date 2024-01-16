@@ -184,12 +184,7 @@ class Master
             ? [0x7F, 0x0]
             : [0x70, $this->id->toInt()];
 
-        // Header block
-        yield SysEx\BulkDumpBlock::create(
-            byteCount: 0x00,
-            address: new SysEx\Address(0x0E, ...$masterAddress),
-            data: [],
-        );
+        yield SysEx\BulkDumpBlock::createHeaderBlock(...$masterAddress);
 
         // Common block
         yield SysEx\BulkDumpBlock::create(
@@ -217,12 +212,7 @@ class Master
         yield $this->zone6->getSysEx();
         yield $this->zone7->getSysEx();
 
-        // Footer block
-        yield SysEx\BulkDumpBlock::create(
-            byteCount: 0x00,
-            address: new SysEx\Address(0x0F, ...$masterAddress),
-            data: [],
-        );
+        yield SysEx\BulkDumpBlock::createFooterBlock(...$masterAddress);
     }
 
     static public function getDumpRequest(MasterId $id): SysEx\DumpRequest
@@ -234,3 +224,5 @@ class Master
         return new SysEx\DumpRequest($address);
     }
 }
+
+assert(count((new \ReflectionMethod(Master::class, 'fromBulkDumpBlocks'))->getParameters()) === Master::DUMP_NB_BLOCKS);

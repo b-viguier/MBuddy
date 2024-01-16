@@ -4,42 +4,50 @@ declare(strict_types=1);
 
 namespace Bveing\MBuddy\Motif;
 
+use Amp\Promise;
+use function Amp\call;
+use Bveing\MBuddy\Motif\SysEx\ParameterRequest;
+
 class MasterRepository
 {
     public function __construct(
-        private MidiDriver $midiDriver,
+        private SysexManager $sysexManager,
     ) {
     }
 
-    public function get(MasterId $id, callable $onResponse): void
+    /**
+     * @return Promise<Master>
+     */
+    public function get(MasterId $id): Promise
     {
-        $dumpRequest = Master::getDumpRequest($id);
-        $address = $dumpRequest->getAddress();
+        return call(
+            function(MasterId $id) {
+                $blocks = yield $this->sysexManager->requestDump(Master::getDumpRequest($id));
 
-        $buffer = [];
-        $listener = function (string $data) use ($onResponse, $address, &$buffer, &$listener): bool {
-            if ($buffer === [] && !SysEx\BulkDumpBlock::matchBulkHeaderBlock($data, $address)) {
-                return false;
-            }
+                if (count($blocks) !== Master::DUMP_NB_BLOCKS) {
+                    throw new \RuntimeException('Invalid number of blocks');
+                }
 
-            $buffer[] = SysEx\BulkDumpBlock::fromBinaryString($data);
-            if (count($buffer) === Master::DUMP_NB_BLOCKS) {
-                $master = Master::fromBulkDumpBlocks(...$buffer);
-                $this->midiDriver->removeListener($listener);
-                $onResponse($master);
-            }
-
-            return true;
-        };
-
-        $this->midiDriver->setListener($listener);
-        $this->midiDriver->send((string) $dumpRequest);
+                return Master::fromBulkDumpBlocks(...$blocks);
+            },
+            $id
+        );
     }
 
-    public function set(Master $master): void
+    public function set(Master $master): Promise
     {
-        foreach($master->getBulkDumpBlocks() as $block) {
-            $this->midiDriver->send((string) $block);
-        }
+        return $this->sysexManager->sendDump($master->getBulkDumpBlocks());
+    }
+
+    public function getCurrentMasterId(): Promise
+    {
+        return call(function() {
+            /** @var SysEx\ParameterChange $parameterChange */
+            $parameterChange = yield $this->sysexManager->requestParameter(
+                new ParameterRequest(new Sysex\Address(0x0A, 0x00, 0x00))
+            );
+
+            return MasterId::fromInt($parameterChange->getData()[0]);
+        });
     }
 }

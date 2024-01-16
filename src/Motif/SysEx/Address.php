@@ -35,4 +35,14 @@ class Address
     {
         return [$this->h, $this->m, $this->l];
     }
+
+    public function toBinaryString(): string
+    {
+        return pack('C3', $this->h, $this->m, $this->l);
+    }
+
+    public function equals(Address $other): bool
+    {
+        return $this->h === $other->h && $this->m === $other->m && $this->l === $other->l;
+    }
 }

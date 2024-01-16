@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace Bveing\MBuddy\Motif\SysEx;
 
-class ParameterChange implements \Stringable
+use Bveing\MBuddy\Motif\Sysex;
+
+class ParameterChange
 {
-    private const SYSEX_HEADER = [0xF0, 0x43, 0x10, 0x7F, 0x03];
-    private const SYSEX_FOOTER = 0xF7;
+    public const DEVICE_NUMBER = 0x10;
+    private const OFFSET_ADDRESS = 0;
+    private const OFFSET_DATA = 3;
 
-    private const OFFSET_ADDRESS = 5;
-    private const OFFSET_DATA = 8;
-
-    private const MIN_FIXED_SIZE = 10;
+    private const MIN_FIXED_SIZE = 4;
 
 
     static public function create(
@@ -22,22 +22,19 @@ class ParameterChange implements \Stringable
         return new self($address, $data);
     }
 
-    static public function fomBinaryString(string $binaryString): self
+    static public function fromSysex(Sysex $sysex): self
     {
-        $bytes = array_values(unpack('C*', $binaryString));
+        if ($sysex->getDeviceNumber() !== self::DEVICE_NUMBER) {
+            throw new \InvalidArgumentException('Invalid Device Number');
+        }
+
+        $bytes = array_values(unpack('C*', $sysex->getData()));
 
         if (count($bytes) < self::MIN_FIXED_SIZE) {
             throw new \InvalidArgumentException('Invalid BulkDump size');
         }
 
-        if (
-            self::SYSEX_HEADER != array_slice($bytes, 0, count(self::SYSEX_HEADER))
-            || self::SYSEX_FOOTER != end($bytes)
-        ) {
-            throw new \InvalidArgumentException('Invalid SysEx message');
-        }
-
-        $data = array_slice($bytes, self::OFFSET_DATA, -1);
+        $data = array_slice($bytes, self::OFFSET_DATA);
         $address = array_slice($bytes, self::OFFSET_ADDRESS, 3);
 
         return new self(new Address(...$address), $data);
@@ -50,14 +47,16 @@ class ParameterChange implements \Stringable
         assert(array_reduce($data, fn($carry, $item) => $carry && is_int($item), true));
     }
 
-    public function __toString(): string
+    public function toSysex(): Sysex
     {
-        return pack('C*', ...[
-            ...self::SYSEX_HEADER,
-            ...$this->address->toArray(),
-            ...$this->data,
-            self::SYSEX_FOOTER,
-        ]);
+        return Sysex::fromData(
+            self::DEVICE_NUMBER,
+            pack(
+                'C*',
+                ...$this->address->toArray(),
+                ...$this->data,
+            ),
+        );
     }
 
     public function getAddress(): Address

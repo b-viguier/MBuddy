@@ -8,9 +8,13 @@ use Bveing\MBuddy\Motif\MidiDriver;
 use bviguier\RtMidi as RtMidiLib;
 use function Amp\delay;
 use function Amp\asyncCall;
+use Amp\Promise;
+use Amp\Success;
 
 class RtMidi implements MidiDriver
 {
+    use EventDispatcherTrait;
+
     private array $listeners = [];
 
     public function __construct(
@@ -21,35 +25,18 @@ class RtMidi implements MidiDriver
         asyncCall(fn()=>$this->loop());
     }
 
-    public function send(string $message): void
+    public function send(string $message): Promise
     {
         $this->output->send(RtMidiLib\Message::fromBinString($message));
-    }
 
-    public function setListener(callable $listener): void
-    {
-        $this->listeners[] = $listener;
-    }
-
-    public function removeListener(callable $listener): void
-    {
-        $this->listeners = array_filter(
-            $this->listeners,
-            fn (callable $l) => $l !== $listener
-        );
+        return new Success();
     }
 
     private function loop(): \Generator
     {
         while (true) {
             if ($message = $this->input->pullMessage()) {
-                $message = $message->toBinString();
-                $listeners = $this->listeners;
-                foreach ($listeners as $listener) {
-                    if ($listener($message)) {
-                        break;
-                    }
-                }
+                $this->dispatch($message->toBinString());
                 yield delay(5 /*ms*/);
             } else {
                 yield delay(500 /*ms*/);

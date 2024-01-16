@@ -4,27 +4,21 @@ declare(strict_types=1);
 
 namespace Bveing\MBuddy\Motif\SysEx;
 
-class DumpRequest implements \Stringable
+use Bveing\MBuddy\Motif\Sysex;
+
+class DumpRequest
 {
-    private const SYSEX_HEADER = [0XF0, 0x43, 0x20, 0x7F, 0x03];
-    private const SYSEX_FOOTER = 0xF7;
-    private string $binaryString;
+    public const DEVICE_NUMBER = 0x20;
+    private Sysex $sysex;
 
     public function __construct(private Address $address)
     {
-        $this->binaryString = pack(
-            'C*',
-            ...[
-                ...self::SYSEX_HEADER,
-                ...$address->toArray(),
-                self::SYSEX_FOOTER,
-            ]
-        );
+        $this->sysex = Sysex::fromData(self::DEVICE_NUMBER, $this->address->toBinaryString());
     }
 
-    public function __toString(): string
+    public function toSysex(): Sysex
     {
-        return $this->binaryString;
+        return $this->sysex;
     }
 
     public function getAddress(): Address
