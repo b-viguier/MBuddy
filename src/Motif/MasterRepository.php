@@ -5,8 +5,9 @@ declare(strict_types=1);
 namespace Bveing\MBuddy\Motif;
 
 use Amp\Promise;
-use function Amp\call;
 use Bveing\MBuddy\Motif\SysEx\ParameterRequest;
+
+use function Amp\call;
 
 class MasterRepository
 {

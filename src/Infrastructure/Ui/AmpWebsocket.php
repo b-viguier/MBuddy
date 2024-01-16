@@ -12,8 +12,9 @@ use Amp\Http\Server\Request;
 use Amp\Http\Server\Response;
 use Amp\Success;
 use Amp\Websocket\Client;
-use function Amp\call;
 use Psr\Log\LoggerInterface;
+
+use function Amp\call;
 
 class AmpWebsocket implements Websocket, ClientHandler
 {

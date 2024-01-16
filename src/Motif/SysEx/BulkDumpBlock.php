@@ -19,7 +19,7 @@ class BulkDumpBlock
     private const FOOTER_BLOCK_ID = 0x0F;
 
 
-    static public function create(
+    public static function create(
         int $byteCount,
         Address $address,
         array $data,
@@ -30,7 +30,7 @@ class BulkDumpBlock
         return new self($address, $data);
     }
 
-    static public function createHeaderBlock(
+    public static function createHeaderBlock(
         int $addressM,
         int $addressL,
     ): self {
@@ -42,7 +42,7 @@ class BulkDumpBlock
         return $this->address->h() === self::HEADER_BLOCK_ID;
     }
 
-    static public function createFooterBlock(
+    public static function createFooterBlock(
         int $addressM,
         int $addressL,
     ): self {
@@ -54,7 +54,7 @@ class BulkDumpBlock
         return $this->address->h() === self::FOOTER_BLOCK_ID;
     }
 
-    static public function fromSysex(Sysex $sysex): self
+    public static function fromSysex(Sysex $sysex): self
     {
         if ($sysex->getDeviceNumber() !== self::DEVICE_NUMBER) {
             throw new \InvalidArgumentException('Invalid Device Number');

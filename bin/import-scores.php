@@ -9,7 +9,7 @@ $outDir = __DIR__.'/../web/scores/';
 echo "Scanning $root\n";
 foreach (glob($root . '/[0-9][0-9]*') ?: [] as $folder) {
     $files = glob($folder . "/*.mscz") ?: [];
-    if(count($files)!== 1) {
+    if(count($files) !== 1) {
         echo "Skip $folder\n";
         continue;
     }
@@ -20,5 +20,3 @@ foreach (glob($root . '/[0-9][0-9]*') ?: [] as $folder) {
     passthru("mv \"$outDir$name-1.png\" \"$outDir$name.png\" ");
 }
 echo "Done!\n";
-
-

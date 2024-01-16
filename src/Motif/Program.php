@@ -10,7 +10,8 @@ class Program
         private int $bankMsb,
         private int $bankLsb,
         private int $number,
-    ) {}
+    ) {
+    }
 
     public function getBankMsb(): int
     {

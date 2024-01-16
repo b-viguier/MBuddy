@@ -7,9 +7,10 @@ namespace Bveing\MBuddy\Infrastructure\Motif\MidiDriver;
 use Bveing\MBuddy\Motif\MidiDriver;
 use Amp\Socket\DatagramSocket;
 use Amp\Socket\EncryptableSocket;
+use Amp\Promise;
+
 use function Amp\delay;
 use function Amp\asyncCall;
-use Amp\Promise;
 
 class Udp implements MidiDriver
 {
@@ -21,7 +22,7 @@ class Udp implements MidiDriver
         private DatagramSocket $input,
         private EncryptableSocket $output,
     ) {
-        asyncCall(fn()=>$this->loop());
+        asyncCall(fn() => $this->loop());
     }
 
     public function send(string $message): Promise

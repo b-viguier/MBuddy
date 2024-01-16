@@ -15,14 +15,14 @@ class ParameterChange
     private const MIN_FIXED_SIZE = 4;
 
 
-    static public function create(
+    public static function create(
         Address $address,
         array $data,
     ): self {
         return new self($address, $data);
     }
 
-    static public function fromSysex(Sysex $sysex): self
+    public static function fromSysex(Sysex $sysex): self
     {
         if ($sysex->getDeviceNumber() !== self::DEVICE_NUMBER) {
             throw new \InvalidArgumentException('Invalid Device Number');

@@ -34,7 +34,7 @@ class MasterId
         return $this->id;
     }
 
-    static public function getAll(): iterable
+    public static function getAll(): iterable
     {
         for ($i = 0; $i <= 127; $i++) {
             yield self::fromInt($i);

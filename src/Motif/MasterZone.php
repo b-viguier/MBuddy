@@ -42,7 +42,7 @@ class MasterZone
     ) {
     }
 
-    static public function default(int $id): self
+    public static function default(int $id): self
     {
         return new self(
             id: $id,
@@ -80,7 +80,7 @@ class MasterZone
         );
     }
 
-    static public function fromBulkDump(SysEx\BulkDumpBlock $block): self
+    public static function fromBulkDump(SysEx\BulkDumpBlock $block): self
     {
         assert($block->getAddress()->h() === 0x32 && $block->getAddress()->l() === 0x00);
         $data = $block->getData();
@@ -169,8 +169,7 @@ class MasterZone
         bool $isAssignableKnobTransmitted = null,
         int $assignableSliderControlNumber = null,
         int $assignableKnobControlNumber = null,
-    ): self
-    {
+    ): self {
         return new self(
             $id ?? $this->id,
             $transmitChannel ?? $this->transmitChannel,

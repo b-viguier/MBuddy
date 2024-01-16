@@ -15,5 +15,9 @@
     },
     "require-dev": {
         "bviguier/php-rtmidi": "dev-main"
+    },
+    "scripts": {
+        "install-tools": "composer install --working-dir=tools",
+        "cs-fix": "tools/vendor/bin/php-cs-fixer fix -v"
     }
 }

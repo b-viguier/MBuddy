@@ -12,7 +12,7 @@ class Id implements \Stringable
     {
         $this->id = uniqid(
             (
-            ($pos = strrpos($class, '\\')) !== false
+                ($pos = strrpos($class, '\\')) !== false
                 ? substr($class, $pos + 1)
                 : $class
             ).'_',

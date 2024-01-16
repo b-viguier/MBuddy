@@ -40,7 +40,7 @@ class Master
     ) {
     }
 
-    static public function default(): self
+    public static function default(): self
     {
         return new self(
             id: MasterId::editBuffer(),
@@ -60,7 +60,7 @@ class Master
         );
     }
 
-    static public function fromBulkDumpBlocks(
+    public static function fromBulkDumpBlocks(
         SysEx\BulkDumpBlock $headerBlock,
         SysEx\BulkDumpBlock $commonBlock,
         SysEx\BulkDumpBlock $zone0Block,
@@ -215,7 +215,7 @@ class Master
         yield SysEx\BulkDumpBlock::createFooterBlock(...$masterAddress);
     }
 
-    static public function getDumpRequest(MasterId $id): SysEx\DumpRequest
+    public static function getDumpRequest(MasterId $id): SysEx\DumpRequest
     {
         $address = $id->isEditBuffer()
             ? new Sysex\Address(0x0E, 0x7F, 0x00)

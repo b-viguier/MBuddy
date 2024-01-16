@@ -13,7 +13,8 @@ class Part implements Component
     public function __construct(
         private JsEventBus $jsEventBus,
         private Motif\Part $part,
-    ) {}
+    ) {
+    }
 
     public function render(): string
     {

@@ -1,2 +1,4 @@
 /vendor/
 /bin/.sync-timestamp.txt
+/tools/vendor/
+/.php-cs-fixer.cache

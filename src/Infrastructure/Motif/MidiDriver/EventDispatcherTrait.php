@@ -17,7 +17,7 @@ trait EventDispatcherTrait
     {
         $this->listeners = array_filter(
             $this->listeners,
-            fn (callable $l) => $l !== $listener
+            fn(callable $l) => $l !== $listener
         );
     }
 
