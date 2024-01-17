@@ -6,5 +6,8 @@
         "friendsofphp/php-cs-fixer": "^3.47",
         "phpstan/phpstan": "^1.10",
         "phpunit/phpunit": "^9.6"
+    },
+    "require": {
+        "php": "8.0.*"
     }
 }
