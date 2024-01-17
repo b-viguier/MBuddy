@@ -19,6 +19,7 @@
     "scripts": {
         "install-tools": "composer install --working-dir=tools",
         "cs-fix": "tools/vendor/bin/php-cs-fixer fix -v",
-        "phpstan": "tools/vendor/bin/phpstan analyse -l max src/Motif"
+        "phpunit": "tools/vendor/bin/phpunit",
+        "phpstan": "tools/vendor/bin/phpstan analyse -l max src/Motif tests"
     }
 }
