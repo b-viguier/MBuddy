@@ -12,7 +12,7 @@ use function Amp\call;
 class MasterRepository
 {
     public function __construct(
-        private SysexManager $sysexManager,
+        private SysExClient $sysExClient,
     ) {
     }
 
@@ -23,7 +23,7 @@ class MasterRepository
     {
         return call(
             function(MasterId $id) {
-                $blocks = yield $this->sysexManager->requestDump(Master::getDumpRequest($id));
+                $blocks = yield $this->sysExClient->requestDump(Master::getDumpRequest($id));
 
                 if (count($blocks) !== Master::DUMP_NB_BLOCKS) {
                     throw new \RuntimeException('Invalid number of blocks');
@@ -40,7 +40,7 @@ class MasterRepository
      */
     public function set(Master $master): Promise
     {
-        return $this->sysexManager->sendDump($master->getBulkDumpBlocks());
+        return $this->sysExClient->sendDump($master->getBulkDumpBlocks());
     }
 
     /**
@@ -49,7 +49,7 @@ class MasterRepository
     public function getCurrentMasterId(): Promise
     {
         return call(function() {
-            $parameterChange = yield $this->sysexManager->requestParameter(
+            $parameterChange = yield $this->sysExClient->requestParameter(
                 new ParameterRequest(new SysEx\Address(0x0A, 0x00, 0x00))
             );
 

@@ -12,8 +12,8 @@ Amp\Loop::run(function() {
     $logger = new \Bveing\MBuddy\Infrastructure\ConsoleLogger();
 
     $driver = new \Bveing\MBuddy\Infrastructure\Motif\MidiDriver\RtMidi($input, $output);
-    $sysexManager = new \Bveing\MBuddy\Motif\SysexManager($driver, $logger);
-    $repository = new \Bveing\MBuddy\Motif\MasterRepository($sysexManager);
+    $sysExClient = new \Bveing\MBuddy\Motif\SysExClient($driver, $logger);
+    $repository = new \Bveing\MBuddy\Motif\MasterRepository($sysExClient);
 
     $master = yield $repository->get(\Bveing\MBuddy\Motif\MasterId::fromInt(0));
 

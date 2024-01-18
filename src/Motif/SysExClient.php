@@ -8,7 +8,7 @@ use Amp\Promise;
 use Amp\Deferred;
 use Psr\Log\LoggerInterface;
 
-class SysexManager
+class SysExClient
 {
     /** @var list<SysEx\BulkDumpBlock> */
     private array $blocksBuffer = [];
