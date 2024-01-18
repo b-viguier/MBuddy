@@ -107,12 +107,13 @@ class BulkDumpBlock
 
         $checksum = 128 - (array_sum($msg) % 128);
 
-        return SysEx::fromBinaryString(
+        return SysEx::fromData(
+            self::DEVICE_NUMBER,
             pack('C*', ...[
                 ...$msg,
                 $checksum,
             ]),
-        ) ?? throw new \RuntimeException('Cannot create SysEx');
+        );
     }
 
     public function getAddress(): Address

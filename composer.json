@@ -13,6 +13,11 @@
             "Bveing\\MBuddy\\": "src/"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "Bveing\\MBuddy\\Tests\\": "tests/"
+        }
+    },
     "require-dev": {
         "bviguier/php-rtmidi": "dev-main"
     },

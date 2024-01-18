@@ -27,11 +27,11 @@ class SysEx implements \Stringable
             return null;
         }
 
-        if (!str_starts_with($binary, self::SYSEX_PREFIX) || str_ends_with($binary, self::SYSEX_SUFFIX)) {
+        if (!str_starts_with($binary, self::SYSEX_PREFIX) || !str_ends_with($binary, self::SYSEX_SUFFIX)) {
             return null;
         }
 
-        if (self::MODEL_ID !== substr($binary, 2, 2)) {
+        if (self::MODEL_ID !== substr($binary, 3, 2)) {
             return null;
         }
 

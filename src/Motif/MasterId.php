@@ -35,7 +35,7 @@ class MasterId
     }
 
     /**
-     * @return iterable<self>
+     * @return \Traversable<self>
      */
     public static function getAll(): iterable
     {

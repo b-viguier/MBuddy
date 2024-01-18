@@ -53,6 +53,7 @@ class AddressTest extends TestCase
         );
 
         self::assertTrue($address->equals(new Address($h, $m, $l)));
+        self::assertEquals($address, new Address($h, $m, $l));
         self::assertFalse($address->equals(new Address($h + 1, $m, $l)));
         self::assertFalse($address->equals(new Address($h, $m + 1, $l)));
         self::assertFalse($address->equals(new Address($h, $m, $l + 1)));
