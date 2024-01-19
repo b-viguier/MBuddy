@@ -12,7 +12,7 @@ class ConsoleLogger extends \Psr\Log\AbstractLogger
             "[%s]\t%s (%s)\n",
             strtoupper($level),
             $message,
-            var_export($context, true),
+            json_encode($context, JSON_THROW_ON_ERROR),
         );
     }
 }
