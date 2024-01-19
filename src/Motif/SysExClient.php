@@ -99,24 +99,39 @@ class SysExClient
     {
         if (!$this->blocksBuffer) {
             if ($block->isHeaderBlock()) {
-                $this->blocksBuffer[] = $block;
+                if (isset($this->deferredDump[$block->getAddress()->toBinaryString()])) {
+                    $this->blocksBuffer = [$block];
+                } else {
+                    $this->logger->warning('Received unknown HeaderBlock');
+                }
             } else {
                 $this->logger->warning('Received BulkDumpBlock without current dump');
             }
         } else {
-            if ($block->isFooterBlock() && $block->getAddress()->equals($this->blocksBuffer[0]->getAddress())) {
-                $this->blocksBuffer[] = $block;
+            if ($block->isFooterBlock()) {
+                $headerAddress = $this->blocksBuffer[0]->getAddress();
+                $footerAddress = $block->getAddress();
+                if($headerAddress->m() === $footerAddress->m() && $headerAddress->l() === $footerAddress->l()) {
+                    $this->blocksBuffer[] = $block;
 
-                $deferredKey = $block->getAddress()->toBinaryString();
-                $deferred = $this->deferredDump[$deferredKey];
-                $buffer = $this->blocksBuffer;
-                unset($this->deferredDump[$deferredKey], $buffer);
-                $this->blocksBuffer = [];
+                    $deferredKey = $headerAddress->toBinaryString();
+                    $deferred = $this->deferredDump[$deferredKey];
+                    $buffer = $this->blocksBuffer;
+                    unset($this->deferredDump[$deferredKey]);
+                    $this->blocksBuffer = [];
 
-                $deferred->resolve($this->blocksBuffer);
+                    $deferred->resolve($buffer);
+                } else {
+                    $this->logger->warning('Received unknown FooterBlock');
+                }
             } else {
                 if ($block->isHeaderBlock()) {
-                    $this->logger->warning('Received BulkDumpBlock while current dump is incomplete');
+                    $this->logger->warning('Received BulkDumpBlock while current dump is incomplete... Resetting');
+                    if (isset($this->deferredDump[$block->getAddress()->toBinaryString()])) {
+                        $this->blocksBuffer = [$block];
+                    } else {
+                        $this->logger->warning('Received unknown HeaderBlock');
+                    }
                 } else {
                     $this->blocksBuffer[] = $block;
                 }
