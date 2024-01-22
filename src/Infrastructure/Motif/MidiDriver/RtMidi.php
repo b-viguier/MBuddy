@@ -11,19 +11,15 @@ use Amp\Success;
 
 use function Amp\delay;
 use function Amp\asyncCall;
+use function Amp\call;
 
 class RtMidi implements MidiDriver
 {
-    use EventDispatcherTrait;
-
-    private array $listeners = [];
-
     public function __construct(
         private RtMidiLib\Input $input,
         private RtMidiLib\Output $output,
     ) {
         $input->allow(RtMidiLib\Input::ALLOW_SYSEX);
-        asyncCall(fn() => $this->loop());
     }
 
     public function send(string $message): Promise
@@ -33,15 +29,15 @@ class RtMidi implements MidiDriver
         return new Success();
     }
 
-    private function loop(): \Generator
+    public function receive(): Promise
     {
-        while (true) {
-            if ($message = $this->input->pullMessage()) {
-                $this->dispatch($message->toBinString());
-                yield delay(5 /*ms*/);
-            } else {
+        return call(function() {
+            while (true) {
+                if ($message = $this->input->pullMessage()) {
+                    return $message->toBinString();
+                }
                 yield delay(500 /*ms*/);
             }
-        }
+        });
     }
 }

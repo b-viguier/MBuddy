@@ -73,9 +73,13 @@ class Master
         SysEx\BulkDumpBlock $zone7Block,
         SysEx\BulkDumpBlock $footerBlock,
     ): self {
+        assert($headerBlock->isHeaderBlock());
+        assert($footerBlock->isFooterBlock());
+
         $headerAddress = $headerBlock->getAddress();
-        assert($headerAddress->h() === 0x0E && in_array($headerAddress->m(), [0x70, 0x7F]));
-        assert($footerBlock->getAddress()->toArray() === [0x0F, $headerAddress->m(), $headerAddress->l()]);
+        assert($footerBlock->getAddress()->m() === $headerAddress->m());
+        assert($footerBlock->getAddress()->l() === $headerAddress->l());
+
         $masterId = match ($headerAddress->m()) {
             0x70 => MasterId::fromInt($headerAddress->l()),
             0x7F => MasterId::editBuffer(),

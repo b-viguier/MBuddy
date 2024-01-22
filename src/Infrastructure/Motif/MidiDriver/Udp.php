@@ -11,18 +11,14 @@ use Amp\Promise;
 
 use function Amp\delay;
 use function Amp\asyncCall;
+use function Amp\call;
 
 class Udp implements MidiDriver
 {
-    use EventDispatcherTrait;
-
-    private array $listeners = [];
-
     public function __construct(
         private DatagramSocket $input,
         private EncryptableSocket $output,
     ) {
-        asyncCall(fn() => $this->loop());
     }
 
     public function send(string $message): Promise
@@ -30,11 +26,11 @@ class Udp implements MidiDriver
         return $this->output->write($message);
     }
 
-    private function loop(): \Generator
+    public function receive(): Promise
     {
-        while (true) {
-            [, $data] = yield $this->input->receive();
-            $this->dispatch($data);
-        }
+        return call(function() {
+            $data = yield $this->input->receive();
+            return $data === null ? null : $data[1];
+        });
     }
 }

@@ -11,11 +11,45 @@ Amp\Loop::run(function() {
 
     $logger = new \Bveing\MBuddy\Infrastructure\ConsoleLogger();
 
-    $driver = new \Bveing\MBuddy\Infrastructure\Motif\MidiDriver\RtMidi($input, $output);
-    $sysExClient = new \Bveing\MBuddy\Motif\SysExClient($driver, $logger);
+    $driver = new \Bveing\MBuddy\Motif\MidiDriver\RateLimiter(
+        new \Bveing\MBuddy\Infrastructure\Motif\MidiDriver\RtMidi($input, $output),
+        0.1,
+    );
+    $sysExClient = new \Bveing\MBuddy\Motif\SysExClient\ConcurrencyLimiter(
+        new \Bveing\MBuddy\Motif\SysExClient\Midi($driver, $logger),
+        5,
+    );
     $repository = new \Bveing\MBuddy\Motif\MasterRepository($sysExClient);
 
-    $master = yield $repository->get(\Bveing\MBuddy\Motif\MasterId::fromInt(0));
+    $promises = [];
+    $countdown = 6;
+    foreach (\Bveing\MBuddy\Motif\MasterId::getAll() as $masterId) {
+        $promises[] = \Amp\call('displayMaster', $repository, $masterId);
+        if (--$countdown === 0) {
+            break;
+        }
+    }
 
-    $logger->info("Master: [{$master->getName()}]");
+    yield \Amp\Promise\all($promises);
+
+    Amp\Loop::stop();
 });
+
+function displayMaster(
+    \Bveing\MBuddy\Motif\MasterRepository $repository,
+    \Bveing\MBuddy\Motif\MasterId $masterId,
+): \Generator {
+    echo "Loading {$masterId->toInt()}...\n";
+    try {
+        $master = yield $repository->get($masterId);
+        if ($master === null) {
+            echo "{$masterId->toInt()}: not found\n";
+
+            return;
+        }
+        echo "{$master->getId()->toInt()}: >{$master->getName()}<\n";
+    } catch (\Throwable $e) {
+        echo "Error: {$masterId->toInt()}\n";
+        var_dump($e);
+    }
+}
