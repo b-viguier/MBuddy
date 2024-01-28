@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 require __DIR__.'/../vendor/autoload.php';
 
-Amp\Loop::run(function () {
+Amp\Loop::run(function() {
     $logger = yield \Bveing\MBuddy\Infrastructure\UdpLogger::create(
         new \Amp\Socket\SocketAddress('192.168.1.11', 8484),
     );
@@ -16,7 +16,7 @@ Amp\Loop::run(function () {
         \Amp\Socket\Server::listen("0.0.0.0:8383"),
     ];
 
-    $router = new Amp\Http\Server\Router;
+    $router = new Amp\Http\Server\Router();
 
     $router->addRoute('GET', $websocket->getPath(), $websocketServer);
 
@@ -27,7 +27,7 @@ Amp\Loop::run(function () {
         'GET',
         '/stop',
         new \Amp\Http\Server\RequestHandler\CallableRequestHandler(
-            function (\Amp\Http\Server\Request $request) use (&$server) {
+            function(\Amp\Http\Server\Request $request) use (&$server) {
                 assert($server);
                 yield $server->stop();
                 yield \Amp\delay(1000);
@@ -43,7 +43,7 @@ Amp\Loop::run(function () {
     $router->addRoute(
         'GET',
         '/midi',
-        new \Amp\Http\Server\RequestHandler\CallableRequestHandler(function (\Amp\Http\Server\Request $request) {
+        new \Amp\Http\Server\RequestHandler\CallableRequestHandler(function(\Amp\Http\Server\Request $request) {
             /** @var \Amp\Socket\EncryptableSocket $out */
             $out = yield \Amp\Socket\connect("udp://127.0.0.1:8123");
             /** @var  $in */
@@ -66,7 +66,7 @@ Amp\Loop::run(function () {
     $router->addRoute(
         'GET',
         '/',
-        new \Amp\Http\Server\RequestHandler\CallableRequestHandler(function (\Amp\Http\Server\Request $request) use($app) {
+        new \Amp\Http\Server\RequestHandler\CallableRequestHandler(function(\Amp\Http\Server\Request $request) use ($app) {
 
             return new \Amp\Http\Server\Response(
                 \Amp\Http\Status::OK,
@@ -92,7 +92,7 @@ Amp\Loop::run(function () {
         $sockets,
         Amp\Http\Server\Middleware\stack($router, new \Amp\Http\Server\Middleware\ExceptionMiddleware()),
         $logger,
-        (new \Amp\Http\Server\Options)->withDebugMode(),
+        (new \Amp\Http\Server\Options())->withDebugMode(),
     );
 
     yield $server->start();
@@ -100,7 +100,7 @@ Amp\Loop::run(function () {
     // Stop the server gracefully when SIGINT is received.
     // This is technically optional, but it is best to call Server::stop()
     if (\extension_loaded("pcntl")) {
-        Amp\Loop::onSignal(SIGINT, function (string $watcherId) use ($server) {
+        Amp\Loop::onSignal(SIGINT, function(string $watcherId) use ($server) {
             Amp\Loop::cancel($watcherId);
             yield $server->stop();
         });
