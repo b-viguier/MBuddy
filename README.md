@@ -8,6 +8,12 @@ composer install
 ```
 
 ## Development
+To run from a compatible Docker container:
+```
+make build
+make bash
+```
+Then all commands below are available
 ```
 composer install-tools
 ```
