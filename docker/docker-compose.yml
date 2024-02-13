@@ -1,0 +1,21 @@
+name: mbuddy
+services:
+  php:
+    build:
+      context: ../
+      dockerfile: docker/php/Dockerfile
+    volumes:
+      - ../:/usr/src/MBuddy
+      - ./php/xdebug.ini:/usr/local/etc/php/conf.d/xdebug.ini
+    working_dir: /usr/src/MBuddy
+    ports:
+      - 8383:8383
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    entrypoint: "php -S 127.0.0.1:80"
+
+  webdriver:
+    build:
+      dockerfile: webdriver/Dockerfile
+    ports:
+      - 4444:4444

@@ -10,7 +10,7 @@ composer install
 ## Development
 To run from a compatible Docker container:
 ```
-make build
+make up
 make bash
 ```
 Then all commands below are available

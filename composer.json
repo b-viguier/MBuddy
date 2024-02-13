@@ -6,7 +6,8 @@
         "amphp/http-server": "^2.1",
         "amphp/http-server-static-content": "^1",
         "amphp/websocket-server": "^2",
-        "amphp/http-server-router": "^1"
+        "amphp/http-server-router": "^1",
+        "amphp/http-client": "^4.6"
     },
     "autoload": {
         "psr-4": {
@@ -22,7 +23,10 @@
         "bviguier/php-rtmidi": "dev-main"
     },
     "scripts": {
-        "install-tools": "composer install --working-dir=tools",
+        "install-tools": [
+            "composer install --working-dir=tools",
+            "ln -s tools/bin/phpunit vendor/phpunit"
+        ],
         "cs-fix": "tools/bin/php-cs-fixer fix -v",
         "phpunit": "tools/bin/phpunit",
         "phpstan": "tools/bin/phpstan analyse -l max src/Motif tests",
