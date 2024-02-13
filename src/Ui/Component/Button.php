@@ -37,4 +37,9 @@ class Button implements Component
             </button>
             HTML;
     }
+
+    public function getId(): Id
+    {
+        return $this->id;
+    }
 }

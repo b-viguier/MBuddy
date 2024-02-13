@@ -112,6 +112,11 @@ class SinglePageApp
         return $this->httpServer->stop();
     }
 
+    public function getJsEventBus(): JsEventBus
+    {
+        return $this->jsEventBus;
+    }
+
     private function render(): string
     {
         assert($this->body !== null);

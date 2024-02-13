@@ -42,4 +42,9 @@ class Label implements Component
 
         return $this;
     }
+
+    public function getId(): Id
+    {
+        return $this->id;
+    }
 }

@@ -191,10 +191,47 @@ class GeckoDriver
             );
 
             $body = yield $response->getBody()->buffer();
-            /** @var array{'value':null|array{'ELEMENT':string}} $jsonResponse */
+            /** @var array{'value':array<string,string>} $jsonResponse */
             $jsonResponse = json_decode($body, associative: true, flags: JSON_THROW_ON_ERROR);
 
-            return $jsonResponse['value']['ELEMENT'] ?? throw new \Exception("Cannot retrieve element content");
+            return reset($jsonResponse['value']) ?: throw new \Exception("Cannot retrieve element content");
+        });
+    }
+
+    /**
+     * @return Promise<null>
+     */
+    public function clickElement(string $elementId): Promise
+    {
+        return call(function() use ($elementId) {
+            yield $this->httpClient->request(
+                new Request(
+                    $this->endpoint.'/session/'.$this->sessionId.'/element/'.$elementId.'/click',
+                    'POST',
+                    '{}',
+                ),
+            );
+        });
+    }
+
+    /**
+     * @return Promise<string>
+     */
+    public function getElementText(string $elementId): Promise
+    {
+        return call(function() use ($elementId) {
+            $response = yield $this->httpClient->request(
+                new Request(
+                    $this->endpoint.'/session/'.$this->sessionId.'/element/'.$elementId.'/text',
+                    'GET',
+                ),
+            );
+
+            $body = yield $response->getBody()->buffer();
+            /** @var array{'value':string|null} $jsonResponse */
+            $jsonResponse = json_decode($body, associative: true, flags: JSON_THROW_ON_ERROR);
+
+            return $jsonResponse['value'] ?? throw new \Exception("Cannot retrieve element text");
         });
     }
 }
