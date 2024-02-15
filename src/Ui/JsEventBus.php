@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Bveing\MBuddy\Ui;
 
 use Psr\Log\LoggerInterface;
+use Amp\Promise;
 
 class JsEventBus implements Websocket\Listener
 {
@@ -89,9 +90,9 @@ class JsEventBus implements Websocket\Listener
             JS;
     }
 
-    public function sendDownEvent(Id $componentId, string $eventId, string $value): void
+    public function sendDownEvent(Id $componentId, string $eventId, string $value): Promise
     {
-        $this->websocket->send(json_encode([(string)$componentId, $eventId, $value]));
+        return $this->websocket->send(json_encode([(string)$componentId, $eventId, $value]));
     }
 
     public function onMessage(string $message): void

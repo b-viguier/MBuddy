@@ -54,11 +54,11 @@ class LabelTest extends TestCase
                 $this->assertSame('L1', yield GeckoServerExtension::$driver->getElementText($elementId1));
                 $this->assertSame('L2', yield GeckoServerExtension::$driver->getElementText($elementId2));
 
-                $label1->setLabel('Hello');
+                yield $label1->setLabel('Hello');
                 $this->assertSame('Hello', yield GeckoServerExtension::$driver->getElementText($elementId1));
                 $this->assertSame('L2', yield GeckoServerExtension::$driver->getElementText($elementId2));
 
-                $label2->setLabel('World');
+                yield $label2->setLabel('World');
                 $this->assertSame('Hello', yield GeckoServerExtension::$driver->getElementText($elementId1));
                 $this->assertSame('World', yield GeckoServerExtension::$driver->getElementText($elementId2));
 

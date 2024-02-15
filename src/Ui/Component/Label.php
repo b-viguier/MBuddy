@@ -7,6 +7,7 @@ namespace Bveing\MBuddy\Ui\Component;
 use Bveing\MBuddy\Ui\Component;
 use Bveing\MBuddy\Ui\JsEventBus;
 use Bveing\MBuddy\Ui\Id;
+use Amp\Promise;
 
 class Label implements Component
 {
@@ -35,12 +36,10 @@ class Label implements Component
             HTML;
     }
 
-    public function setLabel(string $label): self
+    public function setLabel(string $label): Promise
     {
         $this->label = $label;
-        $this->jsEventBus->sendDownEvent($this->id, self::VALUE_EVENT, $label);
-
-        return $this;
+        return $this->jsEventBus->sendDownEvent($this->id, self::VALUE_EVENT, $label);
     }
 
     public function getId(): Id

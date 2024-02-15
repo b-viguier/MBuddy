@@ -33,11 +33,12 @@ class AmpWebsocket implements Websocket, ClientHandler
         return $this->path;
     }
 
-    public function send(string $message): void
+    public function send(string $message): Promise
     {
         assert($this->client !== null);
-        $this->client->send($message);
         $this->logger->debug('Sent message: '.$message);
+
+        return $this->client->send($message);
     }
 
     public function setListener(Websocket\Listener $listener): void
