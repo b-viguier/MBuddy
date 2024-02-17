@@ -1,3 +1,4 @@
+name: mbuddy
 services:
   php:
     build:
