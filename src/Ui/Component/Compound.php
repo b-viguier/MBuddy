@@ -5,10 +5,12 @@ declare(strict_types=1);
 namespace Bveing\MBuddy\Ui\Component;
 
 use Bveing\MBuddy\Ui\Component;
-use Bveing\MBuddy\Ui\JsEventBus;
 
 class Compound implements Component
 {
+    use Trait\NonModifiable;
+    use Trait\AutoId;
+
     private array $htmlComponents;
 
     public function __construct(
@@ -24,5 +26,10 @@ class Compound implements Component
         }
 
         return $html;
+    }
+
+    public function getChildren(): iterable
+    {
+        return $this->htmlComponents;
     }
 }

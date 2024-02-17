@@ -12,6 +12,9 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\AbstractLogger;
 use Bveing\MBuddy\Tests\GeckoServerExtension;
 
+use Amp\Http\Client\HttpClientBuilder;
+use Amp\Http\Client\Request;
+
 use function Amp\delay;
 
 class SinglePageAppTest extends TestCase
@@ -22,14 +25,10 @@ class SinglePageAppTest extends TestCase
             $app = new SinglePageApp(
                 "MBuddy",
                 new NullLogger(),
+                __DIR__,
             );
 
-            $comp = new class () implements Component {
-                public function render(): string
-                {
-                    return '';
-                }
-            };
+            $comp = $this->createEmptyComponent();
 
             try {
                 yield $app->start($comp);
@@ -71,10 +70,14 @@ class SinglePageAppTest extends TestCase
             $app = new SinglePageApp(
                 "MBuddy",
                 $logger,
+                __DIR__,
             );
 
             yield $app->start(
                 new class () implements Component {
+                    use Component\Trait\NonModifiable;
+                    use Component\Trait\AutoId;
+                    use Component\Trait\Childless;
                     public function render(): string
                     {
                         return <<<HTML
@@ -113,5 +116,42 @@ class SinglePageAppTest extends TestCase
                 yield $app->stop();
             }
         });
+    }
+
+    public function testCanDownloadStaticFiles(): void
+    {
+        Loop::run(function() {
+            $app = new SinglePageApp(
+                "MBuddy",
+                new NullLogger(),
+                __DIR__,
+            );
+
+            $comp = $this->createEmptyComponent();
+            $httpClient = HttpClientBuilder::buildDefault();
+
+            try {
+                yield $app->start($comp);
+                $response = yield $httpClient->request(new Request('http://localhost:8383/' .basename(__FILE__)));
+                $content = yield $response->getBody()->buffer();
+
+                $this->assertSame(file_get_contents(__FILE__), $content);
+            } finally {
+                yield $app->stop();
+            }
+        });
+    }
+
+    private function createEmptyComponent(): Component
+    {
+        return new class () implements Component {
+            use Component\Trait\NonModifiable;
+            use Component\Trait\AutoId;
+            use Component\Trait\Childless;
+            public function render(): string
+            {
+                return '';
+            }
+        };
     }
 }

@@ -10,36 +10,30 @@ use Bveing\MBuddy\Ui\Id;
 
 class Button implements Component
 {
-    private const CLICK_EVENT = 'click';
-
-    private Id $id;
+    use Trait\AutoId;
+    use Trait\Childless;
+    use trait\NonModifiable;
 
     /**
      * @param \Closure(string $value):void $onClick
      */
     public function __construct(
         private string $label,
-        \Closure $onClick,
-        private JsEventBus $jsEventBus,
+        private \Closure $onClick,
     ) {
-        $this->id = new Id(self::class);
-
-        $this->jsEventBus->addUpEventListener($this->id, self::CLICK_EVENT, $onClick);
     }
 
     public function render(): string
     {
         return <<<HTML
-            <button type="button" class="btn btn-primary" id="{$this->id}"
-                onclick="{$this->jsEventBus->renderSendUpEvent($this->id, self::CLICK_EVENT, '')}"
-                >
+            <button type="button" data-on-click="onClick" class="btn btn-primary" id="{$this->getId()}">
                 {$this->label}
             </button>
             HTML;
     }
 
-    public function getId(): Id
+    public function onClick(): void
     {
-        return $this->id;
+        ($this->onClick)();
     }
 }

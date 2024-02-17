@@ -8,15 +8,9 @@ class Id implements \Stringable
 {
     private string $id;
 
-    public function __construct(string $class)
+    public function __construct(string $id)
     {
-        $this->id = uniqid(
-            (
-                ($pos = strrpos($class, '\\')) !== false
-                ? substr($class, $pos + 1)
-                : $class
-            ).'_',
-        );
+        $this->id = preg_replace('/[^a-zA-Z0-9_-]/', '_', $id);
     }
 
     public function __toString(): string

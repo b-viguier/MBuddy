@@ -4,108 +4,63 @@ declare(strict_types=1);
 
 require __DIR__.'/../vendor/autoload.php';
 
+use Bveing\MBuddy\Ui;
+
 Amp\Loop::run(function() {
-    $logger = yield \Bveing\MBuddy\Infrastructure\UdpLogger::create(
-        new \Amp\Socket\SocketAddress('192.168.1.11', 8484),
-    );
+    $logger = new \Bveing\MBuddy\Infrastructure\ConsoleLogger();
 
-    $websocket = new \Bveing\MBuddy\Infrastructure\Ui\AmpWebsocket('/websocket', $logger);
-    $websocketServer = new Amp\Websocket\Server\Websocket($websocket);
-
-    $sockets = [
-        \Amp\Socket\Server::listen("0.0.0.0:8383"),
-    ];
-
-    $router = new Amp\Http\Server\Router();
-
-    $router->addRoute('GET', $websocket->getPath(), $websocketServer);
-
-    /** @var \Amp\Http\Server\HttpServer|null $server */
-    $server = null;
-
-    $router->addRoute(
-        'GET',
-        '/stop',
-        new \Amp\Http\Server\RequestHandler\CallableRequestHandler(
-            function(\Amp\Http\Server\Request $request) use (&$server) {
-                assert($server);
-                yield $server->stop();
-                yield \Amp\delay(1000);
-                Amp\Loop::stop();
-
-                return new \Amp\Http\Server\Response(\Amp\Http\Status::OK, [
-                    "content-type" => "text/plain; charset=utf-8",
-                ], "Stop");
-            },
-        ),
-    );
-
-    $router->addRoute(
-        'GET',
-        '/midi',
-        new \Amp\Http\Server\RequestHandler\CallableRequestHandler(function(\Amp\Http\Server\Request $request) {
-            /** @var \Amp\Socket\EncryptableSocket $out */
-            $out = yield \Amp\Socket\connect("udp://127.0.0.1:8123");
-            /** @var  $in */
-            $in = \Amp\Socket\DatagramSocket::bind('udp://127.0.0.1:8321');
-
-            yield $out->write(pack("C*", 0b10010000, 0b0001000, 0b01111111));
-            [, $data] = yield $in->receive();
-            $bytes = unpack("C*", $data);
-
-            return new \Amp\Http\Server\Response(\Amp\Http\Status::OK, [
-                "content-type" => "text/plain; charset=utf-8",
-            ], implode(",", $bytes));
-        }),
-    );
-
-    $jsEventBus = new \Bveing\MBuddy\Ui\JsEventBus($websocket, $logger);
-    $main = new \Bveing\MBuddy\App\Ui\Main($jsEventBus);
-    $app = new \Bveing\MBuddy\Ui\SinglePageApp("MBuddy", $main, $jsEventBus);
-
-    $router->addRoute(
-        'GET',
-        '/',
-        new \Amp\Http\Server\RequestHandler\CallableRequestHandler(function(\Amp\Http\Server\Request $request) use ($app) {
-
-            return new \Amp\Http\Server\Response(
-                \Amp\Http\Status::OK,
-                [
-                    "content-type" => "text/html; charset=utf-8",
-                ],
-                $app->render(),
-            );
-        }),
-    );
-
-    // Asynchronous FileSystem incompatible with PhpWin
-    $fileSystem = new \Amp\File\Filesystem(new \Amp\File\Driver\BlockingDriver());
-
-    // TODO: incompatible with files containing spaces
-    $documentRoot = new \Amp\Http\Server\StaticContent\DocumentRoot(
-        __DIR__.'/',
-        $fileSystem,
-    );
-    $router->setFallback($documentRoot);
-
-    $server = new \Amp\Http\Server\HttpServer(
-        $sockets,
-        Amp\Http\Server\Middleware\stack($router, new \Amp\Http\Server\Middleware\ExceptionMiddleware()),
+    $app = new Ui\SinglePageApp(
+        "MBuddy",
         $logger,
-        (new \Amp\Http\Server\Options())->withDebugMode(),
+        __DIR__ . '/',
     );
 
-    yield $server->start();
 
-    // Stop the server gracefully when SIGINT is received.
-    // This is technically optional, but it is best to call Server::stop()
-    if (\extension_loaded("pcntl")) {
-        Amp\Loop::onSignal(SIGINT, function(string $watcherId) use ($server) {
-            Amp\Loop::cancel($watcherId);
-            yield $server->stop();
-        });
-    }
+    $body = new class () implements Ui\Component {
+        use Ui\Component\Trait\NonModifiable;
+        use Ui\Component\Trait\AutoId;
 
+        private Ui\Component\Button $button1;
+        private Ui\Component\Button $button2;
+
+        private Ui\Component\Label $label;
+
+        public function __construct()
+        {
+            $this->button1 = new Ui\Component\Button(
+                "Button 1",
+                fn() => $this->label->setText("Button 1 clicked"),
+            );
+            $this->button2 = new Ui\Component\Button(
+                "Button 2",
+                fn() => $this->label->setText("Button 2 clicked"),
+            );
+            $this->label = new Ui\Component\Label("Click a button");
+        }
+
+        public function render(): string
+        {
+            return <<<HTML
+                <div>
+                    <h1>Hello World</h1>
+                    {$this->button1->render()}
+                    {$this->label->render()}
+                    {$this->button2->render()}
+                </div>
+                HTML;
+        }
+
+        public function getChildren(): iterable
+        {
+            yield $this->button1;
+            yield $this->button2;
+            yield $this->label;
+        }
+
+
+    };
+
+    yield $app->start($body);
 });
 
 echo "Server stopped\n";

@@ -11,39 +11,25 @@ use Amp\Promise;
 
 class Label implements Component
 {
-    private const VALUE_EVENT = 'value';
-    private Id $id;
-
-    private const JS_SET_LABEL_FUNC = <<<JS
-        function(value) {
-            this.innerHTML = value;
-        }
-        JS;
+    use Trait\AutoId;
+    use Trait\Childless;
+    use Trait\Refreshable;
 
     public function __construct(
         private string $label,
-        private JsEventBus $jsEventBus,
     ) {
-        $this->id = new Id(self::class);
     }
     public function render(): string
     {
+        $this->refreshNeeded = false;
         return <<<HTML
-            <label id="{$this->id}">{$this->label}</label>
-            <script>
-                {$this->jsEventBus->renderDownEventListener($this->id, self::VALUE_EVENT, self::JS_SET_LABEL_FUNC)}
-            </script>
+            <label id="{$this->getId()}">{$this->label}</label>
             HTML;
     }
 
-    public function setLabel(string $label): Promise
+    public function setText(string $label): void
     {
         $this->label = $label;
-        return $this->jsEventBus->sendDownEvent($this->id, self::VALUE_EVENT, $label);
-    }
-
-    public function getId(): Id
-    {
-        return $this->id;
+        $this->refreshNeeded = true;
     }
 }

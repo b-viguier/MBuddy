@@ -18,20 +18,39 @@ use function Amp\Http\Server\Middleware\stack;
 class SinglePageApp
 {
     private HttpServer $httpServer;
-    private JsEventBus $jsEventBus;
+    private Websocket $websocket;
 
     private ?Component $body = null;
+
+    /**
+     * @var list<\WeakReference<Component>>
+     */
+    private array $componentsCache = [];
 
     public function __construct(
         private string $title,
         private LoggerInterface $logger,
+        string $rootDir,
         int $port = 8383,
     ) {
 
-        $websocket = new AmpWebsocket('/websocket', $this->logger);
-        $websocketServer = new WebsocketServer($websocket);
-        $this->jsEventBus = new JsEventBus($websocket, $this->logger);
+        $this->websocket = new AmpWebsocket('/websocket', $this->logger);
+        $websocketServer = new WebsocketServer($this->websocket);
         $router = new Router();
+
+        $this->websocket->setListener(
+            new class (\Closure::fromCallable([$this, 'onWebsocketMessage'])) implements Websocket\Listener {
+                public function __construct(
+                    private \Closure $callback,
+                ) {
+                }
+
+                public function onMessage(string $message): void
+                {
+                    ($this->callback)($message);
+                }
+            }
+        );
 
         $this->httpServer = new \Amp\Http\Server\HttpServer(
             [
@@ -42,7 +61,7 @@ class SinglePageApp
             (new Options())->withDebugMode(),
         );
 
-        $router->addRoute('GET', $websocket->getPath(), $websocketServer);
+        $router->addRoute('GET', $this->websocket->getPath(), $websocketServer);
 
         $router->addRoute(
             'GET',
@@ -79,7 +98,7 @@ class SinglePageApp
 
         // TODO: incompatible with files containing spaces
         $documentRoot = new \Amp\Http\Server\StaticContent\DocumentRoot(
-            __DIR__.'/',
+            $rootDir,
             $fileSystem,
         );
         $router->setFallback($documentRoot);
@@ -112,11 +131,6 @@ class SinglePageApp
         return $this->httpServer->stop();
     }
 
-    public function getJsEventBus(): JsEventBus
-    {
-        return $this->jsEventBus;
-    }
-
     private function render(): string
     {
         assert($this->body !== null);
@@ -132,6 +146,10 @@ class SinglePageApp
             
                 <link rel="stylesheet" href="css/bootstrap.css" crossorigin="anonymous">
                 <link rel="stylesheet" href="css/bootstrap-icons.css" crossorigin="anonymous">
+                
+                <script src="js/jquery.js" crossorigin="anonymous"></script>
+                <script src="js/popper.js" crossorigin="anonymous"></script>
+                <script src="js/bootstrap.js" crossorigin="anonymous"></script>
                 
                 <style>
                     html,
@@ -151,18 +169,154 @@ class SinglePageApp
 
                 <title>{$this->title}</title>
                 
-                {$this->jsEventBus->renderMain()}
+                <script>
+                    var MBuddySocket = new WebSocket(
+                        "ws://" + window.location.hostname + ":" + window.location.port + '{$this->websocket->getPath()}'
+                    );
+                    MBuddySocket.binaryType = "arraybuffer";
+                
+                    MBuddySocket.onopen = function() {
+                        window.onerror = function(message, url, lineNumber) {
+                            MBuddySocket.send(JSON.stringify(['console', 'critical', message + " at " + url + ":" + lineNumber]));
+                            return true;
+                        };
+
+                        console.log = function (msg) {
+                            MBuddySocket.send(JSON.stringify(['console', 'log', msg]));
+                        };
+                        console.warn = function (msg) {
+                            MBuddySocket.send(JSON.stringify(['console', 'warn', msg]));
+                        };
+                        console.error = function (msg) {
+                            MBuddySocket.send(JSON.stringify(['console', 'error', msg]));
+                        };
+                        
+                        MBuddySocket.addEventListener('message', function(event) {
+                            var msg = JSON.parse(event.data);
+                            var [id, eventId, content] = msg;
+                           
+                            switch (eventId) {
+                                case 'refresh':
+                                    var component = $('#'+id);
+                                    if (component === null) {
+                                        console.error('Component not found: ' + id);
+                                        return;
+                                    }
+                                    component.replaceWith(content);
+                                    break;
+                                default:
+                                    console.error('Unknown event: ' + eventId);
+                            }
+                        });
+                        
+                        $(document).on('click', '[data-on-click]', function(event) {
+                            var methodName = event.target.dataset.onClick;
+                            var componentId = event.target.id;
+                            console.debug('click ',componentId,event.target);
+                            if (componentId && methodName) {
+                                MBuddySocket.send(JSON.stringify([componentId, methodName, '']));
+                            }
+                        });
+                    };
+                </script>
             </head>
             <body>
                 {$this->body->render()}
             </div>
             
-            <script src="js/jquery.js" crossorigin="anonymous"></script>
-            <script src="js/popper.js" crossorigin="anonymous"></script>
-            <script src="js/bootstrap.js" crossorigin="anonymous"></script>
-
             </body>
             </html>
             HTML;
+    }
+
+    /**
+     * @return iterable<Component>
+     */
+    private function getComponentsToRefresh(): iterable
+    {
+        assert($this->body !== null);
+
+        $ChildrenIterators = [[$this->body]];
+        while ($ChildrenIterators) {
+            $children = array_pop($ChildrenIterators);
+            foreach ($children as $child) {
+                if ($child->isRefreshNeeded()) {
+                    yield $child;
+                } else {
+                    $ChildrenIterators[] = $child->getChildren();
+                }
+            }
+        }
+    }
+
+    public function refresh(): Promise
+    {
+        $allPromises = [];
+        foreach ($this->getComponentsToRefresh() as $component) {
+            $allPromises[] = $this->websocket->send(json_encode([(string)$component->getId(), 'refresh', $component->render()]));
+        }
+
+        return \Amp\Promise\all($allPromises);
+    }
+
+    private function onWebsocketMessage(string $message): void
+    {
+        $data = json_decode($message, true);
+        if (!is_array($data)) {
+            $this->logger->warning('Invalid message');
+            return;
+        }
+
+        [$componentId, $eventId, $value] = $data;
+        if ($componentId === 'console') {
+            switch($eventId) {
+                case 'log': $this->logger->info("[Console] $value");
+                    break;
+                case 'warn': $this->logger->warning("[Console] $value");
+                    break;
+                case 'error': $this->logger->error("[Console] $value");
+                    break;
+                case 'critical': $this->logger->critical("[Console] $value");
+                    break;
+                default: $this->logger->warning("[Console] Unknown method: $eventId");
+            }
+            return;
+        }
+        $component = $this->getComponentById(new Id($componentId));
+        if ($component === null) {
+            $this->logger->warning('Component not found: ' . $componentId);
+            return;
+        }
+
+        $component->{$eventId}($value);
+
+        $this->refresh();
+    }
+
+    private function getComponentById(Id $id): ?Component
+    {
+        assert($this->body !== null);
+
+        $component = ($this->componentsCache[(string)$id] ?? null)?->get();
+        if ($component !== null) {
+            return $component;
+        }
+
+        $this->componentsCache = [];
+        $found = null;
+
+        $ChildrenIterators = [[$this->body]];
+        while ($ChildrenIterators) {
+            $children = array_pop($ChildrenIterators);
+            foreach ($children as $child) {
+                if ($child->getId() == $id) {
+                    $found = $child;
+                }
+                $this->componentsCache[(string)$child->getId()] = \WeakReference::create($child);
+                $ChildrenIterators[] = $child->getChildren();
+            }
+        }
+
+        return $found;
     }
 }

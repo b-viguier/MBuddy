@@ -20,6 +20,7 @@ class ButtonTest extends TestCase
             $app = new SinglePageApp(
                 "MBuddy",
                 new NullLogger(),
+                __DIR__ . '/../../../web/',
             );
 
             $counter1 = $counter2 = 0;
@@ -29,7 +30,6 @@ class ButtonTest extends TestCase
                 function() use (&$counter1) {
                     ++$counter1;
                 },
-                $app->getJsEventBus(),
             );
 
             $button2 = new Button(
@@ -37,10 +37,12 @@ class ButtonTest extends TestCase
                 function() use (&$counter2) {
                     ++$counter2;
                 },
-                $app->getJsEventBus(),
             );
 
             $comp = new class ($button1, $button2) implements Component {
+                use Component\Trait\NonModifiable;
+                use Component\Trait\AutoId;
+
                 public function __construct(private Button $button1, private Button $button2)
                 {
                 }
@@ -49,13 +51,18 @@ class ButtonTest extends TestCase
                 {
                     return $this->button1->render() . $this->button2->render();
                 }
+
+                public function getChildren(): iterable
+                {
+                    yield $this->button1;
+                    yield $this->button2;
+                }
             };
 
 
             try {
                 yield $app->start($comp);
                 yield GeckoServerExtension::navigateToHomePage();
-                file_put_contents(__DIR__ . '/screenshot.png', yield GeckoServerExtension::$driver->takeScreenshot());
 
                 $this->assertSame(0, $counter1);
                 $this->assertSame(0, $counter2);
@@ -67,10 +74,12 @@ class ButtonTest extends TestCase
                 $this->assertSame('B2', yield GeckoServerExtension::$driver->getElementText($elementId2));
 
                 yield GeckoServerExtension::$driver->clickElement($elementId1);
+
                 $this->assertSame(1, $counter1);
                 $this->assertSame(0, $counter2);
 
                 yield GeckoServerExtension::$driver->clickElement($elementId2);
+
                 $this->assertSame(1, $counter1);
                 $this->assertSame(1, $counter2);
 
