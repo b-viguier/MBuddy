@@ -15,7 +15,9 @@ return (new PhpCsFixer\Config())
             'closure_function_spacing' => 'none',
             'closure_fn_spacing' => 'none',
         ],
-        'ordered_imports' => true,
+        'ordered_imports' => ['imports_order' => ['class', 'function', 'const'], 'sort_algorithm' => 'alpha'],
         'no_unused_imports' => true,
+        'blank_line_between_import_groups' => false,
+        'no_extra_blank_lines' => ['tokens' => ['use']],
     ])
     ->setFinder($finder);

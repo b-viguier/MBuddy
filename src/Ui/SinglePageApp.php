@@ -5,17 +5,15 @@ declare(strict_types=1);
 namespace Bveing\MBuddy\Ui;
 
 use Amp\Http\Server\HttpServer;
-
-use function Amp\Http\Server\Middleware\stack;
-
 use Amp\Http\Server\Options;
 use Amp\Http\Server\Router;
 use Amp\Promise;
 use Amp\Socket\Server;
 use Amp\Websocket\Server\Websocket as WebsocketServer;
 use Bveing\MBuddy\Infrastructure\Ui\AmpWebsocket;
-
 use Psr\Log\LoggerInterface;
+use function Amp\call;
+use function Amp\Http\Server\Middleware\stack;
 
 class SinglePageApp
 {
@@ -25,7 +23,7 @@ class SinglePageApp
     private ?Component $body = null;
 
     /**
-     * @var list<\WeakReference<Component>>
+     * @var array<string,\WeakReference<Component>>
      */
     private array $componentsCache = [];
 
@@ -69,7 +67,7 @@ class SinglePageApp
             'GET',
             '/stop',
             new \Amp\Http\Server\RequestHandler\CallableRequestHandler(
-                function(\Amp\Http\Server\Request $request) use (&$server) {
+                function(\Amp\Http\Server\Request $request) {
                     // TODO: how to stop main loop?
                     yield $this->stop();
 
@@ -109,13 +107,16 @@ class SinglePageApp
         // Stop the server gracefully when SIGINT is received.
         // This is technically optional, but it is best to call Server::stop()
         if (\extension_loaded("pcntl")) {
-            \Amp\Loop::onSignal(SIGINT, function(string $watcherId) use ($server) {
+            \Amp\Loop::onSignal(SIGINT, function(string $watcherId) {
                 \Amp\Loop::cancel($watcherId);
                 yield $this->stop();
             });
         }
     }
 
+    /**
+     * @return Promise<void>
+     */
     public function start(Component $body): Promise
     {
         assert($this->body === null);
@@ -126,6 +127,9 @@ class SinglePageApp
         return $this->httpServer->start();
     }
 
+    /**
+     * @return Promise<void>
+     */
     public function stop(): Promise
     {
         $this->body = null;
@@ -251,14 +255,23 @@ class SinglePageApp
         }
     }
 
+    /**
+     * @return Promise<int>
+     */
     public function refresh(): Promise
     {
-        $allPromises = [];
-        foreach ($this->getComponentsToRefresh() as $component) {
-            $allPromises[] = $this->websocket->send(json_encode([(string)$component->getId(), 'refresh', $component->render()]));
-        }
+        return call(function() {
+            $allPromises = [];
+            foreach ($this->getComponentsToRefresh() as $component) {
+                $allPromises[] = $this->websocket->send(
+                    json_encode([(string)$component->getId(), 'refresh', $component->render()], JSON_THROW_ON_ERROR)
+                );
+            }
 
-        return \Amp\Promise\all($allPromises);
+            yield \Amp\Promise\all($allPromises);
+
+            return \count($allPromises);
+        });
     }
 
     private function onWebsocketMessage(string $message): void

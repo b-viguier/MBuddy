@@ -11,6 +11,9 @@ interface Websocket
 {
     public function getPath(): string;
 
+    /**
+     * @return Promise<null>
+     */
     public function send(string $message): Promise;
 
     public function setListener(Listener $listener): void;

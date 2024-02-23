@@ -4,11 +4,10 @@ declare(strict_types=1);
 
 namespace Bveing\MBuddy\Motif\SysExClient;
 
-use function Amp\asyncCall;
-
 use Amp\Promise;
 use Bveing\MBuddy\Motif\SysEx;
 use Bveing\MBuddy\Motif\SysExClient;
+use function Amp\asyncCall;
 
 class ConcurrencyLimiter implements SysExClient
 {

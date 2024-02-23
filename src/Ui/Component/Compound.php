@@ -11,12 +11,13 @@ class Compound implements Component
     use Trait\NonModifiable;
     use Trait\AutoId;
 
+    /** @var list<Component> */
     private array $htmlComponents;
 
     public function __construct(
         Component ...$htmlComponents,
     ) {
-        $this->htmlComponents = $htmlComponents;
+        $this->htmlComponents = array_values($htmlComponents);
     }
     public function render(): string
     {

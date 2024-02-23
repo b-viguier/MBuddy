@@ -11,10 +11,10 @@ class Button implements Component
 {
     use Trait\AutoId;
     use Trait\Childless;
-    use trait\Refreshable;
+    use Trait\Refreshable;
 
     /**
-     * @param \Closure(string $value):void $onClick
+     * @param \Closure():void $onClick
      */
     public function __construct(
         private string $label,

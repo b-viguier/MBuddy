@@ -9,7 +9,6 @@ use Bveing\MBuddy\Tests\GeckoServerExtension;
 use Bveing\MBuddy\Ui\Component;
 use Bveing\MBuddy\Ui\SinglePageApp;
 use PHPUnit\Framework\TestCase;
-
 use Psr\Log\NullLogger;
 
 class LabelTest extends TestCase

@@ -4,14 +4,12 @@ declare(strict_types=1);
 
 namespace Bveing\MBuddy\Infrastructure\Motif\MidiDriver;
 
-use function Amp\call;
-use function Amp\delay;
-
 use Amp\Promise;
-
 use Amp\Success;
 use Bveing\MBuddy\Motif\MidiDriver;
 use bviguier\RtMidi as RtMidiLib;
+use function Amp\call;
+use function Amp\delay;
 
 class RtMidi implements MidiDriver
 {
