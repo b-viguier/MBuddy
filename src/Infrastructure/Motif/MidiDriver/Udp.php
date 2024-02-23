@@ -4,14 +4,13 @@ declare(strict_types=1);
 
 namespace Bveing\MBuddy\Infrastructure\Motif\MidiDriver;
 
-use Bveing\MBuddy\Motif\MidiDriver;
-use Amp\Socket\DatagramSocket;
-use Amp\Socket\EncryptableSocket;
+use function Amp\call;
+
 use Amp\Promise;
 
-use function Amp\delay;
-use function Amp\asyncCall;
-use function Amp\call;
+use Amp\Socket\DatagramSocket;
+use Amp\Socket\EncryptableSocket;
+use Bveing\MBuddy\Motif\MidiDriver;
 
 class Udp implements MidiDriver
 {

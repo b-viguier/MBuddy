@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Bveing\MBuddy\App\Ui;
 
-use Bveing\MBuddy\Ui\JsEventBus;
-use Bveing\MBuddy\Ui\Component;
 use Bveing\MBuddy\Motif;
+use Bveing\MBuddy\Ui\Component;
+use Bveing\MBuddy\Ui\JsEventBus;
 
 class Main implements Component
 {

@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Bveing\MBuddy\Tests;
 
-use PHPUnit\Runner\BeforeFirstTestHook;
-use PHPUnit\Runner\BeforeTestHook;
-use PHPUnit\Runner\AfterTestHook;
+use Amp\Loop;
+use Amp\Promise;
 use PHPUnit\Runner\AfterLastTestHook;
 use PHPUnit\Runner\AfterTestErrorHook;
 use PHPUnit\Runner\AfterTestFailureHook;
-use Amp\Loop;
-use Amp\Promise;
+use PHPUnit\Runner\AfterTestHook;
+use PHPUnit\Runner\BeforeFirstTestHook;
+use PHPUnit\Runner\BeforeTestHook;
 
 class GeckoServerExtension implements BeforeFirstTestHook, BeforeTestHook, AfterTestHook, AfterLastTestHook, AfterTestErrorHook, AfterTestFailureHook
 {

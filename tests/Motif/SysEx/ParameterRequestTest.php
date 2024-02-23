@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Bveing\MBuddy\Tests\Motif\SysEx;
 
-use PHPUnit\Framework\TestCase;
-use Bveing\MBuddy\Motif\SysEx\ParameterRequest;
 use Bveing\MBuddy\Motif\SysEx\Address;
+use Bveing\MBuddy\Motif\SysEx\ParameterRequest;
+use PHPUnit\Framework\TestCase;
 
 class ParameterRequestTest extends TestCase
 {

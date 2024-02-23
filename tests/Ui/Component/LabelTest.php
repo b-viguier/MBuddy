@@ -4,14 +4,13 @@ declare(strict_types=1);
 
 namespace Bveing\MBuddy\Tests\Ui\Component;
 
-use PHPUnit\Framework\TestCase;
 use Amp\Loop;
-use Bveing\MBuddy\Ui\SinglePageApp;
-use Psr\Log\NullLogger;
-use Bveing\MBuddy\Ui\Component;
 use Bveing\MBuddy\Tests\GeckoServerExtension;
+use Bveing\MBuddy\Ui\Component;
+use Bveing\MBuddy\Ui\SinglePageApp;
+use PHPUnit\Framework\TestCase;
 
-use function Amp\delay;
+use Psr\Log\NullLogger;
 
 class LabelTest extends TestCase
 {

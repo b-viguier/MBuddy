@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Bveing\MBuddy\Infrastructure;
 
-use Amp\Socket\SocketAddress;
-use Amp\Socket\EncryptableSocket;
 use Amp\Promise;
+use Amp\Socket\EncryptableSocket;
+use Amp\Socket\SocketAddress;
 
 class UdpLogger extends \Psr\Log\AbstractLogger
 {

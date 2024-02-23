@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Bveing\MBuddy\Infrastructure\Ui;
 
-use Bveing\MBuddy\Ui\Websocket;
 use Amp\Promise;
 use Amp\Success;
+use Bveing\MBuddy\Ui\Websocket;
 
 class NullWebsocket implements Websocket
 {

@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace Bveing\MBuddy\Motif\MidiDriver;
 
-use Bveing\MBuddy\Motif\MidiDriver;
-use Amp\Promise;
+use function Amp\asyncCall;
+
 use Amp\Deferred;
 
-use function Amp\asyncCall;
 use function Amp\delay;
+
+use Amp\Promise;
+use Bveing\MBuddy\Motif\MidiDriver;
 
 class RateLimiter implements MidiDriver
 {

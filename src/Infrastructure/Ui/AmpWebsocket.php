@@ -4,17 +4,18 @@ declare(strict_types=1);
 
 namespace Bveing\MBuddy\Infrastructure\Ui;
 
-use Bveing\MBuddy\Ui\Websocket;
-use Amp\Websocket\Server\ClientHandler;
-use Amp\Promise;
-use Amp\Websocket\Server\Gateway;
+use function Amp\call;
+
 use Amp\Http\Server\Request;
 use Amp\Http\Server\Response;
+use Amp\Promise;
 use Amp\Success;
 use Amp\Websocket\Client;
-use Psr\Log\LoggerInterface;
+use Amp\Websocket\Server\ClientHandler;
+use Amp\Websocket\Server\Gateway;
+use Bveing\MBuddy\Ui\Websocket;
 
-use function Amp\call;
+use Psr\Log\LoggerInterface;
 
 class AmpWebsocket implements Websocket, ClientHandler
 {

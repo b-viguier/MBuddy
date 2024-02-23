@@ -4,16 +4,18 @@ declare(strict_types=1);
 
 namespace Bveing\MBuddy\Ui;
 
-use Amp\Promise;
-use Psr\Log\LoggerInterface;
-use Bveing\MBuddy\Infrastructure\Ui\AmpWebsocket;
-use Amp\Websocket\Server\Websocket as WebsocketServer;
-use Amp\Http\Server\Router;
 use Amp\Http\Server\HttpServer;
-use Amp\Socket\Server;
-use Amp\Http\Server\Options;
 
 use function Amp\Http\Server\Middleware\stack;
+
+use Amp\Http\Server\Options;
+use Amp\Http\Server\Router;
+use Amp\Promise;
+use Amp\Socket\Server;
+use Amp\Websocket\Server\Websocket as WebsocketServer;
+use Bveing\MBuddy\Infrastructure\Ui\AmpWebsocket;
+
+use Psr\Log\LoggerInterface;
 
 class SinglePageApp
 {

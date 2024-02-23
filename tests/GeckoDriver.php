@@ -4,13 +4,14 @@ declare(strict_types=1);
 
 namespace Bveing\MBuddy\Tests;
 
+use function Amp\call;
+
 use Amp\Http\Client\HttpClient;
 use Amp\Http\Client\HttpClientBuilder;
-use Amp\Promise;
-use Amp\Success;
 use Amp\Http\Client\Request;
+use Amp\Promise;
 
-use function Amp\call;
+use Amp\Success;
 
 class GeckoDriver
 {

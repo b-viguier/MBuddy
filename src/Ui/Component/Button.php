@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Bveing\MBuddy\Ui\Component;
 
 use Bveing\MBuddy\Ui\Component;
-use Bveing\MBuddy\Ui\JsEventBus;
-use Bveing\MBuddy\Ui\Id;
 use Bveing\MBuddy\Ui\Style\Color;
 
 class Button implements Component

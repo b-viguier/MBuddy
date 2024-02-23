@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Bveing\MBuddy\Ui\Component;
 
 use Bveing\MBuddy\Ui\Component;
-use Bveing\MBuddy\Ui\JsEventBus;
-use Bveing\MBuddy\Ui\Id;
-use Amp\Promise;
 
 class Label implements Component
 {

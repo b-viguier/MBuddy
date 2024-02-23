@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Bveing\MBuddy\Tests\Motif\SysEx;
 
-use PHPUnit\Framework\TestCase;
-use Bveing\MBuddy\Motif\SysEx\ParameterChange;
-use Bveing\MBuddy\Motif\SysEx\Address;
 use Bveing\MBuddy\Motif\SysEx;
+use Bveing\MBuddy\Motif\SysEx\Address;
+use Bveing\MBuddy\Motif\SysEx\ParameterChange;
+use PHPUnit\Framework\TestCase;
 
 class ParameterChangeTest extends TestCase
 {

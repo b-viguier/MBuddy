@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Bveing\MBuddy\Ui;
 
-use Bveing\MBuddy\Ui\Websocket\Listener;
 use Amp\Promise;
+use Bveing\MBuddy\Ui\Websocket\Listener;
 
 interface Websocket
 {

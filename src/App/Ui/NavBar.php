@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Bveing\MBuddy\App\Ui;
 
+use Bveing\MBuddy\Motif\Preset;
 use Bveing\MBuddy\Ui\Component;
 use Bveing\MBuddy\Ui\JsEventBus;
-use Bveing\MBuddy\Motif\Preset;
 
 class NavBar implements Component
 {

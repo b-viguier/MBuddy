@@ -4,15 +4,18 @@ declare(strict_types=1);
 
 namespace Bveing\MBuddy\Motif\SysExClient;
 
-use Amp\Deferred;
-use Bveing\MBuddy\Motif\MidiDriver;
-use Psr\Log\LoggerInterface;
-use Amp\Promise;
-use Bveing\MBuddy\Motif\SysEx;
-use Bveing\MBuddy\Motif\SysExClient;
-
 use function Amp\asyncCall;
+
+use Amp\Deferred;
+
 use function Amp\delay;
+
+use Amp\Promise;
+use Bveing\MBuddy\Motif\MidiDriver;
+use Bveing\MBuddy\Motif\SysEx;
+
+use Bveing\MBuddy\Motif\SysExClient;
+use Psr\Log\LoggerInterface;
 
 class Midi implements SysExClient
 {

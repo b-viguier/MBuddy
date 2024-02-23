@@ -4,18 +4,19 @@ declare(strict_types=1);
 
 namespace Bveing\MBuddy\Tests\Ui;
 
-use Bveing\MBuddy\Ui\SinglePageApp;
-use Bveing\MBuddy\Ui\Component;
-use Psr\Log\NullLogger;
-use Amp\Loop;
-use PHPUnit\Framework\TestCase;
-use Psr\Log\AbstractLogger;
-use Bveing\MBuddy\Tests\GeckoServerExtension;
+use function Amp\delay;
 
 use Amp\Http\Client\HttpClientBuilder;
 use Amp\Http\Client\Request;
+use Amp\Loop;
+use Bveing\MBuddy\Tests\GeckoServerExtension;
+use Bveing\MBuddy\Ui\Component;
+use Bveing\MBuddy\Ui\SinglePageApp;
 
-use function Amp\delay;
+use PHPUnit\Framework\TestCase;
+use Psr\Log\AbstractLogger;
+
+use Psr\Log\NullLogger;
 
 class SinglePageAppTest extends TestCase
 {

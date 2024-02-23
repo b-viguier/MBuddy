@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Bveing\MBuddy\Tests\Motif;
 
-use PHPUnit\Framework\TestCase;
 use Bveing\MBuddy\Motif\MasterId;
+use PHPUnit\Framework\TestCase;
 
 class MasterIdTest extends TestCase
 {
