@@ -1,0 +1,8 @@
+parameters:
+	level: max
+	paths:
+		- src/Motif
+		- tests
+
+includes:
+    - tools/vendor/timeweb/phpstan-enum/extension.neon

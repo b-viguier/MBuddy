@@ -7,7 +7,8 @@
         "amphp/http-server-static-content": "^1",
         "amphp/websocket-server": "^2",
         "amphp/http-server-router": "^1",
-        "amphp/http-client": "^4.6"
+        "amphp/http-client": "^4.6",
+        "myclabs/php-enum": "^1.8"
     },
     "autoload": {
         "psr-4": {
@@ -29,7 +30,7 @@
         ],
         "cs-fix": "tools/bin/php-cs-fixer fix -v",
         "phpunit": "tools/bin/phpunit",
-        "phpstan": "tools/bin/phpstan analyse -l max src/Motif tests",
+        "phpstan": "tools/bin/phpstan analyse",
         "qa": [
             "@cs-fix",
             "@phpstan",

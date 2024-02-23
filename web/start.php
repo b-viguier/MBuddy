@@ -27,13 +27,16 @@ Amp\Loop::run(function() {
 
         public function __construct()
         {
-            $this->button1 = new Ui\Component\Button(
+            $this->button1 = (new Ui\Component\Button(
                 "Button 1",
                 fn() => $this->label->setText("Button 1 clicked"),
-            );
+            ))->set(color: Ui\Style\Color::SECONDARY());
             $this->button2 = new Ui\Component\Button(
                 "Button 2",
-                fn() => $this->label->setText("Button 2 clicked"),
+                function() {
+                    $this->label->setText("Button 2 clicked");
+                    $this->button1->set(label: "Oops!");
+                },
             );
             $this->label = new Ui\Component\Label("Click a button");
         }
