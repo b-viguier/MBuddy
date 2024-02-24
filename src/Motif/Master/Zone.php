@@ -2,9 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Bveing\MBuddy\Motif;
+namespace Bveing\MBuddy\Motif\Master;
 
-class MasterZone
+use Bveing\MBuddy\Motif\Program;
+use Bveing\MBuddy\Motif\SysEx;
+
+class Zone
 {
     private function __construct(
         private int $id,
@@ -249,11 +252,6 @@ class MasterZone
     public function getProgram(): Program
     {
         return $this->program;
-    }
-
-    public function getPreset(): Preset
-    {
-        return new Preset();
     }
 
     public function isBankSelectTransmittedForToneGenerator(): bool

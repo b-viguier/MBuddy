@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace Bveing\MBuddy\Tests\Motif;
+namespace Bveing\MBuddy\Tests\Motif\Master;
 
-use Bveing\MBuddy\Motif\MasterId;
+use Bveing\MBuddy\Motif\Master\Id;
 use PHPUnit\Framework\TestCase;
 
-class MasterIdTest extends TestCase
+class IdTest extends TestCase
 {
     public function testEditBuffer(): void
     {
-        $masterId = MasterId::editBuffer();
+        $masterId = Id::editBuffer();
 
         self::assertTrue($masterId->isEditBuffer());
         self::assertSame(-1, $masterId->toInt());
@@ -19,7 +19,7 @@ class MasterIdTest extends TestCase
 
     public function testRegularId(): void
     {
-        $masterId = MasterId::fromInt(42);
+        $masterId = Id::fromInt(42);
 
         self::assertFalse($masterId->isEditBuffer());
         self::assertSame(42, $masterId->toInt());
@@ -28,8 +28,8 @@ class MasterIdTest extends TestCase
     public function testAll(): void
     {
         $masterIds = array_map(
-            fn(MasterId $masterId) => $masterId->toInt(),
-            iterator_to_array(MasterId::getAll()),
+            fn(Id $masterId) => $masterId->toInt(),
+            iterator_to_array(Id::getAll()),
         );
 
         self::assertSame(range(0, 127), $masterIds);

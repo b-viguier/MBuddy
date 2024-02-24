@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Bveing\MBuddy\Motif;
+namespace Bveing\MBuddy\Motif\Master;
 
-class MasterId
+class Id
 {
     private function __construct(
         private int $id,

@@ -19,11 +19,11 @@ Amp\Loop::run(function() {
         new \Bveing\MBuddy\Motif\SysExClient\Midi($driver, $logger),
         5,
     );
-    $repository = new \Bveing\MBuddy\Motif\MasterRepository($sysExClient);
+    $repository = new \Bveing\MBuddy\Motif\Master\Repository($sysExClient);
 
     $promises = [];
     $countdown = 6;
-    foreach (\Bveing\MBuddy\Motif\MasterId::getAll() as $masterId) {
+    foreach (\Bveing\MBuddy\Motif\Master\Id::getAll() as $masterId) {
         $promises[] = \Amp\call('displayMaster', $repository, $masterId);
         if (--$countdown === 0) {
             break;
@@ -36,8 +36,8 @@ Amp\Loop::run(function() {
 });
 
 function displayMaster(
-    \Bveing\MBuddy\Motif\MasterRepository $repository,
-    \Bveing\MBuddy\Motif\MasterId $masterId,
+    \Bveing\MBuddy\Motif\Master\Repository $repository,
+    \Bveing\MBuddy\Motif\Master\Id $masterId,
 ): \Generator {
     echo "Loading {$masterId->toInt()}...\n";
     try {

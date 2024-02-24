@@ -6,57 +6,43 @@ namespace Bveing\MBuddy\Motif;
 
 class Master
 {
-    public const MODE_VOICE = 0;
-    public const MODE_PERFORMANCE = 1;
-    public const MODE_PATTERN = 2;
-    public const MODE_SONG = 3;
-
-
-    public const FUNC_TONE1 = 0;
-    public const FUNC_TONE2 = 1;
-    public const FUNC_ARP = 2;
-    public const FUNC_REV = 3;
-    public const FUNC_CHO = 4;
-    public const FUNC_PAN = 5;
-    public const FUNC_ZONE = 6;
-
     public const DUMP_NB_BLOCKS = 11;
 
     private function __construct(
-        private MasterId $id,
+        private Master\Id $id,
         private string $name,
-        private int $mode,
+        private Master\Mode $mode,
         private Program $program,
         private bool $zoneEnabled,
-        private int $knobSliderFunction,
-        private MasterZone $zone0,
-        private MasterZone $zone1,
-        private MasterZone $zone2,
-        private MasterZone $zone3,
-        private MasterZone $zone4,
-        private MasterZone $zone5,
-        private MasterZone $zone6,
-        private MasterZone $zone7,
+        private Master\KnobSliderFunction $knobSliderFunction,
+        private Master\Zone $zone0,
+        private Master\Zone $zone1,
+        private Master\Zone $zone2,
+        private Master\Zone $zone3,
+        private Master\Zone $zone4,
+        private Master\Zone $zone5,
+        private Master\Zone $zone6,
+        private Master\Zone $zone7,
     ) {
     }
 
     public static function default(): self
     {
         return new self(
-            id: MasterId::editBuffer(),
+            id: Master\Id::editBuffer(),
             name: 'New',
-            mode: self::MODE_SONG,
+            mode: Master\Mode::SONG(),
             program: new Program(0, 0, 0),
             zoneEnabled: true,
-            knobSliderFunction: self::FUNC_ZONE,
-            zone0: MasterZone::default(0),
-            zone1: MasterZone::default(1),
-            zone2: MasterZone::default(2),
-            zone3: MasterZone::default(3),
-            zone4: MasterZone::default(4),
-            zone5: MasterZone::default(5),
-            zone6: MasterZone::default(6),
-            zone7: MasterZone::default(7),
+            knobSliderFunction: Master\KnobSliderFunction::ZONE(),
+            zone0: Master\Zone::default(0),
+            zone1: Master\Zone::default(1),
+            zone2: Master\Zone::default(2),
+            zone3: Master\Zone::default(3),
+            zone4: Master\Zone::default(4),
+            zone5: Master\Zone::default(5),
+            zone6: Master\Zone::default(6),
+            zone7: Master\Zone::default(7),
         );
     }
 
@@ -81,8 +67,8 @@ class Master
         assert($footerBlock->getAddress()->l() === $headerAddress->l());
 
         $masterId = match ($headerAddress->m()) {
-            0x70 => MasterId::fromInt($headerAddress->l()),
-            0x7F => MasterId::editBuffer(),
+            0x70 => Master\Id::fromInt($headerAddress->l()),
+            0x7F => Master\Id::editBuffer(),
             default => throw new \RuntimeException('Invalid MasterId'),
         };
 
@@ -92,18 +78,18 @@ class Master
         return new self(
             id: $masterId,
             name: trim(pack('C20', ...array_slice($commonData, 0, 20))),
-            mode: $commonData[0x19],
+            mode: Master\Mode::from($commonData[0x19]),
             program: new Program($commonData[0x1A], $commonData[0x1B], $commonData[0x1C]),
             zoneEnabled: (bool)$commonData[0x1D],
-            knobSliderFunction: $commonData[0x1E],
-            zone0: MasterZone::fromBulkDump($zone0Block),
-            zone1: MasterZone::fromBulkDump($zone1Block),
-            zone2: MasterZone::fromBulkDump($zone2Block),
-            zone3: MasterZone::fromBulkDump($zone3Block),
-            zone4: MasterZone::fromBulkDump($zone4Block),
-            zone5: MasterZone::fromBulkDump($zone5Block),
-            zone6: MasterZone::fromBulkDump($zone6Block),
-            zone7: MasterZone::fromBulkDump($zone7Block),
+            knobSliderFunction: Master\KnobSliderFunction::from($commonData[0x1E]),
+            zone0: Master\Zone::fromBulkDump($zone0Block),
+            zone1: Master\Zone::fromBulkDump($zone1Block),
+            zone2: Master\Zone::fromBulkDump($zone2Block),
+            zone3: Master\Zone::fromBulkDump($zone3Block),
+            zone4: Master\Zone::fromBulkDump($zone4Block),
+            zone5: Master\Zone::fromBulkDump($zone5Block),
+            zone6: Master\Zone::fromBulkDump($zone6Block),
+            zone7: Master\Zone::fromBulkDump($zone7Block),
         );
     }
 
@@ -113,7 +99,7 @@ class Master
         return $this;
     }
 
-    public function getId(): MasterId
+    public function getId(): Master\Id
     {
         return $this->id;
     }
@@ -123,7 +109,7 @@ class Master
         return $this->name;
     }
 
-    public function getMode(): int
+    public function getMode(): Master\Mode
     {
         return $this->mode;
     }
@@ -138,47 +124,47 @@ class Master
         return $this->zoneEnabled;
     }
 
-    public function knobSliderFunction(): int
+    public function knobSliderFunction(): Master\KnobSliderFunction
     {
         return $this->knobSliderFunction;
     }
 
-    public function getZone0(): MasterZone
+    public function getZone0(): Master\Zone
     {
         return $this->zone0;
     }
 
-    public function getZone1(): MasterZone
+    public function getZone1(): Master\Zone
     {
         return $this->zone1;
     }
 
-    public function getZone2(): MasterZone
+    public function getZone2(): Master\Zone
     {
         return $this->zone2;
     }
 
-    public function getZone3(): MasterZone
+    public function getZone3(): Master\Zone
     {
         return $this->zone3;
     }
 
-    public function getZone4(): MasterZone
+    public function getZone4(): Master\Zone
     {
         return $this->zone4;
     }
 
-    public function getZone5(): MasterZone
+    public function getZone5(): Master\Zone
     {
         return $this->zone5;
     }
 
-    public function getZone6(): MasterZone
+    public function getZone6(): Master\Zone
     {
         return $this->zone6;
     }
 
-    public function getZone7(): MasterZone
+    public function getZone7(): Master\Zone
     {
         return $this->zone7;
     }
@@ -204,12 +190,12 @@ class Master
             data: [
                 ...$name,
                 ...[0x00, 0x00, 0x00, 0x00, 0x00], // Reserved
-                0x19 => $this->mode,
+                0x19 => $this->mode->getValue(),
                 0x1A => $this->program->getBankMsb(),
                 0x1B => $this->program->getBankLsb(),
                 0x1C => $this->program->getNumber(),
                 0x1D => $this->zoneEnabled,
-                0x1E => $this->knobSliderFunction,
+                0x1E => $this->knobSliderFunction->getValue(),
             ],
         );
 
@@ -226,7 +212,7 @@ class Master
         yield SysEx\BulkDumpBlock::createFooterBlock(...$masterAddress);
     }
 
-    public static function getDumpRequest(MasterId $id): SysEx\DumpRequest
+    public static function getDumpRequest(Master\Id $id): SysEx\DumpRequest
     {
         $address = $id->isEditBuffer()
             ? new SysEx\Address(0x0E, 0x7F, 0x00)

@@ -2,13 +2,16 @@
 
 declare(strict_types=1);
 
-namespace Bveing\MBuddy\Motif;
+namespace Bveing\MBuddy\Motif\Master;
 
 use Amp\Promise;
+use Bveing\MBuddy\Motif\Master;
+use Bveing\MBuddy\Motif\SysEx;
 use Bveing\MBuddy\Motif\SysEx\ParameterRequest;
+use Bveing\MBuddy\Motif\SysExClient;
 use function Amp\call;
 
-class MasterRepository
+class Repository
 {
     public function __construct(
         private SysExClient $sysExClient,
@@ -18,10 +21,10 @@ class MasterRepository
     /**
      * @return Promise<Master|null>
      */
-    public function get(MasterId $id): Promise
+    public function get(Master\Id $id): Promise
     {
         return call(
-            function(MasterId $id) {
+            function(Master\Id $id) {
                 $blocks = yield $this->sysExClient->requestDump(Master::getDumpRequest($id));
 
                 if ($blocks === null || count($blocks) !== Master::DUMP_NB_BLOCKS) {
@@ -43,7 +46,7 @@ class MasterRepository
     }
 
     /**
-     * @return Promise<MasterId>
+     * @return Promise<Master\Id>
      */
     public function getCurrentMasterId(): Promise
     {
@@ -56,14 +59,14 @@ class MasterRepository
                 return null;
             }
 
-            return MasterId::fromInt($parameterChange->getData()[0]);
+            return Id::fromInt($parameterChange->getData()[0]);
         });
     }
 
     /**
      * @return Promise<int>
      */
-    public function setCurrentMasterId(MasterId $masterId): Promise
+    public function setCurrentMasterId(Master\Id $masterId): Promise
     {
         assert(!$masterId->isEditBuffer());
 
