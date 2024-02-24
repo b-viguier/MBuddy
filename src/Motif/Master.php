@@ -200,14 +200,14 @@ class Master
         );
 
         // Zones
-        yield $this->zone0->getSysEx();
-        yield $this->zone1->getSysEx();
-        yield $this->zone2->getSysEx();
-        yield $this->zone3->getSysEx();
-        yield $this->zone4->getSysEx();
-        yield $this->zone5->getSysEx();
-        yield $this->zone6->getSysEx();
-        yield $this->zone7->getSysEx();
+        yield $this->zone0->toSysEx();
+        yield $this->zone1->toSysEx();
+        yield $this->zone2->toSysEx();
+        yield $this->zone3->toSysEx();
+        yield $this->zone4->toSysEx();
+        yield $this->zone5->toSysEx();
+        yield $this->zone6->toSysEx();
+        yield $this->zone7->toSysEx();
 
         yield SysEx\BulkDumpBlock::createFooterBlock(...$masterAddress);
     }

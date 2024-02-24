@@ -130,18 +130,17 @@ class Zone
         );
     }
 
-    public function getId(): int
+    public function id(): int
     {
         return $this->id;
     }
 
-    public function getTransmitChannel(): Channel
+    public function transmitChannel(): Channel
     {
         return $this->transmitChannel;
     }
 
     public function with(
-        int $id = null,
         Channel $transmitChannel = null,
         bool $isTransmittedForMidi = null,
         bool $isTransmittedForToneGenerator = null,
@@ -175,7 +174,7 @@ class Zone
         int $assignableKnobControlNumber = null,
     ): self {
         return new self(
-            $id ?? $this->id,
+            $this->id,
             $transmitChannel ?? $this->transmitChannel,
             $isTransmittedForMidi ?? $this->isTransmittedForMidi,
             $isTransmittedForToneGenerator ?? $this->isTransmittedForToneGenerator,
@@ -220,37 +219,37 @@ class Zone
         return $this->isTransmittedForMidi;
     }
 
-    public function getTransposeOctave(): int
+    public function transposeOctave(): int
     {
         return $this->transposeOctave;
     }
 
-    public function getTransposeSemitone(): int
+    public function transposeSemitone(): int
     {
         return $this->transposeSemitone;
     }
 
-    public function getNoteLimitLow(): int
+    public function noteLimitLow(): int
     {
         return $this->noteLimitLow;
     }
 
-    public function getNoteLimitHigh(): int
+    public function noteLimitHigh(): int
     {
         return $this->noteLimitHigh;
     }
 
-    public function getVolume(): int
+    public function volume(): int
     {
         return $this->volume;
     }
 
-    public function getPan(): int
+    public function pan(): int
     {
         return $this->pan;
     }
 
-    public function getProgram(): Program
+    public function program(): Program
     {
         return $this->program;
     }
@@ -350,17 +349,17 @@ class Zone
         return $this->isAssignableKnobTransmitted;
     }
 
-    public function getAssignableSliderControlNumber(): int
+    public function assignableSliderControlNumber(): int
     {
         return $this->assignableSliderControlNumber;
     }
 
-    public function getAssignableKnobControlNumber(): int
+    public function assignableKnobControlNumber(): int
     {
         return $this->assignableKnobControlNumber;
     }
 
-    public function getSysEx(): SysEx\BulkDumpBlock
+    public function toSysEx(): SysEx\BulkDumpBlock
     {
         return SysEx\BulkDumpBlock::create(
             byteCount: 0x10,
