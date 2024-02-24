@@ -10,18 +10,13 @@ use Bveing\MBuddy\Ui\Component;
 use Bveing\MBuddy\Ui\Component\Button;
 use Bveing\MBuddy\Ui\SinglePageApp;
 use PHPUnit\Framework\TestCase;
-use Psr\Log\NullLogger;
 
 class ButtonTest extends TestCase
 {
     public function testCallbackWhenClicked(): void
     {
         Loop::run(function() {
-            $app = new SinglePageApp(
-                "MBuddy",
-                new NullLogger(),
-                __DIR__ . '/../../../web/',
-            );
+            $app = new SinglePageApp();
 
             $counter1 = $counter2 = 0;
 

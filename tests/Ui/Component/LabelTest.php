@@ -9,18 +9,13 @@ use Bveing\MBuddy\Tests\GeckoServerExtension;
 use Bveing\MBuddy\Ui\Component;
 use Bveing\MBuddy\Ui\SinglePageApp;
 use PHPUnit\Framework\TestCase;
-use Psr\Log\NullLogger;
 
 class LabelTest extends TestCase
 {
     public function testTextChange(): void
     {
         Loop::run(function() {
-            $app = new SinglePageApp(
-                "MBuddy",
-                new NullLogger(),
-                __DIR__ . '/../../../web/',
-            );
+            $app = new SinglePageApp();
 
             $label1 = new Component\Label(
                 'L1',

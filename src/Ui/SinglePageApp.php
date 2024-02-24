@@ -20,6 +20,8 @@ class SinglePageApp
     private HttpServer $httpServer;
     private Websocket $websocket;
 
+    private LoggerInterface $logger;
+
     private ?Component $body = null;
 
     /**
@@ -28,12 +30,12 @@ class SinglePageApp
     private array $componentsCache = [];
 
     public function __construct(
-        private string $title,
-        private LoggerInterface $logger,
-        string $rootDir,
+        private string $title = 'MBuddy',
+        LoggerInterface $logger = null,
+        ?string $rootDir = null,
         int $port = 8383,
     ) {
-
+        $this->logger = $logger ?? new \Psr\Log\NullLogger();
         $this->websocket = new AmpWebsocket('/websocket', $this->logger);
         $websocketServer = new WebsocketServer($this->websocket);
         $router = new Router();
@@ -57,7 +59,7 @@ class SinglePageApp
                 Server::listen("0.0.0.0:$port"),
             ],
             stack($router, new \Amp\Http\Server\Middleware\ExceptionMiddleware()),
-            $logger,
+            $this->logger,
             (new Options())->withDebugMode(),
         );
 
@@ -96,12 +98,24 @@ class SinglePageApp
         // Asynchronous FileSystem incompatible with PhpWin
         $fileSystem = new \Amp\File\Filesystem(new \Amp\File\Driver\BlockingDriver());
 
-        // TODO: incompatible with files containing spaces
-        $documentRoot = new \Amp\Http\Server\StaticContent\DocumentRoot(
-            $rootDir,
-            $fileSystem,
+        $router->addRoute(
+            'GET',
+            '/mbuddy-assets/{path:.+}',
+            new \Amp\Http\Server\StaticContent\DocumentRoot(
+                __DIR__,
+                $fileSystem,
+            ),
         );
-        $router->setFallback($documentRoot);
+
+        if ($rootDir !== null) {
+            // TODO: incompatible with files containing spaces
+            $router->setFallback(
+                new \Amp\Http\Server\StaticContent\DocumentRoot(
+                    $rootDir,
+                    $fileSystem,
+                )
+            );
+        }
 
 
         // Stop the server gracefully when SIGINT is received.
@@ -150,12 +164,12 @@ class SinglePageApp
                 <meta name="apple-mobile-web-app-status-bar-style" content="translucent">
                 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
             
-                <link rel="stylesheet" href="css/bootstrap.css" crossorigin="anonymous">
-                <link rel="stylesheet" href="css/bootstrap-icons.css" crossorigin="anonymous">
+                <link rel="stylesheet" href="mbuddy-assets/css/bootstrap.css" crossorigin="anonymous">
+                <link rel="stylesheet" href="mbuddy-assets/css/bootstrap-icons.css" crossorigin="anonymous">
                 
-                <script src="js/jquery.js" crossorigin="anonymous"></script>
-                <script src="js/popper.js" crossorigin="anonymous"></script>
-                <script src="js/bootstrap.js" crossorigin="anonymous"></script>
+                <script src="mbuddy-assets/js/jquery.js" crossorigin="anonymous"></script>
+                <script src="mbuddy-assets/js/popper.js" crossorigin="anonymous"></script>
+                <script src="mbuddy-assets/js/bootstrap.js" crossorigin="anonymous"></script>
                 
                 <style>
                     html,

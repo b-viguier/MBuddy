@@ -12,7 +12,6 @@ use Bveing\MBuddy\Ui\Component;
 use Bveing\MBuddy\Ui\SinglePageApp;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\AbstractLogger;
-use Psr\Log\NullLogger;
 use function Amp\delay;
 
 class SinglePageAppTest extends TestCase
@@ -21,9 +20,7 @@ class SinglePageAppTest extends TestCase
     {
         Loop::run(function() {
             $app = new SinglePageApp(
-                "MBuddy",
-                new NullLogger(),
-                __DIR__,
+                title: "My Title",
             );
 
             $comp = $this->createEmptyComponent();
@@ -32,14 +29,14 @@ class SinglePageAppTest extends TestCase
                 yield $app->start($comp);
                 yield GeckoServerExtension::navigateToHomePage();
 
-                $this->assertSame('MBuddy', yield GeckoServerExtension::$driver->getTitle());
+                $this->assertSame('My Title', yield GeckoServerExtension::$driver->getTitle());
                 yield $app->stop();
 
 
                 yield $app->start($comp);
                 yield GeckoServerExtension::$driver->refresh();
                 $title = yield GeckoServerExtension::$driver->getTitle();
-                $this->assertSame('MBuddy', $title);
+                $this->assertSame('My Title', $title);
             } finally {
                 yield $app->stop();
             }
@@ -65,11 +62,7 @@ class SinglePageAppTest extends TestCase
                 }
             };
 
-            $app = new SinglePageApp(
-                "MBuddy",
-                $logger,
-                __DIR__,
-            );
+            $app = new SinglePageApp(logger: $logger);
 
             yield $app->start(
                 new class () implements Component {
@@ -120,9 +113,7 @@ class SinglePageAppTest extends TestCase
     {
         Loop::run(function() {
             $app = new SinglePageApp(
-                "MBuddy",
-                new NullLogger(),
-                __DIR__,
+                rootDir: __DIR__,
             );
 
             $comp = $this->createEmptyComponent();
