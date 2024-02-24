@@ -11,6 +11,9 @@ class Program
         private int $bankLsb,
         private int $number,
     ) {
+        assert(0 <= $bankMsb && $bankMsb <= 127);
+        assert(0 <= $bankLsb && $bankLsb <= 127);
+        assert(0 <= $number && $number <= 127);
     }
 
     public function getBankMsb(): int

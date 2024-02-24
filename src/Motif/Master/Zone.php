@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Bveing\MBuddy\Motif\Master;
 
+use Bveing\MBuddy\Motif\Channel;
 use Bveing\MBuddy\Motif\Program;
 use Bveing\MBuddy\Motif\SysEx;
 
@@ -11,7 +12,7 @@ class Zone
 {
     private function __construct(
         private int $id,
-        private int $transmitChannel,
+        private Channel $transmitChannel,
         private bool $isTransmittedForMidi,
         private bool $isTransmittedForToneGenerator,
         private int $transposeOctave,
@@ -49,7 +50,7 @@ class Zone
     {
         return new self(
             id: $id,
-            transmitChannel: 1,
+            transmitChannel: Channel::fromMidiByte(0),
             isTransmittedForMidi: false,
             isTransmittedForToneGenerator: true,
             transposeOctave: 0,
@@ -91,7 +92,7 @@ class Zone
 
         return new self(
             id: $block->getAddress()->m(),
-            transmitChannel: $data[0x00] & 0b00001111,
+            transmitChannel: Channel::fromMidiByte($data[0x00] & 0b00001111),
             isTransmittedForMidi: (bool)($data[0x00] & (1 << 4)),
             isTransmittedForToneGenerator: (bool)($data[0x00] & (1 << 5)),
             transposeOctave: $data[0x01] - 0x40,
@@ -134,14 +135,14 @@ class Zone
         return $this->id;
     }
 
-    public function getTransmitChannel(): int
+    public function getTransmitChannel(): Channel
     {
         return $this->transmitChannel;
     }
 
     public function with(
         int $id = null,
-        int $transmitChannel = null,
+        Channel $transmitChannel = null,
         bool $isTransmittedForMidi = null,
         bool $isTransmittedForToneGenerator = null,
         int $transposeOctave = null,
@@ -365,7 +366,7 @@ class Zone
             byteCount: 0x10,
             address: new SysEx\Address(0x32, $this->id, 0x00),
             data: [
-                0x00 => (0b00001111 & $this->transmitChannel) | ($this->isTransmittedForMidi << 4) | ($this->isTransmittedForToneGenerator << 5),
+                0x00 => (0b00001111 & $this->transmitChannel->toMidiByte()) | ($this->isTransmittedForMidi << 4) | ($this->isTransmittedForToneGenerator << 5),
                 0x01 => 0x40 + $this->transposeOctave,
                 0x02 => 0x40 + $this->transposeSemitone,
                 0x03 => $this->noteLimitLow,
