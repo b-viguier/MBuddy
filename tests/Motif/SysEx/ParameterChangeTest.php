@@ -19,10 +19,10 @@ class ParameterChangeTest extends TestCase
         $parameterChange = ParameterChange::create($address, $data);
         $sysex = $parameterChange->toSysex();
 
-        self::assertSame($address, $parameterChange->getAddress());
-        self::assertSame($data, $parameterChange->getData());
-        self::assertSame(ParameterChange::DEVICE_NUMBER, $sysex->getDeviceNumber());
-        self::assertSame([...$address->toArray(), ...$data], $sysex->getBytes());
+        self::assertSame($address, $parameterChange->address());
+        self::assertSame($data, $parameterChange->data());
+        self::assertSame(ParameterChange::DEVICE_NUMBER, $sysex->deviceNumber());
+        self::assertSame([...$address->toArray(), ...$data], $sysex->toBytes());
     }
 
     /**
@@ -42,11 +42,11 @@ class ParameterChangeTest extends TestCase
     public static function invalidSysExProvider(): iterable
     {
         yield 'invalid device number' => [
-            SysEx::fromData(ParameterChange::DEVICE_NUMBER + 1, '*'),
+            SysEx::fromBytes(ParameterChange::DEVICE_NUMBER + 1, '*'),
             'Invalid Device Number',
         ];
         yield 'invalid size' => [
-            SysEx::fromData(ParameterChange::DEVICE_NUMBER, '*'),
+            SysEx::fromBytes(ParameterChange::DEVICE_NUMBER, '*'),
             'Invalid BulkDump size',
         ];
     }
@@ -56,14 +56,14 @@ class ParameterChangeTest extends TestCase
         $address = new Address(1, 2, 3);
         $data = 'data';
 
-        $sysEx = SysEx::fromData(
+        $sysEx = SysEx::fromBytes(
             ParameterChange::DEVICE_NUMBER,
             $address->toBinaryString().$data,
         );
         $parameterChange = ParameterChange::fromSysex($sysEx);
 
-        self::assertEquals($address, $parameterChange->getAddress());
-        self::assertSame([ord('d'), ord('a'), ord('t'), ord('a')], $parameterChange->getData());
+        self::assertEquals($address, $parameterChange->address());
+        self::assertSame([ord('d'), ord('a'), ord('t'), ord('a')], $parameterChange->data());
         self::assertSame((string)$sysEx, (string)$parameterChange->toSysEx());
     }
 }

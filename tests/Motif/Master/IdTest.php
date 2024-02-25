@@ -29,7 +29,7 @@ class IdTest extends TestCase
     {
         $masterIds = array_map(
             fn(Id $masterId) => $masterId->toInt(),
-            iterator_to_array(Id::getAll()),
+            iterator_to_array(Id::all()),
         );
 
         self::assertSame(range(0, 127), $masterIds);

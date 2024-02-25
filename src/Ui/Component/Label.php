@@ -20,7 +20,7 @@ class Label implements Component
     {
         $this->refreshNeeded = false;
         return <<<HTML
-            <label id="{$this->getId()}">{$this->label}</label>
+            <label id="{$this->id()}">{$this->label}</label>
             HTML;
     }
 

@@ -16,8 +16,8 @@ class ParameterRequestTest extends TestCase
         $parameterRequest = new ParameterRequest($address);
         $sysex = $parameterRequest->toSysex();
 
-        self::assertSame($address, $parameterRequest->getAddress());
-        self::assertSame(ParameterRequest::DEVICE_NUMBER, $sysex->getDeviceNumber());
-        self::assertSame($address->toArray(), $sysex->getBytes());
+        self::assertSame($address, $parameterRequest->address());
+        self::assertSame(ParameterRequest::DEVICE_NUMBER, $sysex->deviceNumber());
+        self::assertSame($address->toArray(), $sysex->toBytes());
     }
 }

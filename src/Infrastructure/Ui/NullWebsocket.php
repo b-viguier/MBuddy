@@ -10,7 +10,7 @@ use Bveing\MBuddy\Ui\Websocket;
 
 class NullWebsocket implements Websocket
 {
-    public function getPath(): string
+    public function path(): string
     {
         return '/';
     }

@@ -13,7 +13,7 @@ class DumpRequest
 
     public function __construct(private Address $address)
     {
-        $this->sysex = SysEx::fromData(self::DEVICE_NUMBER, $this->address->toBinaryString());
+        $this->sysex = SysEx::fromBytes(self::DEVICE_NUMBER, $this->address->toBinaryString());
     }
 
     public function toSysex(): SysEx
@@ -21,7 +21,7 @@ class DumpRequest
         return $this->sysex;
     }
 
-    public function getAddress(): Address
+    public function address(): Address
     {
         return $this->address;
     }

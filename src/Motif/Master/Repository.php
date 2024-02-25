@@ -48,7 +48,7 @@ class Repository
     /**
      * @return Promise<Master\Id>
      */
-    public function getCurrentMasterId(): Promise
+    public function currentMasterId(): Promise
     {
         return call(function() {
             $parameterChange = yield $this->sysExClient->requestParameter(
@@ -59,7 +59,7 @@ class Repository
                 return null;
             }
 
-            return Id::fromInt($parameterChange->getData()[0]);
+            return Id::fromInt($parameterChange->data()[0]);
         });
     }
 
@@ -81,7 +81,7 @@ class Repository
     /**
      * @return Promise<string>
      */
-    public function getCurrentName(): Promise
+    public function currentName(): Promise
     {
         return call(function() {
 
@@ -98,7 +98,7 @@ class Repository
                 if ($param === null) {
                     $name .= ' ';
                 } else {
-                    $name .= chr($param->getData()[0]);
+                    $name .= chr($param->data()[0]);
                 }
             }
 

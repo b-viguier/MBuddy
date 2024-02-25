@@ -13,7 +13,7 @@ class ParameterRequest
 
     public function __construct(private Address $address)
     {
-        $this->sysex = SysEx::fromData(
+        $this->sysex = SysEx::fromBytes(
             self::DEVICE_NUMBER,
             $address->toBinaryString(),
         );
@@ -24,7 +24,7 @@ class ParameterRequest
         return $this->sysex;
     }
 
-    public function getAddress(): Address
+    public function address(): Address
     {
         return $this->address;
     }

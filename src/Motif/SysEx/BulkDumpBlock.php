@@ -58,11 +58,11 @@ class BulkDumpBlock
 
     public static function fromSysEx(SysEx $sysex): self
     {
-        if ($sysex->getDeviceNumber() !== self::DEVICE_NUMBER) {
+        if ($sysex->deviceNumber() !== self::DEVICE_NUMBER) {
             throw new \InvalidArgumentException('Invalid Device Number');
         }
 
-        $bytes = $sysex->getBytes();
+        $bytes = $sysex->toBytes();
 
         if (count($bytes) < self::MIN_FIXED_SIZE) {
             throw new \InvalidArgumentException('Invalid BulkDump size');
@@ -107,7 +107,7 @@ class BulkDumpBlock
 
         $checksum = 128 - (array_sum($msg) % 128);
 
-        return SysEx::fromData(
+        return SysEx::fromBytes(
             self::DEVICE_NUMBER,
             pack('C*', ...[
                 ...$msg,
@@ -116,7 +116,7 @@ class BulkDumpBlock
         );
     }
 
-    public function getAddress(): Address
+    public function address(): Address
     {
         return $this->address;
     }
@@ -124,7 +124,7 @@ class BulkDumpBlock
     /**
      * @return list<int>
      */
-    public function getData(): array
+    public function data(): array
     {
         return $this->data;
     }

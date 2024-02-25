@@ -27,11 +27,11 @@ class ParameterChange
 
     public static function fromSysex(SysEx $sysex): self
     {
-        if ($sysex->getDeviceNumber() !== self::DEVICE_NUMBER) {
+        if ($sysex->deviceNumber() !== self::DEVICE_NUMBER) {
             throw new \InvalidArgumentException('Invalid Device Number');
         }
 
-        $bytes = $sysex->getBytes();
+        $bytes = $sysex->toBytes();
 
         if (count($bytes) < self::MIN_FIXED_SIZE) {
             throw new \InvalidArgumentException('Invalid BulkDump size');
@@ -56,7 +56,7 @@ class ParameterChange
 
     public function toSysEx(): SysEx
     {
-        return SysEx::fromData(
+        return SysEx::fromBytes(
             self::DEVICE_NUMBER,
             pack(
                 'C*',
@@ -66,7 +66,7 @@ class ParameterChange
         );
     }
 
-    public function getAddress(): Address
+    public function address(): Address
     {
         return $this->address;
     }
@@ -74,7 +74,7 @@ class ParameterChange
     /**
      * @return list<int>
      */
-    public function getData(): array
+    public function data(): array
     {
         return $this->data;
     }

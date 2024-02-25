@@ -47,7 +47,7 @@ class ButtonTest extends TestCase
                     return $this->button1->render() . $this->button2->render();
                 }
 
-                public function getChildren(): iterable
+                public function children(): iterable
                 {
                     yield $this->button1;
                     yield $this->button2;
@@ -62,8 +62,8 @@ class ButtonTest extends TestCase
                 $this->assertSame(0, $counter1);
                 $this->assertSame(0, $counter2);
 
-                $elementId1 = yield GeckoServerExtension::$driver->findElement(sprintf('#%s', $button1->getId()));
-                $elementId2 = yield GeckoServerExtension::$driver->findElement(sprintf('#%s', $button2->getId()));
+                $elementId1 = yield GeckoServerExtension::$driver->findElement(sprintf('#%s', $button1->id()));
+                $elementId2 = yield GeckoServerExtension::$driver->findElement(sprintf('#%s', $button2->id()));
 
                 $this->assertSame('B1', yield GeckoServerExtension::$driver->getElementText($elementId1));
                 $this->assertSame('B2', yield GeckoServerExtension::$driver->getElementText($elementId2));

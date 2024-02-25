@@ -16,8 +16,8 @@ class DumpRequestTest extends TestCase
         $dumpRequest = new DumpRequest($address);
         $sysex = $dumpRequest->toSysex();
 
-        self::assertSame($address, $dumpRequest->getAddress());
-        self::assertSame(DumpRequest::DEVICE_NUMBER, $sysex->getDeviceNumber());
-        self::assertSame($address->toArray(), $sysex->getBytes());
+        self::assertSame($address, $dumpRequest->address());
+        self::assertSame(DumpRequest::DEVICE_NUMBER, $sysex->deviceNumber());
+        self::assertSame($address->toArray(), $sysex->toBytes());
     }
 }

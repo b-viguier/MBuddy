@@ -37,7 +37,7 @@ class LabelTest extends TestCase
                     return $this->label1->render() . $this->label2->render();
                 }
 
-                public function getChildren(): iterable
+                public function children(): iterable
                 {
                     yield $this->label1;
                     yield $this->label2;
@@ -49,8 +49,8 @@ class LabelTest extends TestCase
                 yield $app->start($comp);
                 yield GeckoServerExtension::navigateToHomePage();
 
-                $elementId1 = yield GeckoServerExtension::$driver->findElement(sprintf('#%s', $label1->getId()));
-                $elementId2 = yield GeckoServerExtension::$driver->findElement(sprintf('#%s', $label2->getId()));
+                $elementId1 = yield GeckoServerExtension::$driver->findElement(sprintf('#%s', $label1->id()));
+                $elementId2 = yield GeckoServerExtension::$driver->findElement(sprintf('#%s', $label2->id()));
 
                 $this->assertSame('L1', yield GeckoServerExtension::$driver->getElementText($elementId1));
                 $this->assertSame('L2', yield GeckoServerExtension::$driver->getElementText($elementId2));
@@ -58,8 +58,8 @@ class LabelTest extends TestCase
                 $label1->setText('Hello');
                 yield $app->refresh();
 
-                $elementId1 = yield GeckoServerExtension::$driver->findElement(sprintf('#%s', $label1->getId()));
-                $elementId2 = yield GeckoServerExtension::$driver->findElement(sprintf('#%s', $label2->getId()));
+                $elementId1 = yield GeckoServerExtension::$driver->findElement(sprintf('#%s', $label1->id()));
+                $elementId2 = yield GeckoServerExtension::$driver->findElement(sprintf('#%s', $label2->id()));
 
                 $this->assertSame('Hello', yield GeckoServerExtension::$driver->getElementText($elementId1));
                 $this->assertSame('L2', yield GeckoServerExtension::$driver->getElementText($elementId2));
@@ -67,8 +67,8 @@ class LabelTest extends TestCase
                 $label2->setText('World');
                 yield $app->refresh();
 
-                $elementId1 = yield GeckoServerExtension::$driver->findElement(sprintf('#%s', $label1->getId()));
-                $elementId2 = yield GeckoServerExtension::$driver->findElement(sprintf('#%s', $label2->getId()));
+                $elementId1 = yield GeckoServerExtension::$driver->findElement(sprintf('#%s', $label1->id()));
+                $elementId2 = yield GeckoServerExtension::$driver->findElement(sprintf('#%s', $label2->id()));
 
                 $this->assertSame('Hello', yield GeckoServerExtension::$driver->getElementText($elementId1));
                 $this->assertSame('World', yield GeckoServerExtension::$driver->getElementText($elementId2));

@@ -10,7 +10,7 @@ trait AutoId
 {
     private ?Id $id;
 
-    public function getId(): Id
+    public function id(): Id
     {
         return $this->id ?? $this->id = new Id(
             uniqid(

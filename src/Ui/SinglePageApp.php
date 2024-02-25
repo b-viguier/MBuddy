@@ -63,7 +63,7 @@ class SinglePageApp
             (new Options())->withDebugMode(),
         );
 
-        $router->addRoute('GET', $this->websocket->getPath(), $websocketServer);
+        $router->addRoute('GET', $this->websocket->path(), $websocketServer);
 
         $router->addRoute(
             'GET',
@@ -191,7 +191,7 @@ class SinglePageApp
                 
                 <script>
                     var MBuddySocket = new WebSocket(
-                        "ws://" + window.location.hostname + ":" + window.location.port + '{$this->websocket->getPath()}'
+                        "ws://" + window.location.hostname + ":" + window.location.port + '{$this->websocket->path()}'
                     );
                     MBuddySocket.binaryType = "arraybuffer";
                 
@@ -252,10 +252,11 @@ class SinglePageApp
     /**
      * @return iterable<Component>
      */
-    private function getComponentsToRefresh(): iterable
+    private function findComponentsToRefresh(): iterable
     {
         assert($this->body !== null);
 
+        /** @var array<iterable<Component>> $ChildrenIterators */
         $ChildrenIterators = [[$this->body]];
         while ($ChildrenIterators) {
             $children = array_pop($ChildrenIterators);
@@ -263,7 +264,7 @@ class SinglePageApp
                 if ($child->isRefreshNeeded()) {
                     yield $child;
                 } else {
-                    $ChildrenIterators[] = $child->getChildren();
+                    $ChildrenIterators[] = $child->children();
                 }
             }
         }
@@ -276,9 +277,9 @@ class SinglePageApp
     {
         return call(function() {
             $allPromises = [];
-            foreach ($this->getComponentsToRefresh() as $component) {
+            foreach ($this->findComponentsToRefresh() as $component) {
                 $allPromises[] = $this->websocket->send(
-                    json_encode([(string)$component->getId(), 'refresh', $component->render()], JSON_THROW_ON_ERROR)
+                    json_encode([(string)$component->id(), 'refresh', $component->render()], JSON_THROW_ON_ERROR)
                 );
             }
 
@@ -311,7 +312,7 @@ class SinglePageApp
             }
             return;
         }
-        $component = $this->getComponentById(new Id($componentId));
+        $component = $this->findComponentById(new Id($componentId));
         if ($component === null) {
             $this->logger->warning('Component not found: ' . $componentId);
             return;
@@ -322,7 +323,7 @@ class SinglePageApp
         $this->refresh();
     }
 
-    private function getComponentById(Id $id): ?Component
+    private function findComponentById(Id $id): ?Component
     {
         assert($this->body !== null);
 
@@ -334,15 +335,16 @@ class SinglePageApp
         $this->componentsCache = [];
         $found = null;
 
+        /** @var array<iterable<Component>> $ChildrenIterators */
         $ChildrenIterators = [[$this->body]];
         while ($ChildrenIterators) {
             $children = array_pop($ChildrenIterators);
             foreach ($children as $child) {
-                if ($child->getId() == $id) {
+                if ($child->id() == $id) {
                     $found = $child;
                 }
-                $this->componentsCache[(string)$child->getId()] = \WeakReference::create($child);
-                $ChildrenIterators[] = $child->getChildren();
+                $this->componentsCache[(string)$child->id()] = \WeakReference::create($child);
+                $ChildrenIterators[] = $child->children();
             }
         }
 

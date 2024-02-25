@@ -62,9 +62,9 @@ class Master
         assert($headerBlock->isHeaderBlock());
         assert($footerBlock->isFooterBlock());
 
-        $headerAddress = $headerBlock->getAddress();
-        assert($footerBlock->getAddress()->m() === $headerAddress->m());
-        assert($footerBlock->getAddress()->l() === $headerAddress->l());
+        $headerAddress = $headerBlock->address();
+        assert($footerBlock->address()->m() === $headerAddress->m());
+        assert($footerBlock->address()->l() === $headerAddress->l());
 
         $masterId = match ($headerAddress->m()) {
             0x70 => Master\Id::fromInt($headerAddress->l()),
@@ -72,8 +72,8 @@ class Master
             default => throw new \RuntimeException('Invalid MasterId'),
         };
 
-        assert($commonBlock->getAddress()->toArray() === [0x33, 0x00, 0x00]);
-        $commonData = $commonBlock->getData();
+        assert($commonBlock->address()->toArray() === [0x33, 0x00, 0x00]);
+        $commonData = $commonBlock->data();
 
         return new self(
             id: $masterId,
@@ -192,9 +192,9 @@ class Master
                 ...$name,
                 ...[0x00, 0x00, 0x00, 0x00, 0x00], // Reserved
                 0x19 => $this->mode->getValue(),
-                0x1A => $this->program->getBankMsb(),
-                0x1B => $this->program->getBankLsb(),
-                0x1C => $this->program->getNumber(),
+                0x1A => $this->program->bankMsb(),
+                0x1B => $this->program->bankLsb(),
+                0x1C => $this->program->number(),
                 0x1D => (int) $this->zoneEnabled,
                 0x1E => $this->knobSliderFunction->getValue(),
             ],

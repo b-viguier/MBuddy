@@ -37,7 +37,7 @@ class Id
     /**
      * @return \Traversable<self>
      */
-    public static function getAll(): iterable
+    public static function all(): iterable
     {
         for ($i = 0; $i <= 127; $i++) {
             yield self::fromInt($i);

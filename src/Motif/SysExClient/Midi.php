@@ -45,7 +45,7 @@ class Midi implements SysExClient
     public function requestDump(SysEx\DumpRequest $request): Promise
     {
         $deferred = new Deferred();
-        $deferredKey = $request->getAddress()->toBinaryString();
+        $deferredKey = $request->address()->toBinaryString();
         $this->deferredDump[$deferredKey] = $deferred;
 
         asyncCall(function() use ($request, $deferred, $deferredKey) {
@@ -77,7 +77,7 @@ class Midi implements SysExClient
     public function requestParameter(SysEx\ParameterRequest $request): Promise
     {
         $deferred = new Deferred();
-        $deferredKey = $request->getAddress()->toBinaryString();
+        $deferredKey = $request->address()->toBinaryString();
         $this->deferredParam[$deferredKey] = $deferred;
 
         asyncCall(function() use ($request, $deferred, $deferredKey) {
@@ -109,7 +109,7 @@ class Midi implements SysExClient
         }
 
         try {
-            switch ($sysex->getDeviceNumber()) {
+            switch ($sysex->deviceNumber()) {
                 case SysEx\BulkDumpBlock::DEVICE_NUMBER:
                     $this->handleBulkDumpBlock(SysEx\BulkDumpBlock::fromSysEx($sysex));
                     break;
@@ -134,7 +134,7 @@ class Midi implements SysExClient
     {
         if (!$this->blocksBuffer) {
             if ($block->isHeaderBlock()) {
-                if (isset($this->deferredDump[$block->getAddress()->toBinaryString()])) {
+                if (isset($this->deferredDump[$block->address()->toBinaryString()])) {
                     $this->blocksBuffer = [$block];
                 } else {
                     $this->logger->warning('Received unknown HeaderBlock');
@@ -144,8 +144,8 @@ class Midi implements SysExClient
             }
         } else {
             if ($block->isFooterBlock()) {
-                $headerAddress = $this->blocksBuffer[0]->getAddress();
-                $footerAddress = $block->getAddress();
+                $headerAddress = $this->blocksBuffer[0]->address();
+                $footerAddress = $block->address();
                 if ($headerAddress->m() === $footerAddress->m() && $headerAddress->l() === $footerAddress->l()) {
                     $deferredKey = $headerAddress->toBinaryString();
                     if (!isset($this->deferredDump[$deferredKey])) {
@@ -167,7 +167,7 @@ class Midi implements SysExClient
             } else {
                 if ($block->isHeaderBlock()) {
                     $this->logger->warning('Received BulkDumpBlock while current dump is incomplete... Resetting');
-                    if (isset($this->deferredDump[$block->getAddress()->toBinaryString()])) {
+                    if (isset($this->deferredDump[$block->address()->toBinaryString()])) {
                         $this->blocksBuffer = [$block];
                     } else {
                         $this->logger->warning('Received unknown HeaderBlock');
@@ -181,7 +181,7 @@ class Midi implements SysExClient
 
     private function handleParameterChange(SysEx\ParameterChange $change): void
     {
-        $deferredKey = $change->getAddress()->toBinaryString();
+        $deferredKey = $change->address()->toBinaryString();
         if (!isset($this->deferredParam[$deferredKey])) {
             $this->logger->warning('Received ParameterChange but job has been cancelled');
 

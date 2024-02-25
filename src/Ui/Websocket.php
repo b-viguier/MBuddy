@@ -9,7 +9,7 @@ use Bveing\MBuddy\Ui\Websocket\Listener;
 
 interface Websocket
 {
-    public function getPath(): string;
+    public function path(): string;
 
     /**
      * @return Promise<null>

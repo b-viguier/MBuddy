@@ -6,7 +6,7 @@ namespace Bveing\MBuddy\Ui\Component\Trait;
 
 trait Childless
 {
-    public function getChildren(): iterable
+    public function children(): iterable
     {
         return [];
     }

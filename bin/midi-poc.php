@@ -23,7 +23,7 @@ Amp\Loop::run(function() {
 
     $promises = [];
     $countdown = 6;
-    foreach (\Bveing\MBuddy\Motif\Master\Id::getAll() as $masterId) {
+    foreach (\Bveing\MBuddy\Motif\Master\Id::all() as $masterId) {
         $promises[] = \Amp\call('displayMaster', $repository, $masterId);
         if (--$countdown === 0) {
             break;

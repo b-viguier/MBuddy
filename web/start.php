@@ -53,7 +53,7 @@ Amp\Loop::run(function() {
                 HTML;
         }
 
-        public function getChildren(): iterable
+        public function children(): iterable
         {
             yield $this->button1;
             yield $this->button2;

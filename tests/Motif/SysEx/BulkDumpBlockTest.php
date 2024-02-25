@@ -23,12 +23,12 @@ class BulkDumpBlockTest extends TestCase
         $block = BulkDumpBlock::create($byteCount, $address, $data);
         $sysex = $block->toSysex();
 
-        self::assertSame($address, $block->getAddress());
-        self::assertSame($data, $block->getData());
-        self::assertSame(BulkDumpBlock::DEVICE_NUMBER, $sysex->getDeviceNumber());
+        self::assertSame($address, $block->address());
+        self::assertSame($data, $block->data());
+        self::assertSame(BulkDumpBlock::DEVICE_NUMBER, $sysex->deviceNumber());
         self::assertSame(
             [$byteCountMsb, $byteCountLsb, ...$address->toArray(), ...$data, $checksum],
-            $sysex->getBytes(),
+            $sysex->toBytes(),
         );
 
         self::assertFalse($block->isHeaderBlock());
@@ -55,11 +55,11 @@ class BulkDumpBlockTest extends TestCase
     public static function invalidSysExProvider(): iterable
     {
         yield 'invalid device number' => [
-            SysEx::fromData(BulkDumpBlock::DEVICE_NUMBER + 1, '*'),
+            SysEx::fromBytes(BulkDumpBlock::DEVICE_NUMBER + 1, '*'),
             'Invalid Device Number',
         ];
         yield 'invalid size' => [
-            SysEx::fromData(BulkDumpBlock::DEVICE_NUMBER, '*'),
+            SysEx::fromBytes(BulkDumpBlock::DEVICE_NUMBER, '*'),
             'Invalid BulkDump size',
         ];
 
@@ -69,7 +69,7 @@ class BulkDumpBlockTest extends TestCase
         $checksum = 99;
 
         yield 'wrong size' => [
-            SysEx::fromData(
+            SysEx::fromBytes(
                 BulkDumpBlock::DEVICE_NUMBER,
                 pack('C*', 0, $size),
             ),
@@ -77,7 +77,7 @@ class BulkDumpBlockTest extends TestCase
         ];
 
         yield 'wrong checksum' => [
-            SysEx::fromData(
+            SysEx::fromBytes(
                 BulkDumpBlock::DEVICE_NUMBER,
                 pack('C*', ...[0, $size, ...$address, ...$data, $checksum + 1]),
             ),
@@ -91,8 +91,8 @@ class BulkDumpBlockTest extends TestCase
 
         self::assertTrue($block->isHeaderBlock());
         self::assertFalse($block->isFooterBlock());
-        self::assertEquals(new Address(0x0E, $m, $l), $block->getAddress());
-        self::assertEmpty($block->getData());
+        self::assertEquals(new Address(0x0E, $m, $l), $block->address());
+        self::assertEmpty($block->data());
 
         $blockFromSysex = BulkDumpBlock::fromSysex($block->toSysex());
 
@@ -105,8 +105,8 @@ class BulkDumpBlockTest extends TestCase
 
         self::assertTrue($block->isFooterBlock());
         self::assertFalse($block->isHeaderBlock());
-        self::assertEquals(new Address(0x0F, $m, $l), $block->getAddress());
-        self::assertEmpty($block->getData());
+        self::assertEquals(new Address(0x0F, $m, $l), $block->address());
+        self::assertEmpty($block->data());
 
         $blockFromSysex = BulkDumpBlock::fromSysex($block->toSysex());
 

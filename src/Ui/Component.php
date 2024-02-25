@@ -11,9 +11,9 @@ interface Component
     /**
      * @return iterable<Component>
      */
-    public function getChildren(): iterable;
+    public function children(): iterable;
 
-    public function getId(): Id;
+    public function id(): Id;
 
     public function isRefreshNeeded(): bool;
 }

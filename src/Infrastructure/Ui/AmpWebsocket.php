@@ -27,7 +27,7 @@ class AmpWebsocket implements Websocket, ClientHandler
         $this->listener = new Websocket\NullListener();
     }
 
-    public function getPath(): string
+    public function path(): string
     {
         return $this->path;
     }

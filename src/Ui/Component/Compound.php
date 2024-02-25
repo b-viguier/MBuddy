@@ -29,7 +29,7 @@ class Compound implements Component
         return $html;
     }
 
-    public function getChildren(): iterable
+    public function children(): iterable
     {
         return $this->htmlComponents;
     }

@@ -11,8 +11,8 @@ class ProgramTest extends TestCase
     public function testGetValues(): void
     {
         $program = new \Bveing\MBuddy\Motif\Program(1, 2, 3);
-        $this->assertSame(1, $program->getBankMsb());
-        $this->assertSame(2, $program->getBankLsb());
-        $this->assertSame(3, $program->getNumber());
+        $this->assertSame(1, $program->bankMsb());
+        $this->assertSame(2, $program->bankLsb());
+        $this->assertSame(3, $program->number());
     }
 }

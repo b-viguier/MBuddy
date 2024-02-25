@@ -27,7 +27,7 @@ class Button implements Component
     {
         $this->refreshNeeded = false;
         return <<<HTML
-            <button type="button" data-on-click="onClick" class="btn btn-{$this->color}" id="{$this->getId()}">
+            <button type="button" data-on-click="onClick" class="btn btn-{$this->color}" id="{$this->id()}">
                 {$this->label}
             </button>
             HTML;

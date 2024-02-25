@@ -16,17 +16,17 @@ class Program
         assert(0 <= $number && $number <= 127);
     }
 
-    public function getBankMsb(): int
+    public function bankMsb(): int
     {
         return $this->bankMsb;
     }
 
-    public function getBankLsb(): int
+    public function bankLsb(): int
     {
         return $this->bankLsb;
     }
 
-    public function getNumber(): int
+    public function number(): int
     {
         return $this->number;
     }

@@ -41,19 +41,19 @@ class SysEx implements \Stringable
     /**
      * @return list<int>
      */
-    public function getBytes(): array
+    public function toBytes(): array
     {
         return array_values(
             unpack('C*', substr($this->sysexMsg, 5, -1)) ?: throw new \RuntimeException('Cannot unpack SysEx'),
         );
     }
 
-    public function getDeviceNumber(): int
+    public function deviceNumber(): int
     {
         return ord($this->sysexMsg[2]);
     }
 
-    public static function fromData(int $deviceNumber, string $data): self
+    public static function fromBytes(int $deviceNumber, string $data): self
     {
         assert($deviceNumber >= 0x00 && $deviceNumber < 0xF0);
         assert(

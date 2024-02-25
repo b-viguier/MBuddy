@@ -86,12 +86,12 @@ class Zone
 
     public static function fromBulkDump(SysEx\BulkDumpBlock $block): self
     {
-        assert($block->getAddress()->h() === 0x32 && $block->getAddress()->l() === 0x00);
-        $data = $block->getData();
+        assert($block->address()->h() === 0x32 && $block->address()->l() === 0x00);
+        $data = $block->data();
         assert(count($data) === 0x10);
 
         return new self(
-            id: $block->getAddress()->m(),
+            id: $block->address()->m(),
             transmitChannel: Channel::fromMidiByte($data[0x00] & 0b00001111),
             isTransmittedForMidi: (bool)($data[0x00] & (1 << 4)),
             isTransmittedForToneGenerator: (bool)($data[0x00] & (1 << 5)),
@@ -373,9 +373,9 @@ class Zone
                 0x05 => 0x00, // Reserved
                 0x06 => $this->volume,
                 0x07 => $this->pan,
-                0x08 => $this->program->getBankMsb(),
-                0x09 => $this->program->getBankLsb(),
-                0x0A => $this->program->getNumber(),
+                0x08 => $this->program->bankMsb(),
+                0x09 => $this->program->bankLsb(),
+                0x0A => $this->program->number(),
                 0x0B => $this->isBankSelectTransmittedForToneGenerator << 0
                     | $this->isProgramChangeTransmittedForToneGenerator << 1
                     | $this->isRibbonTransmitted << 2
