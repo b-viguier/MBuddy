@@ -3,6 +3,7 @@ parameters:
 	paths:
 		- src/Motif
 		- src/Ui
+		- src/Infrastructure
 		- tests
 
 includes:

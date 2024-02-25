@@ -24,7 +24,7 @@ class RtMidi implements MidiDriver
     {
         $this->output->send(RtMidiLib\Message::fromBinString($message));
 
-        return new Success();
+        return new Success(strlen($message));
     }
 
     public function receive(): Promise

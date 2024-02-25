@@ -34,10 +34,13 @@ class AmpWebsocket implements Websocket, ClientHandler
 
     public function send(string $message): Promise
     {
-        assert($this->client !== null);
-        $this->logger->debug('Sent message: '.$message);
+        return call(function() use ($message) {
+            assert($this->client !== null);
+            yield $this->client->send($message);
+            $this->logger->debug('Sent message: '.$message);
 
-        return $this->client->send($message);
+            return null;
+        });
     }
 
     public function setListener(Websocket\Listener $listener): void
@@ -67,13 +70,13 @@ class AmpWebsocket implements Websocket, ClientHandler
         $this->client = $client;
         $this->logger->debug('Client connected');
 
-        return call(fn() => $this->receiveLoop());
+        return call(fn() => yield from $this->receiveLoop());
     }
 
     private function receiveLoop(): \Generator
     {
         try {
-            while ($message = yield $this->client->receive()) {
+            while ($this->client && $message = yield $this->client->receive()) {
                 $data = yield $message->buffer();
                 $this->logger->debug('Received message: '.$data);
                 $this->listener->onMessage($data);

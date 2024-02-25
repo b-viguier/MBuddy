@@ -16,7 +16,7 @@ class UdpLogger extends \Psr\Log\AbstractLogger
     public static function create(
         SocketAddress $socketAddress,
     ): Promise {
-        return \Amp\call(fn() => new self(
+        return \Amp\call(fn(): \Generator => new self(
             yield \Amp\Socket\connect('udp://'.$socketAddress->toString()),
         ));
     }
@@ -26,6 +26,11 @@ class UdpLogger extends \Psr\Log\AbstractLogger
     ) {
     }
 
+    /**
+     * @inheritDoc
+     * @param string $level
+     * @param array<mixed> $context
+     */
     public function log($level, \Stringable|string $message, array $context = []): void
     {
         $this->socket->write(
