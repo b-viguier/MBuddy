@@ -2,18 +2,17 @@
 
 declare(strict_types=1);
 
-namespace Bveing\MBuddy\Motif\SysExClient;
+namespace Bveing\MBuddy\Motif\SysEx\Client;
 
 use Amp\Deferred;
 use Amp\Promise;
 use Bveing\MBuddy\Motif\MidiDriver;
 use Bveing\MBuddy\Motif\SysEx;
-use Bveing\MBuddy\Motif\SysExClient;
 use Psr\Log\LoggerInterface;
 use function Amp\asyncCall;
 use function Amp\delay;
 
-class Midi implements SysExClient
+class Midi implements Sysex\Client
 {
     /** @var list<SysEx\BulkDumpBlock> */
     private array $blocksBuffer = [];
@@ -27,9 +26,9 @@ class Midi implements SysExClient
     public function __construct(
         private MidiDriver $midiDriver,
         private LoggerInterface $logger,
-        private float $timeout = 3.0,
+        private float $timeoutInSeconds = 3.0,
     ) {
-        assert($timeout > 0, 'Timeout must be greater than 0');
+        assert($timeoutInSeconds > 0, 'Timeout must be greater than 0');
         asyncCall(function() {
             while (true) {
                 $message = yield $this->midiDriver->receive();
@@ -51,7 +50,7 @@ class Midi implements SysExClient
         asyncCall(function() use ($request, $deferred, $deferredKey) {
             yield $this->midiDriver->send((string)$request->toSysex());
 
-            yield delay(\intval($this->timeout * 1000));
+            yield delay(\intval($this->timeoutInSeconds * 1000));
 
             if (!isset($this->deferredDump[$deferredKey])) {
                 return;
@@ -83,7 +82,7 @@ class Midi implements SysExClient
         asyncCall(function() use ($request, $deferred, $deferredKey) {
             yield $this->midiDriver->send((string)$request->toSysex());
 
-            yield delay(\intval($this->timeout * 1000));
+            yield delay(\intval($this->timeoutInSeconds * 1000));
 
             if (!isset($this->deferredParam[$deferredKey])) {
                 return;

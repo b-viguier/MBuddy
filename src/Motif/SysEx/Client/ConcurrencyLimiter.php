@@ -2,21 +2,20 @@
 
 declare(strict_types=1);
 
-namespace Bveing\MBuddy\Motif\SysExClient;
+namespace Bveing\MBuddy\Motif\SysEx\Client;
 
 use Amp\Promise;
 use Bveing\MBuddy\Motif\SysEx;
-use Bveing\MBuddy\Motif\SysExClient;
 use function Amp\asyncCall;
 
-class ConcurrencyLimiter implements SysExClient
+class ConcurrencyLimiter implements Sysex\Client
 {
     /** @var \SplQueue<\Closure> */
     private \SplQueue $queue;
     private int $nbRunning = 0;
 
     public function __construct(
-        private SysExClient $sysExClient,
+        private Sysex\Client $sysExClient,
         private int $maxConcurrency,
     ) {
         $this->queue = new \SplQueue();

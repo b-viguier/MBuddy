@@ -15,8 +15,8 @@ Amp\Loop::run(function() {
         new \Bveing\MBuddy\Infrastructure\Motif\MidiDriver\RtMidi($input, $output),
         0.1,
     );
-    $sysExClient = new \Bveing\MBuddy\Motif\SysExClient\ConcurrencyLimiter(
-        new \Bveing\MBuddy\Motif\SysExClient\Midi($driver, $logger),
+    $sysExClient = new \Bveing\MBuddy\Motif\SysEx\Client\ConcurrencyLimiter(
+        new \Bveing\MBuddy\Motif\SysEx\Client\Midi($driver, $logger),
         5,
     );
     $repository = new \Bveing\MBuddy\Motif\Master\Repository($sysExClient);

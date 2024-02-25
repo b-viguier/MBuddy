@@ -2,11 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Bveing\MBuddy\Motif;
+namespace Bveing\MBuddy\Motif\SysEx;
 
 use Amp\Promise;
+use Bveing\MBuddy\Motif\SysEx;
 
-interface SysExClient
+interface Client
 {
     /**
      * @return Promise<list<SysEx\BulkDumpBlock>|null>

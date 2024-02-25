@@ -7,14 +7,12 @@ namespace Bveing\MBuddy\Motif\Master;
 use Amp\Promise;
 use Bveing\MBuddy\Motif\Master;
 use Bveing\MBuddy\Motif\SysEx;
-use Bveing\MBuddy\Motif\SysEx\ParameterRequest;
-use Bveing\MBuddy\Motif\SysExClient;
 use function Amp\call;
 
 class Repository
 {
     public function __construct(
-        private SysExClient $sysExClient,
+        private Sysex\Client $sysExClient,
     ) {
     }
 
@@ -52,7 +50,7 @@ class Repository
     {
         return call(function() {
             $parameterChange = yield $this->sysExClient->requestParameter(
-                new ParameterRequest(new SysEx\Address(0x0A, 0x00, 0x00)),
+                new Sysex\ParameterRequest(new SysEx\Address(0x0A, 0x00, 0x00)),
             );
 
             if ($parameterChange === null) {
@@ -88,7 +86,7 @@ class Repository
             $promises = [];
             for ($i = 0; $i < 20; $i++) {
                 $promises[] = $this->sysExClient->requestParameter(
-                    new ParameterRequest(new SysEx\Address(0x33, 0x00, $i)),
+                    new Sysex\ParameterRequest(new SysEx\Address(0x33, 0x00, $i)),
                 );
             }
             $params = yield Promise\all($promises);
