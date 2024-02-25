@@ -9,12 +9,12 @@ class Id
     private function __construct(
         private int $id,
     ) {
-        assert(-1 <= $id && $id <= 127);
+        \assert(-1 <= $id && $id <= 127);
     }
 
     public static function fromInt(int $id): self
     {
-        assert(0 <= $id);
+        \assert(0 <= $id);
 
         return new self($id);
     }

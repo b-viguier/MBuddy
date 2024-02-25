@@ -62,8 +62,8 @@ class ButtonTest extends TestCase
                 $this->assertSame(0, $counter1);
                 $this->assertSame(0, $counter2);
 
-                $elementId1 = yield GeckoServerExtension::$driver->findElement(sprintf('#%s', $button1->id()));
-                $elementId2 = yield GeckoServerExtension::$driver->findElement(sprintf('#%s', $button2->id()));
+                $elementId1 = yield GeckoServerExtension::$driver->findElement(\sprintf('#%s', $button1->id()));
+                $elementId2 = yield GeckoServerExtension::$driver->findElement(\sprintf('#%s', $button2->id()));
 
                 $this->assertSame('B1', yield GeckoServerExtension::$driver->getElementText($elementId1));
                 $this->assertSame('B2', yield GeckoServerExtension::$driver->getElementText($elementId2));

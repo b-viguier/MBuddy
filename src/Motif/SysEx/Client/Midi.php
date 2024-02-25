@@ -28,7 +28,7 @@ class Midi implements Sysex\Client
         private LoggerInterface $logger,
         private float $timeoutInSeconds = 3.0,
     ) {
-        assert($timeoutInSeconds > 0, 'Timeout must be greater than 0');
+        \assert($timeoutInSeconds > 0, 'Timeout must be greater than 0');
         asyncCall(function() {
             while (true) {
                 $message = yield $this->midiDriver->receive();

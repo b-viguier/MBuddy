@@ -27,11 +27,11 @@ class IdTest extends TestCase
 
     public function testAll(): void
     {
-        $masterIds = array_map(
+        $masterIds = \array_map(
             fn(Id $masterId) => $masterId->toInt(),
-            iterator_to_array(Id::all()),
+            \iterator_to_array(Id::all()),
         );
 
-        self::assertSame(range(0, 127), $masterIds);
+        self::assertSame(\range(0, 127), $masterIds);
     }
 }

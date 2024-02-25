@@ -35,8 +35,8 @@ class SysExTest extends TestCase
 
         self::assertNotNull($sysex);
         self::assertSame($binaryString, (string)$sysex);
-        self::assertSame(ord('*'), $sysex->deviceNumber());
-        self::assertSame([ord('d'), ord('a'), ord('t'), ord('a')], $sysex->toBytes());
+        self::assertSame(\ord('*'), $sysex->deviceNumber());
+        self::assertSame([\ord('d'), \ord('a'), \ord('t'), \ord('a')], $sysex->toBytes());
     }
 
     public function testFromBytes(): void
@@ -48,6 +48,6 @@ class SysExTest extends TestCase
 
         self::assertSame("\xF0\x43\x01\x7F\x03data\xF7", (string)$sysex);
         self::assertSame($deviceNumber, $sysex->deviceNumber());
-        self::assertSame([ord('d'), ord('a'), ord('t'), ord('a')], $sysex->toBytes());
+        self::assertSame([\ord('d'), \ord('a'), \ord('t'), \ord('a')], $sysex->toBytes());
     }
 }

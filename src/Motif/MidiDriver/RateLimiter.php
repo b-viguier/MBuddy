@@ -24,8 +24,8 @@ class RateLimiter implements MidiDriver
         private float $timeBetweenMessages,
         ?callable $microtimeFunction = null,
     ) {
-        assert($timeBetweenMessages > 0, 'Time between messages must be greater than 0');
-        $this->microtimeFunction = $microtimeFunction ? \Closure::fromCallable($microtimeFunction) : fn() => microtime(true);
+        \assert($timeBetweenMessages > 0, 'Time between messages must be greater than 0');
+        $this->microtimeFunction = $microtimeFunction ? \Closure::fromCallable($microtimeFunction) : fn() => \microtime(true);
         $this->queue = new \SplQueue();
     }
 
@@ -33,7 +33,7 @@ class RateLimiter implements MidiDriver
     {
         $deferred = new Deferred();
         $this->queue->enqueue([$message, $deferred]);
-        if (count($this->queue) === 1) {
+        if (\count($this->queue) === 1) {
             $this->scheduleNextMessage();
         }
 
@@ -48,7 +48,7 @@ class RateLimiter implements MidiDriver
     private function scheduleNextMessage(): void
     {
         asyncCall(function(): \Generator {
-            assert($this->queue->count() > 0);
+            \assert($this->queue->count() > 0);
             $timeToWait = $this->nextAllowedTime - ($this->microtimeFunction)();
             if ($timeToWait > 0) {
                 yield delay(\intval($timeToWait * 1000));

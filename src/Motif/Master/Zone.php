@@ -86,9 +86,9 @@ class Zone
 
     public static function fromBulkDump(SysEx\BulkDumpBlock $block): self
     {
-        assert($block->address()->h() === 0x32 && $block->address()->l() === 0x00);
+        \assert($block->address()->h() === 0x32 && $block->address()->l() === 0x00);
         $data = $block->data();
-        assert(count($data) === 0x10);
+        \assert(\count($data) === 0x10);
 
         return new self(
             id: $block->address()->m(),

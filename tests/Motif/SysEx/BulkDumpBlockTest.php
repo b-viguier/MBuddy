@@ -19,7 +19,7 @@ class BulkDumpBlockTest extends TestCase
         $checksum = 66;
 
         $address = new Address(0x01, 0x02, 0x03);
-        $data = array_map(fn($byte) => $byte % 0xF0, range(0, $byteCount - 1));
+        $data = \array_map(fn($byte) => $byte % 0xF0, \range(0, $byteCount - 1));
         $block = BulkDumpBlock::create($byteCount, $address, $data);
         $sysex = $block->toSysex();
 
@@ -71,7 +71,7 @@ class BulkDumpBlockTest extends TestCase
         yield 'wrong size' => [
             SysEx::fromBytes(
                 BulkDumpBlock::DEVICE_NUMBER,
-                pack('C*', 0, $size),
+                \pack('C*', 0, $size),
             ),
             'Invalid BulkDump size',
         ];
@@ -79,7 +79,7 @@ class BulkDumpBlockTest extends TestCase
         yield 'wrong checksum' => [
             SysEx::fromBytes(
                 BulkDumpBlock::DEVICE_NUMBER,
-                pack('C*', ...[0, $size, ...$address, ...$data, $checksum + 1]),
+                \pack('C*', ...[0, $size, ...$address, ...$data, $checksum + 1]),
             ),
             'Invalid Checksum',
         ];

@@ -11,9 +11,9 @@ class Address
         private int $m,
         private int $l,
     ) {
-        assert(0x00 <= $h && $h <= 0x47);
-        assert(0x00 <= $m && $m < 0x80);
-        assert(0x00 <= $l && $l < 0x80);
+        \assert(0x00 <= $h && $h <= 0x47);
+        \assert(0x00 <= $m && $m < 0x80);
+        \assert(0x00 <= $l && $l < 0x80);
     }
 
     public function h(): int
@@ -41,7 +41,7 @@ class Address
 
     public function toBinaryString(): string
     {
-        return pack('C3', $this->h, $this->m, $this->l);
+        return \pack('C3', $this->h, $this->m, $this->l);
     }
 
     public function equals(Address $other): bool

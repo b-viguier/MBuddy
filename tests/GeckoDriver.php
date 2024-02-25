@@ -37,7 +37,7 @@ class GeckoDriver
                 new Request(
                     $this->endpoint.'/session',
                     'POST',
-                    json_encode(
+                    \json_encode(
                         [
                             'capabilities' => [
                                 'firstMatch' => [
@@ -58,14 +58,14 @@ class GeckoDriver
                                 ],
                             ],
                         ],
-                        JSON_THROW_ON_ERROR,
+                        \JSON_THROW_ON_ERROR,
                     ),
                 ),
             );
 
             $body = yield $response->getBody()->buffer();
             /** @var array{'value':null|array{'sessionId':string}} $jsonResponse */
-            $jsonResponse = json_decode($body, associative: true, flags: JSON_THROW_ON_ERROR);
+            $jsonResponse = \json_decode($body, associative: true, flags: \JSON_THROW_ON_ERROR);
             $this->sessionId = $jsonResponse['value']['sessionId'] ?? throw new \Exception("Cannot retrieve sessionId");
 
             return null;
@@ -101,11 +101,11 @@ class GeckoDriver
                 new Request(
                     $this->endpoint.'/session/'.$this->sessionId.'/url',
                     'POST',
-                    json_encode(
+                    \json_encode(
                         [
                             'url' => $url,
                         ],
-                        JSON_THROW_ON_ERROR,
+                        \JSON_THROW_ON_ERROR,
                     ),
                 ),
             );
@@ -142,7 +142,7 @@ class GeckoDriver
 
             $body = yield $response->getBody()->buffer();
             /** @var array{'value':string|null} $jsonResponse */
-            $jsonResponse = json_decode($body, associative: true, flags: JSON_THROW_ON_ERROR);
+            $jsonResponse = \json_decode($body, associative: true, flags: \JSON_THROW_ON_ERROR);
 
             return $jsonResponse['value'] ?? throw new \Exception("Cannot retrieve title");
         });
@@ -163,9 +163,9 @@ class GeckoDriver
 
             $body = yield $response->getBody()->buffer();
             /** @var array{'value':string|null} $jsonResponse */
-            $jsonResponse = json_decode($body, associative: true, flags: JSON_THROW_ON_ERROR);
+            $jsonResponse = \json_decode($body, associative: true, flags: \JSON_THROW_ON_ERROR);
 
-            return base64_decode($jsonResponse['value'] ?? throw new \Exception("Cannot retrieve screenshot"));
+            return \base64_decode($jsonResponse['value'] ?? throw new \Exception("Cannot retrieve screenshot"));
         });
     }
 
@@ -179,21 +179,21 @@ class GeckoDriver
                 new Request(
                     $this->endpoint.'/session/'.$this->sessionId.'/element',
                     'POST',
-                    json_encode(
+                    \json_encode(
                         [
                             'using' => 'css selector',
                             'value' => $selector,
                         ],
-                        JSON_THROW_ON_ERROR,
+                        \JSON_THROW_ON_ERROR,
                     ),
                 ),
             );
 
             $body = yield $response->getBody()->buffer();
             /** @var array{'value':array<string,string>} $jsonResponse */
-            $jsonResponse = json_decode($body, associative: true, flags: JSON_THROW_ON_ERROR);
+            $jsonResponse = \json_decode($body, associative: true, flags: \JSON_THROW_ON_ERROR);
 
-            return reset($jsonResponse['value']) ?: throw new \Exception("Cannot retrieve element content");
+            return \reset($jsonResponse['value']) ?: throw new \Exception("Cannot retrieve element content");
         });
     }
 
@@ -228,7 +228,7 @@ class GeckoDriver
 
             $body = yield $response->getBody()->buffer();
             /** @var array{'value':string|null} $jsonResponse */
-            $jsonResponse = json_decode($body, associative: true, flags: JSON_THROW_ON_ERROR);
+            $jsonResponse = \json_decode($body, associative: true, flags: \JSON_THROW_ON_ERROR);
 
             return $jsonResponse['value'] ?? throw new \Exception("Cannot retrieve element text");
         });

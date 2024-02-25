@@ -63,7 +63,7 @@ class ParameterChangeTest extends TestCase
         $parameterChange = ParameterChange::fromSysex($sysEx);
 
         self::assertEquals($address, $parameterChange->address());
-        self::assertSame([ord('d'), ord('a'), ord('t'), ord('a')], $parameterChange->data());
+        self::assertSame([\ord('d'), \ord('a'), \ord('t'), \ord('a')], $parameterChange->data());
         self::assertSame((string)$sysEx, (string)$parameterChange->toSysEx());
     }
 }

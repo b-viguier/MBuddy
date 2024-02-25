@@ -36,9 +36,9 @@ class AddressTest extends TestCase
     public function testBinaryStringConversion(): void
     {
         $address = new Address(
-            ord('A'),
-            ord('B'),
-            ord('C'),
+            \ord('A'),
+            \ord('B'),
+            \ord('C'),
         );
 
         self::assertSame('ABC', $address->toBinaryString());

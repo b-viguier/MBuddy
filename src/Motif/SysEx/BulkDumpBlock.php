@@ -27,7 +27,7 @@ class BulkDumpBlock
         Address $address,
         array $data,
     ): self {
-        assert($byteCount === count($data));
+        \assert($byteCount === \count($data));
 
         return new self($address, $data);
     }
@@ -64,23 +64,23 @@ class BulkDumpBlock
 
         $bytes = $sysex->toBytes();
 
-        if (count($bytes) < self::MIN_FIXED_SIZE) {
+        if (\count($bytes) < self::MIN_FIXED_SIZE) {
             throw new \InvalidArgumentException('Invalid BulkDump size');
         }
 
         $dataByteCount = $bytes[self::OFFSET_BYTE_COUNT_MSB] * 128 + $bytes[self::OFFSET_BYTE_COUNT_LSB];
-        if ($dataByteCount + self::MIN_FIXED_SIZE != count($bytes)) {
+        if ($dataByteCount + self::MIN_FIXED_SIZE != \count($bytes)) {
             throw new \InvalidArgumentException('Wrong BulkDump size');
         }
 
-        $checkSumData = array_slice($bytes, self::OFFSET_BYTE_COUNT_MSB, -1);
+        $checkSumData = \array_slice($bytes, self::OFFSET_BYTE_COUNT_MSB, -1);
         $checksum = $bytes[self::OFFSET_DATA + $dataByteCount];
-        if ((array_sum($checkSumData) + $checksum) % 128 !== 0) {
+        if ((\array_sum($checkSumData) + $checksum) % 128 !== 0) {
             throw new \InvalidArgumentException('Invalid Checksum');
         }
 
-        $data = array_slice($bytes, self::OFFSET_DATA, $dataByteCount);
-        $address = array_slice($bytes, self::OFFSET_ADDRESS, 3);
+        $data = \array_slice($bytes, self::OFFSET_DATA, $dataByteCount);
+        $address = \array_slice($bytes, self::OFFSET_ADDRESS, 3);
 
         return new self(new Address(...$address), $data);
     }
@@ -92,24 +92,24 @@ class BulkDumpBlock
         private Address $address,
         private array $data,
     ) {
-        assert(array_reduce($data, fn($carry, $byte) => $carry && is_int($byte) && 0 <= $byte && $byte < 256, true));
+        \assert(\array_reduce($data, fn($carry, $byte) => $carry && \is_int($byte) && 0 <= $byte && $byte < 256, true));
     }
 
     public function toSysEx(): SysEx
     {
-        $byteCount = count($this->data);
+        $byteCount = \count($this->data);
         $msg = [
-            intdiv($byteCount, 128),
+            \intdiv($byteCount, 128),
             $byteCount % 128,
             ...$this->address->toArray(),
             ...$this->data,
         ];
 
-        $checksum = 128 - (array_sum($msg) % 128);
+        $checksum = 128 - (\array_sum($msg) % 128);
 
         return SysEx::fromBytes(
             self::DEVICE_NUMBER,
-            pack('C*', ...[
+            \pack('C*', ...[
                 ...$msg,
                 $checksum,
             ]),

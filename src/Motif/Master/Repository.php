@@ -25,7 +25,7 @@ class Repository
             function(Master\Id $id) {
                 $blocks = yield $this->sysExClient->requestDump(Master::dumpRequest($id));
 
-                if ($blocks === null || count($blocks) !== Master::DUMP_NB_BLOCKS) {
+                if ($blocks === null || \count($blocks) !== Master::DUMP_NB_BLOCKS) {
                     return null;
                 }
 
@@ -66,7 +66,7 @@ class Repository
      */
     public function setCurrentMasterId(Master\Id $masterId): Promise
     {
-        assert(!$masterId->isEditBuffer());
+        \assert(!$masterId->isEditBuffer());
 
         return $this->sysExClient->sendParameter(
             SysEx\ParameterChange::create(
@@ -96,7 +96,7 @@ class Repository
                 if ($param === null) {
                     $name .= ' ';
                 } else {
-                    $name .= chr($param->data()[0]);
+                    $name .= \chr($param->data()[0]);
                 }
             }
 

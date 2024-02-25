@@ -12,7 +12,7 @@ class Channel implements \Stringable
 
     public static function fromMidiByte(int $channelId): self
     {
-        assert($channelId >= 0 && $channelId <= 15);
+        \assert($channelId >= 0 && $channelId <= 15);
 
         return new self($channelId);
     }
@@ -24,7 +24,7 @@ class Channel implements \Stringable
 
     public function toHumanReadable(): string
     {
-        return strval($this->channelId + 1);
+        return \strval($this->channelId + 1);
     }
 
     public function __toString(): string

@@ -14,7 +14,7 @@ class Id implements \Stringable
      */
     public function __construct(string $id)
     {
-        $this->id = preg_replace('/[^a-zA-Z0-9_-]/', '_', $id)
+        $this->id = \preg_replace('/[^a-zA-Z0-9_-]/', '_', $id)
             ?? throw new \InvalidArgumentException('Invalid id');
         ;
     }

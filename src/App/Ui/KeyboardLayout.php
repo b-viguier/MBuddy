@@ -17,7 +17,7 @@ class KeyboardLayout implements Component
         private string $name,
         Motif\Part ...$parts
     ) {
-        $this->parts = array_map(fn($part) => new Part($this->jsEventBus, $part), $parts);
+        $this->parts = \array_map(fn($part) => new Part($this->jsEventBus, $part), $parts);
     }
 
     public function render(): string
@@ -37,6 +37,6 @@ class KeyboardLayout implements Component
 
     private function renderParts(): string
     {
-        return implode(PHP_EOL, array_map(fn($part) => $part->render(), $this->parts));
+        return \implode(\PHP_EOL, \array_map(fn($part) => $part->render(), $this->parts));
     }
 }

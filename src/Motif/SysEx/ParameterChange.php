@@ -33,12 +33,12 @@ class ParameterChange
 
         $bytes = $sysex->toBytes();
 
-        if (count($bytes) < self::MIN_FIXED_SIZE) {
+        if (\count($bytes) < self::MIN_FIXED_SIZE) {
             throw new \InvalidArgumentException('Invalid BulkDump size');
         }
 
-        $data = array_slice($bytes, self::OFFSET_DATA);
-        $address = array_slice($bytes, self::OFFSET_ADDRESS, 3);
+        $data = \array_slice($bytes, self::OFFSET_DATA);
+        $address = \array_slice($bytes, self::OFFSET_ADDRESS, 3);
 
         return new self(new Address(...$address), $data);
     }
@@ -50,15 +50,15 @@ class ParameterChange
         private Address $address,
         private array $data,
     ) {
-        assert(array_keys($data) === range(0, count($this->data) - 1));
-        assert(array_reduce($data, fn($carry, $byte) => $carry && is_int($byte) && 0 <= $byte && $byte < 256, true));
+        \assert(\array_keys($data) === \range(0, \count($this->data) - 1));
+        \assert(\array_reduce($data, fn($carry, $byte) => $carry && \is_int($byte) && 0 <= $byte && $byte < 256, true));
     }
 
     public function toSysEx(): SysEx
     {
         return SysEx::fromBytes(
             self::DEVICE_NUMBER,
-            pack(
+            \pack(
                 'C*',
                 ...$this->address->toArray(),
                 ...$this->data,

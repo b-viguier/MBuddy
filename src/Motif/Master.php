@@ -59,12 +59,12 @@ class Master
         SysEx\BulkDumpBlock $zone7Block,
         SysEx\BulkDumpBlock $footerBlock,
     ): self {
-        assert($headerBlock->isHeaderBlock());
-        assert($footerBlock->isFooterBlock());
+        \assert($headerBlock->isHeaderBlock());
+        \assert($footerBlock->isFooterBlock());
 
         $headerAddress = $headerBlock->address();
-        assert($footerBlock->address()->m() === $headerAddress->m());
-        assert($footerBlock->address()->l() === $headerAddress->l());
+        \assert($footerBlock->address()->m() === $headerAddress->m());
+        \assert($footerBlock->address()->l() === $headerAddress->l());
 
         $masterId = match ($headerAddress->m()) {
             0x70 => Master\Id::fromInt($headerAddress->l()),
@@ -72,12 +72,12 @@ class Master
             default => throw new \RuntimeException('Invalid MasterId'),
         };
 
-        assert($commonBlock->address()->toArray() === [0x33, 0x00, 0x00]);
+        \assert($commonBlock->address()->toArray() === [0x33, 0x00, 0x00]);
         $commonData = $commonBlock->data();
 
         return new self(
             id: $masterId,
-            name: trim(pack('C20', ...array_slice($commonData, 0, 20))),
+            name: \trim(\pack('C20', ...\array_slice($commonData, 0, 20))),
             mode: Master\Mode::from($commonData[0x19]),
             program: new Program($commonData[0x1A], $commonData[0x1B], $commonData[0x1C]),
             zoneEnabled: (bool)$commonData[0x1D],
@@ -180,9 +180,9 @@ class Master
 
         yield SysEx\BulkDumpBlock::createHeaderBlock(...$masterAddress);
 
-        $name = unpack('C20', str_pad($this->name, 20));
-        assert(is_array($name));
-        assert(count($name) === 20);
+        $name = \unpack('C20', \str_pad($this->name, 20));
+        \assert(\is_array($name));
+        \assert(\count($name) === 20);
 
         // Common block
         yield SysEx\BulkDumpBlock::create(
@@ -223,4 +223,4 @@ class Master
     }
 }
 
-assert(count((new \ReflectionMethod(Master::class, 'fromBulkDumpBlocks'))->getParameters()) === Master::DUMP_NB_BLOCKS);
+\assert(\count((new \ReflectionMethod(Master::class, 'fromBulkDumpBlocks'))->getParameters()) === Master::DUMP_NB_BLOCKS);

@@ -121,10 +121,10 @@ class SinglePageAppTest extends TestCase
 
             try {
                 yield $app->start($comp);
-                $response = yield $httpClient->request(new Request('http://localhost:8383/' .basename(__FILE__)));
+                $response = yield $httpClient->request(new Request('http://localhost:8383/' .\basename(__FILE__)));
                 $content = yield $response->getBody()->buffer();
 
-                $this->assertSame(file_get_contents(__FILE__), $content);
+                $this->assertSame(\file_get_contents(__FILE__), $content);
             } finally {
                 yield $app->stop();
             }

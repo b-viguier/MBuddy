@@ -51,12 +51,12 @@ $ch = curl_init();
 foreach (filteredFileIterator() as $file) {
     echo "$file\t";
     curl_setopt_array($ch, [
-        CURLOPT_URL => DST_HOST,
-        CURLOPT_POST => true,
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_CONNECTTIMEOUT => 2,
-        CURLOPT_TIMEOUT => 5,
-        CURLOPT_POSTFIELDS => [
+        \CURLOPT_URL => DST_HOST,
+        \CURLOPT_POST => true,
+        \CURLOPT_RETURNTRANSFER => true,
+        \CURLOPT_CONNECTTIMEOUT => 2,
+        \CURLOPT_TIMEOUT => 5,
+        \CURLOPT_POSTFIELDS => [
             'file' => new \CURLFile(filename: ROOT.$file, posted_filename: $file),
             'dst' => $file,
         ],
@@ -65,7 +65,7 @@ foreach (filteredFileIterator() as $file) {
     if ($statusCode = curl_errno($ch)) {
         $result .= "\n".curl_strerror($statusCode);
     } else {
-        $statusCode = 'HTTP'.curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $statusCode = 'HTTP'.curl_getinfo($ch, \CURLINFO_HTTP_CODE);
     }
 
     if ($statusCode === 'HTTP200') {

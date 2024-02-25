@@ -18,7 +18,7 @@ class GeckoServerExtension implements BeforeFirstTestHook, BeforeTestHook, After
     public static GeckoDriver $driver;
     public function __construct()
     {
-        $host = getenv('WEBDRIVER_HOST') ?: 'http://webdriver:4444';
+        $host = \getenv('WEBDRIVER_HOST') ?: 'http://webdriver:4444';
         self::$driver = new GeckoDriver($host);
     }
 

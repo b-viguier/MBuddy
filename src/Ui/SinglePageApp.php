@@ -133,8 +133,8 @@ class SinglePageApp
      */
     public function start(Component $body): Promise
     {
-        assert($this->body === null);
-        assert($this->httpServer->getState() === HttpServer::STOPPED);
+        \assert($this->body === null);
+        \assert($this->httpServer->getState() === HttpServer::STOPPED);
 
         $this->body = $body;
 
@@ -153,7 +153,7 @@ class SinglePageApp
 
     private function render(): string
     {
-        assert($this->body !== null);
+        \assert($this->body !== null);
 
         return <<<HTML
             <!DOCTYPE html>
@@ -254,12 +254,12 @@ class SinglePageApp
      */
     private function findComponentsToRefresh(): iterable
     {
-        assert($this->body !== null);
+        \assert($this->body !== null);
 
         /** @var array<iterable<Component>> $ChildrenIterators */
         $ChildrenIterators = [[$this->body]];
         while ($ChildrenIterators) {
-            $children = array_pop($ChildrenIterators);
+            $children = \array_pop($ChildrenIterators);
             foreach ($children as $child) {
                 if ($child->isRefreshNeeded()) {
                     yield $child;
@@ -279,7 +279,7 @@ class SinglePageApp
             $allPromises = [];
             foreach ($this->findComponentsToRefresh() as $component) {
                 $allPromises[] = $this->websocket->send(
-                    json_encode([(string)$component->id(), 'refresh', $component->render()], JSON_THROW_ON_ERROR)
+                    \json_encode([(string)$component->id(), 'refresh', $component->render()], \JSON_THROW_ON_ERROR)
                 );
             }
 
@@ -291,8 +291,8 @@ class SinglePageApp
 
     private function onWebsocketMessage(string $message): void
     {
-        $data = json_decode($message, true);
-        if (!is_array($data)) {
+        $data = \json_decode($message, true);
+        if (!\is_array($data)) {
             $this->logger->warning('Invalid message');
             return;
         }
@@ -325,7 +325,7 @@ class SinglePageApp
 
     private function findComponentById(Id $id): ?Component
     {
-        assert($this->body !== null);
+        \assert($this->body !== null);
 
         $component = ($this->componentsCache[(string)$id] ?? null)?->get();
         if ($component !== null) {
@@ -338,7 +338,7 @@ class SinglePageApp
         /** @var array<iterable<Component>> $ChildrenIterators */
         $ChildrenIterators = [[$this->body]];
         while ($ChildrenIterators) {
-            $children = array_pop($ChildrenIterators);
+            $children = \array_pop($ChildrenIterators);
             foreach ($children as $child) {
                 if ($child->id() == $id) {
                     $found = $child;

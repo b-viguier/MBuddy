@@ -17,7 +17,7 @@ class Compound implements Component
     public function __construct(
         Component ...$htmlComponents,
     ) {
-        $this->htmlComponents = array_values($htmlComponents);
+        $this->htmlComponents = \array_values($htmlComponents);
     }
     public function render(): string
     {
