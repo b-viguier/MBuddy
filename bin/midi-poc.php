@@ -47,7 +47,7 @@ function displayMaster(
 
             return;
         }
-        echo "{$master->getId()->toInt()}: >{$master->getName()}<\n";
+        echo "{$master->id()->toInt()}: >{$master->name()}<\n";
     } catch (\Throwable $e) {
         echo "Error: {$masterId->toInt()}\n";
         var_dump($e);

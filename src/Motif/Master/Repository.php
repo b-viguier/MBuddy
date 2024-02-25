@@ -25,7 +25,7 @@ class Repository
     {
         return call(
             function(Master\Id $id) {
-                $blocks = yield $this->sysExClient->requestDump(Master::getDumpRequest($id));
+                $blocks = yield $this->sysExClient->requestDump(Master::dumpRequest($id));
 
                 if ($blocks === null || count($blocks) !== Master::DUMP_NB_BLOCKS) {
                     return null;
@@ -42,7 +42,7 @@ class Repository
      */
     public function set(Master $master): Promise
     {
-        return $this->sysExClient->sendDump($master->getBulkDumpBlocks());
+        return $this->sysExClient->sendDump($master->toBulkDumpBlocks());
     }
 
     /**

@@ -99,22 +99,22 @@ class Master
         return $this;
     }
 
-    public function getId(): Master\Id
+    public function id(): Master\Id
     {
         return $this->id;
     }
 
-    public function getName(): string
+    public function name(): string
     {
         return $this->name;
     }
 
-    public function getMode(): Master\Mode
+    public function mode(): Master\Mode
     {
         return $this->mode;
     }
 
-    public function getProgram(): Program
+    public function program(): Program
     {
         return $this->program;
     }
@@ -129,42 +129,42 @@ class Master
         return $this->knobSliderFunction;
     }
 
-    public function getZone0(): Master\Zone
+    public function zone0(): Master\Zone
     {
         return $this->zone0;
     }
 
-    public function getZone1(): Master\Zone
+    public function zone1(): Master\Zone
     {
         return $this->zone1;
     }
 
-    public function getZone2(): Master\Zone
+    public function zone2(): Master\Zone
     {
         return $this->zone2;
     }
 
-    public function getZone3(): Master\Zone
+    public function zone3(): Master\Zone
     {
         return $this->zone3;
     }
 
-    public function getZone4(): Master\Zone
+    public function zone4(): Master\Zone
     {
         return $this->zone4;
     }
 
-    public function getZone5(): Master\Zone
+    public function zone5(): Master\Zone
     {
         return $this->zone5;
     }
 
-    public function getZone6(): Master\Zone
+    public function zone6(): Master\Zone
     {
         return $this->zone6;
     }
 
-    public function getZone7(): Master\Zone
+    public function zone7(): Master\Zone
     {
         return $this->zone7;
     }
@@ -172,7 +172,7 @@ class Master
     /**
      * @return iterable<SysEx\BulkDumpBlock>
      */
-    public function getBulkDumpBlocks(): iterable
+    public function toBulkDumpBlocks(): iterable
     {
         $masterAddress = $this->id->isEditBuffer()
             ? [0x7F, 0x0]
@@ -180,8 +180,9 @@ class Master
 
         yield SysEx\BulkDumpBlock::createHeaderBlock(...$masterAddress);
 
-        $name = unpack('A20', str_pad($this->name, 20));
+        $name = unpack('C20', str_pad($this->name, 20));
         assert(is_array($name));
+        assert(count($name) === 20);
 
         // Common block
         yield SysEx\BulkDumpBlock::create(
@@ -194,7 +195,7 @@ class Master
                 0x1A => $this->program->getBankMsb(),
                 0x1B => $this->program->getBankLsb(),
                 0x1C => $this->program->getNumber(),
-                0x1D => $this->zoneEnabled,
+                0x1D => (int) $this->zoneEnabled,
                 0x1E => $this->knobSliderFunction->getValue(),
             ],
         );
@@ -212,7 +213,7 @@ class Master
         yield SysEx\BulkDumpBlock::createFooterBlock(...$masterAddress);
     }
 
-    public static function getDumpRequest(Master\Id $id): SysEx\DumpRequest
+    public static function dumpRequest(Master\Id $id): SysEx\DumpRequest
     {
         $address = $id->isEditBuffer()
             ? new SysEx\Address(0x0E, 0x7F, 0x00)
