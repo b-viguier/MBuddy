@@ -50,6 +50,7 @@ class ParameterChange
         private Address $address,
         private array $data,
     ) {
+        \assert(\count($data) > 0);
         \assert(\array_keys($data) === \range(0, \count($this->data) - 1));
         \assert(\array_reduce($data, fn($carry, $byte) => $carry && \is_int($byte) && 0 <= $byte && $byte < 256, true));
     }
