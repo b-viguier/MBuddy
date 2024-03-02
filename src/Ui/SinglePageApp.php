@@ -175,15 +175,11 @@ class SinglePageApp
                     html,
                     body {
                       height: 100%;
-                      background-color: #333;
                     }
                     
                     body {
                       display: -ms-flexbox;
                       display: flex;
-                      color: #fff;
-                      text-shadow: 0 .05rem .1rem rgba(0, 0, 0, .5);
-                      box-shadow: inset 0 0 5rem rgba(0, 0, 0, .5);
                     }
                 </style>
 
@@ -218,7 +214,7 @@ class SinglePageApp
                             switch (eventId) {
                                 case 'refresh':
                                     var component = $('#'+id);
-                                    if (component === null) {
+                                    if (component.length === 0) {
                                         console.error('Component not found: ' + id);
                                         return;
                                     }
@@ -231,10 +227,10 @@ class SinglePageApp
                         
                         $(document).on('click', '[data-on-click]', function(event) {
                             var methodName = event.target.dataset.onClick;
-                            var componentId = event.target.id;
-                            console.debug('click ',componentId,event.target);
+                            var value = event.target.dataset.value || '';
+                            var componentId = event.target.dataset.targetId || event.target.id;
                             if (componentId && methodName) {
-                                MBuddySocket.send(JSON.stringify([componentId, methodName, '']));
+                                MBuddySocket.send(JSON.stringify([componentId, methodName, value]));
                             }
                         });
                     };

@@ -21,24 +21,23 @@ Amp\Loop::run(function() {
         use Ui\Component\Trait\AutoId;
 
         private Ui\Component\Button $button1;
-        private Ui\Component\Button $button2;
 
         private Ui\Component\Label $label;
+        private Ui\Component\SelectBox $selectBox;
 
         public function __construct()
         {
-            $this->button1 = (new Ui\Component\Button(
-                "Button 1",
-                fn() => $this->label->setText("Button 1 clicked"),
-            ))->set(color: Ui\Style\Color::SECONDARY());
-            $this->button2 = new Ui\Component\Button(
-                "Button 2",
-                function() {
-                    $this->label->setText("Button 2 clicked");
-                    $this->button1->set(label: "Oops!");
-                },
+            $this->selectBox = new Ui\Component\SelectBox(
+                "Select",
+                ["Option 1", "Option 2", "Option 3"],
+                "Option 1",
+                fn($selected) => $this->label->setText("Selected: $selected"),
             );
-            $this->label = new Ui\Component\Label("Click a button");
+            $this->button1 = (new Ui\Component\Button(
+                "Open",
+                fn() => $this->selectBox->show(),
+            ))->set(color: Ui\Style\Color::SECONDARY());
+            $this->label = new Ui\Component\Label("Label");
         }
 
         public function render(): string
@@ -48,7 +47,7 @@ Amp\Loop::run(function() {
                     <h1>Hello World</h1>
                     {$this->button1->render()}
                     {$this->label->render()}
-                    {$this->button2->render()}
+                    {$this->selectBox->render()}
                 </div>
                 HTML;
         }
@@ -56,8 +55,8 @@ Amp\Loop::run(function() {
         public function children(): iterable
         {
             yield $this->button1;
-            yield $this->button2;
             yield $this->label;
+            yield $this->selectBox;
         }
 
 
