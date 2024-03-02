@@ -13,9 +13,6 @@ use function Amp\call;
 
 class GeckoDriver
 {
-    private HttpClient $httpClient;
-    private ?string $sessionId = null;
-
     public function __construct(
         private string $endpoint,
     ) {
@@ -233,4 +230,6 @@ class GeckoDriver
             return $jsonResponse['value'] ?? throw new \Exception("Cannot retrieve element text");
         });
     }
+    private HttpClient $httpClient;
+    private ?string $sessionId = null;
 }

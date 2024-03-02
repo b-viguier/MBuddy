@@ -6,16 +6,6 @@ namespace Bveing\MBuddy\Motif;
 
 class SysEx implements \Stringable
 {
-    private const MIN_FIXED_SIZE = 6;
-    private const SYSEX_PREFIX = "\xF0\x43";
-    private const SYSEX_SUFFIX = "\xF7";
-    private const MODEL_ID = "\x7F\x03";
-
-
-    private function __construct(private string $sysexMsg)
-    {
-    }
-
     public function __toString(): string
     {
         return $this->sysexMsg;
@@ -65,5 +55,14 @@ class SysEx implements \Stringable
         );
 
         return new self(self::SYSEX_PREFIX.\chr($deviceNumber).self::MODEL_ID.$data.self::SYSEX_SUFFIX);
+    }
+    private const MIN_FIXED_SIZE = 6;
+    private const SYSEX_PREFIX = "\xF0\x43";
+    private const SYSEX_SUFFIX = "\xF7";
+    private const MODEL_ID = "\x7F\x03";
+
+
+    private function __construct(private string $sysexMsg)
+    {
     }
 }

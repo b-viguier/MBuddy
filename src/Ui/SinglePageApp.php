@@ -17,18 +17,6 @@ use function Amp\Http\Server\Middleware\stack;
 
 class SinglePageApp
 {
-    private HttpServer $httpServer;
-    private Websocket $websocket;
-
-    private LoggerInterface $logger;
-
-    private ?Component $body = null;
-
-    /**
-     * @var array<string,\WeakReference<Component>>
-     */
-    private array $componentsCache = [];
-
     public function __construct(
         private string $title = 'MBuddy',
         LoggerInterface $logger = null,
@@ -151,6 +139,36 @@ class SinglePageApp
         return $this->httpServer->stop();
     }
 
+    /**
+     * @return Promise<int>
+     */
+    public function refresh(): Promise
+    {
+        return call(function() {
+            $allPromises = [];
+            foreach ($this->findComponentsToRefresh() as $component) {
+                $allPromises[] = $this->websocket->send(
+                    \json_encode([(string)$component->id(), 'refresh', $component->render()], \JSON_THROW_ON_ERROR)
+                );
+            }
+
+            yield \Amp\Promise\all($allPromises);
+
+            return \count($allPromises);
+        });
+    }
+    private HttpServer $httpServer;
+    private Websocket $websocket;
+
+    private LoggerInterface $logger;
+
+    private ?Component $body = null;
+
+    /**
+     * @var array<string,\WeakReference<Component>>
+     */
+    private array $componentsCache = [];
+
     private function render(): string
     {
         \assert($this->body !== null);
@@ -264,25 +282,6 @@ class SinglePageApp
                 }
             }
         }
-    }
-
-    /**
-     * @return Promise<int>
-     */
-    public function refresh(): Promise
-    {
-        return call(function() {
-            $allPromises = [];
-            foreach ($this->findComponentsToRefresh() as $component) {
-                $allPromises[] = $this->websocket->send(
-                    \json_encode([(string)$component->id(), 'refresh', $component->render()], \JSON_THROW_ON_ERROR)
-                );
-            }
-
-            yield \Amp\Promise\all($allPromises);
-
-            return \count($allPromises);
-        });
     }
 
     private function onWebsocketMessage(string $message): void

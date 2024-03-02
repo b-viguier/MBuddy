@@ -8,8 +8,6 @@ use Bveing\MBuddy\Ui\Id;
 
 trait AutoId
 {
-    private ?Id $id;
-
     public function id(): Id
     {
         return $this->id ?? $this->id = new Id(
@@ -20,4 +18,5 @@ trait AutoId
             ).'_',
         );
     }
+    private ?Id $id;
 }

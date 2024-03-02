@@ -9,7 +9,6 @@ use Bveing\MBuddy\Motif\SysEx;
 class ParameterRequest
 {
     public const DEVICE_NUMBER = 0x30;
-    private SysEx $sysex;
 
     public function __construct(private Address $address)
     {
@@ -28,4 +27,5 @@ class ParameterRequest
     {
         return $this->address;
     }
+    private SysEx $sysex;
 }

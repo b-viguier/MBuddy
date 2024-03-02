@@ -6,12 +6,6 @@ namespace Bveing\MBuddy\Motif\Master;
 
 class Id
 {
-    private function __construct(
-        private int $id,
-    ) {
-        \assert(-1 <= $id && $id <= 127);
-    }
-
     public static function fromInt(int $id): self
     {
         \assert(0 <= $id);
@@ -42,5 +36,10 @@ class Id
         for ($i = 0; $i <= 127; $i++) {
             yield self::fromInt($i);
         }
+    }
+    private function __construct(
+        private int $id,
+    ) {
+        \assert(-1 <= $id && $id <= 127);
     }
 }

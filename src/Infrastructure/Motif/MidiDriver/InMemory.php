@@ -10,12 +10,6 @@ use Bveing\MBuddy\Motif\MidiDriver;
 
 class InMemory implements MidiDriver
 {
-    /** @var \SplQueue<array{0:string,1:Deferred<null>}> */
-    private \SplQueue $sendQueue;
-
-    /** @var Deferred<string>  */
-    private Deferred $receiveDeferred;
-
     public function __construct()
     {
         $this->sendQueue = new \SplQueue();
@@ -53,4 +47,9 @@ class InMemory implements MidiDriver
         $this->receiveDeferred = new Deferred();
         $deferred->resolve($message);
     }
+    /** @var \SplQueue<array{0:string,1:Deferred<null>}> */
+    private \SplQueue $sendQueue;
+
+    /** @var Deferred<string>  */
+    private Deferred $receiveDeferred;
 }

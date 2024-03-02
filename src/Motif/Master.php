@@ -8,24 +8,6 @@ class Master
 {
     public const DUMP_NB_BLOCKS = 11;
 
-    private function __construct(
-        private Master\Id $id,
-        private string $name,
-        private Master\Mode $mode,
-        private Program $program,
-        private bool $zoneEnabled,
-        private Master\KnobSliderFunction $knobSliderFunction,
-        private Master\Zone $zone0,
-        private Master\Zone $zone1,
-        private Master\Zone $zone2,
-        private Master\Zone $zone3,
-        private Master\Zone $zone4,
-        private Master\Zone $zone5,
-        private Master\Zone $zone6,
-        private Master\Zone $zone7,
-    ) {
-    }
-
     public static function default(): self
     {
         return new self(
@@ -220,6 +202,24 @@ class Master
             : new SysEx\Address(0x0E, 0x70, $id->toInt());
 
         return new SysEx\DumpRequest($address);
+    }
+
+    private function __construct(
+        private Master\Id $id,
+        private string $name,
+        private Master\Mode $mode,
+        private Program $program,
+        private bool $zoneEnabled,
+        private Master\KnobSliderFunction $knobSliderFunction,
+        private Master\Zone $zone0,
+        private Master\Zone $zone1,
+        private Master\Zone $zone2,
+        private Master\Zone $zone3,
+        private Master\Zone $zone4,
+        private Master\Zone $zone5,
+        private Master\Zone $zone6,
+        private Master\Zone $zone7,
+    ) {
     }
 }
 

@@ -54,14 +54,14 @@ class SelectBox implements Component
         // Html is owned by the Modal
     }
 
-    private Modal $modal;
-    private Html $html;
-
     public function onSelected(string $index): void
     {
         $this->selected = $this->options[(int)$index];
         $this->refresh();
     }
+
+    private Modal $modal;
+    private Html $html;
 
     private function refresh(): void
     {

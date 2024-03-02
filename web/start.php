@@ -20,11 +20,6 @@ Amp\Loop::run(function() {
         use Ui\Component\Trait\NonModifiable;
         use Ui\Component\Trait\AutoId;
 
-        private Ui\Component\Button $button1;
-
-        private Ui\Component\Label $label;
-        private Ui\Component\SelectBox $selectBox;
-
         public function __construct()
         {
             $this->selectBox = new Ui\Component\SelectBox(
@@ -58,6 +53,11 @@ Amp\Loop::run(function() {
             yield $this->label;
             yield $this->selectBox;
         }
+
+        private Ui\Component\Button $button1;
+
+        private Ui\Component\Label $label;
+        private Ui\Component\SelectBox $selectBox;
 
 
     };

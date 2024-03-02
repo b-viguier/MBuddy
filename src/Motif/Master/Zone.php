@@ -10,42 +10,6 @@ use Bveing\MBuddy\Motif\SysEx;
 
 class Zone
 {
-    private function __construct(
-        private int $id,
-        private Channel $transmitChannel,
-        private bool $isTransmittedForMidi,
-        private bool $isTransmittedForToneGenerator,
-        private int $transposeOctave,
-        private int $transposeSemitone,
-        private int $noteLimitLow,
-        private int $noteLimitHigh,
-        private int $volume,
-        private int $pan,
-        private Program $program,
-        private bool $isBankSelectTransmittedForToneGenerator,
-        private bool $isProgramChangeTransmittedForToneGenerator,
-        private bool $isBankSelectTransmittedForMidi,
-        private bool $isProgramChangeTransmittedForMidi,
-        private bool $isRibbonTransmitted,
-        private bool $isVolumeExpressionTransmitted,
-        private bool $isPanTransmitted,
-        private bool $isSustainTransmitted,
-        private bool $isAssignableButton1Transmitted,
-        private bool $isAssignableButton2Transmitted,
-        private bool $isAfterTouchTransmitted,
-        private bool $isPitchBendTransmitted,
-        private bool $isFootController2Transmitted,
-        private bool $isFootSwitchTransmitted,
-        private bool $isFootController1Transmitted,
-        private bool $isBreathControllerTransmitted,
-        private bool $isModWheelTransmitted,
-        private bool $isAssignableSliderTransmitted,
-        private bool $isAssignableKnobTransmitted,
-        private int $assignableSliderControlNumber,
-        private int $assignableKnobControlNumber,
-    ) {
-    }
-
     public static function default(int $id): self
     {
         return new self(
@@ -399,5 +363,40 @@ class Zone
                 0x0F => $this->assignableKnobControlNumber,
             ],
         );
+    }
+    private function __construct(
+        private int $id,
+        private Channel $transmitChannel,
+        private bool $isTransmittedForMidi,
+        private bool $isTransmittedForToneGenerator,
+        private int $transposeOctave,
+        private int $transposeSemitone,
+        private int $noteLimitLow,
+        private int $noteLimitHigh,
+        private int $volume,
+        private int $pan,
+        private Program $program,
+        private bool $isBankSelectTransmittedForToneGenerator,
+        private bool $isProgramChangeTransmittedForToneGenerator,
+        private bool $isBankSelectTransmittedForMidi,
+        private bool $isProgramChangeTransmittedForMidi,
+        private bool $isRibbonTransmitted,
+        private bool $isVolumeExpressionTransmitted,
+        private bool $isPanTransmitted,
+        private bool $isSustainTransmitted,
+        private bool $isAssignableButton1Transmitted,
+        private bool $isAssignableButton2Transmitted,
+        private bool $isAfterTouchTransmitted,
+        private bool $isPitchBendTransmitted,
+        private bool $isFootController2Transmitted,
+        private bool $isFootSwitchTransmitted,
+        private bool $isFootController1Transmitted,
+        private bool $isBreathControllerTransmitted,
+        private bool $isModWheelTransmitted,
+        private bool $isAssignableSliderTransmitted,
+        private bool $isAssignableKnobTransmitted,
+        private int $assignableSliderControlNumber,
+        private int $assignableKnobControlNumber,
+    ) {
     }
 }

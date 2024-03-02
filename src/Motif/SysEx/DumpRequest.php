@@ -9,7 +9,6 @@ use Bveing\MBuddy\Motif\SysEx;
 class DumpRequest
 {
     public const DEVICE_NUMBER = 0x20;
-    private SysEx $sysex;
 
     public function __construct(private Address $address)
     {
@@ -25,4 +24,5 @@ class DumpRequest
     {
         return $this->address;
     }
+    private SysEx $sysex;
 }

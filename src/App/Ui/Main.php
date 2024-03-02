@@ -10,13 +10,6 @@ use Bveing\MBuddy\Ui\JsEventBus;
 
 class Main implements Component
 {
-    private NavBar $navBar;
-    private KeyboardLayout $motifLayout;
-    private KeyboardLayout $impulseLayout;
-
-    private ScoreViewer $scoreViewer;
-    private ButtonGroup $buttonGroup;
-
     public function __construct(
         private JsEventBus $jsEventBus,
     ) {
@@ -76,4 +69,10 @@ class Main implements Component
             </div>
             HTML;
     }
+    private NavBar $navBar;
+    private KeyboardLayout $motifLayout;
+    private KeyboardLayout $impulseLayout;
+
+    private ScoreViewer $scoreViewer;
+    private ButtonGroup $buttonGroup;
 }

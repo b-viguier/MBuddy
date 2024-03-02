@@ -12,13 +12,6 @@ use function Amp\delay;
 
 class RateLimiter implements MidiDriver
 {
-    private float $nextAllowedTime = 0.0;
-
-    private \Closure $microtimeFunction;
-
-    /** @var \SplQueue<array{0: string, 1: Deferred<int>}> */
-    private \SplQueue $queue;
-
     public function __construct(
         private MidiDriver $driver,
         private float $timeBetweenMessages,
@@ -44,6 +37,12 @@ class RateLimiter implements MidiDriver
     {
         return $this->driver->receive();
     }
+    private float $nextAllowedTime = 0.0;
+
+    private \Closure $microtimeFunction;
+
+    /** @var \SplQueue<array{0: string, 1: Deferred<int>}> */
+    private \SplQueue $queue;
 
     private function scheduleNextMessage(): void
     {

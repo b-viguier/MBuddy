@@ -10,10 +10,6 @@ use function Amp\asyncCall;
 
 class ConcurrencyLimiter implements Sysex\Client
 {
-    /** @var \SplQueue<\Closure> */
-    private \SplQueue $queue;
-    private int $nbRunning = 0;
-
     public function __construct(
         private Sysex\Client $sysExClient,
         private int $maxConcurrency,
@@ -79,4 +75,7 @@ class ConcurrencyLimiter implements Sysex\Client
     {
         return $this->sysExClient->sendParameter($change);
     }
+    /** @var \SplQueue<\Closure> */
+    private \SplQueue $queue;
+    private int $nbRunning = 0;
 }

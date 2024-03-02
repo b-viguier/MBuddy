@@ -6,9 +6,6 @@ namespace Bveing\MBuddy\Ui;
 
 class Id implements \Stringable
 {
-    /** @var non-empty-string */
-    private string $id;
-
     /**
      * @param non-empty-string $id
      */
@@ -23,4 +20,6 @@ class Id implements \Stringable
     {
         return $this->id;
     }
+    /** @var non-empty-string */
+    private string $id;
 }

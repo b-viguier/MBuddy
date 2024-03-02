@@ -10,8 +10,6 @@ use Bveing\MBuddy\Ui\JsEventBus;
 
 class KeyboardLayout implements Component
 {
-    private array $parts;
-
     public function __construct(
         private JsEventBus $jsEventBus,
         private string $name,
@@ -34,6 +32,7 @@ class KeyboardLayout implements Component
             </div>
             HTML;
     }
+    private array $parts;
 
     private function renderParts(): string
     {

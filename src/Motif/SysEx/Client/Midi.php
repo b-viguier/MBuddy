@@ -14,15 +14,6 @@ use function Amp\delay;
 
 class Midi implements Sysex\Client
 {
-    /** @var list<SysEx\BulkDumpBlock> */
-    private array $blocksBuffer = [];
-
-    /** @var array<string,Deferred<list<SysEx\BulkDumpBlock>>> */
-    private array $deferredDump = [];
-
-    /** @var array<string,Deferred<SysEx\ParameterChange>> */
-    private array $deferredParam = [];
-
     public function __construct(
         private MidiDriver $midiDriver,
         private LoggerInterface $logger,
@@ -99,6 +90,14 @@ class Midi implements Sysex\Client
     {
         return $this->midiDriver->send((string)$change->toSysEx());
     }
+    /** @var list<SysEx\BulkDumpBlock> */
+    private array $blocksBuffer = [];
+
+    /** @var array<string,Deferred<list<SysEx\BulkDumpBlock>>> */
+    private array $deferredDump = [];
+
+    /** @var array<string,Deferred<SysEx\ParameterChange>> */
+    private array $deferredParam = [];
 
     private function onMessage(string $message): bool
     {

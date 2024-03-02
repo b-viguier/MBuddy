@@ -17,9 +17,6 @@ use function Amp\call;
 
 class AmpWebsocket implements Websocket, ClientHandler
 {
-    private ?Client $client = null;
-    private Websocket\Listener $listener;
-
     public function __construct(
         private string $path,
         private LoggerInterface $logger,
@@ -72,6 +69,8 @@ class AmpWebsocket implements Websocket, ClientHandler
 
         return call(fn() => yield from $this->receiveLoop());
     }
+    private ?Client $client = null;
+    private Websocket\Listener $listener;
 
     private function receiveLoop(): \Generator
     {

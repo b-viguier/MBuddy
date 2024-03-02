@@ -9,10 +9,6 @@ use Bveing\MBuddy\Motif\SysEx;
 class ParameterChange
 {
     public const DEVICE_NUMBER = 0x10;
-    private const OFFSET_ADDRESS = 0;
-    private const OFFSET_DATA = 3;
-
-    private const MIN_FIXED_SIZE = 4;
 
 
     /**
@@ -43,18 +39,6 @@ class ParameterChange
         return new self(new Address(...$address), $data);
     }
 
-    /**
-     * @param list<int> $data
-     */
-    private function __construct(
-        private Address $address,
-        private array $data,
-    ) {
-        \assert(\count($data) > 0);
-        \assert(\array_keys($data) === \range(0, \count($this->data) - 1));
-        \assert(\array_reduce($data, fn($carry, $byte) => $carry && \is_int($byte) && 0 <= $byte && $byte < 256, true));
-    }
-
     public function toSysEx(): SysEx
     {
         return SysEx::fromBytes(
@@ -78,5 +62,21 @@ class ParameterChange
     public function data(): array
     {
         return $this->data;
+    }
+    private const OFFSET_ADDRESS = 0;
+    private const OFFSET_DATA = 3;
+
+    private const MIN_FIXED_SIZE = 4;
+
+    /**
+     * @param list<int> $data
+     */
+    private function __construct(
+        private Address $address,
+        private array $data,
+    ) {
+        \assert(\count($data) > 0);
+        \assert(\array_keys($data) === \range(0, \count($this->data) - 1));
+        \assert(\array_reduce($data, fn($carry, $byte) => $carry && \is_int($byte) && 0 <= $byte && $byte < 256, true));
     }
 }

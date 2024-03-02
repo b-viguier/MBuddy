@@ -10,14 +10,6 @@ class BulkDumpBlock
 {
     public const DEVICE_NUMBER = 0x00;
 
-    private const OFFSET_BYTE_COUNT_MSB = 0;
-    private const OFFSET_BYTE_COUNT_LSB = 1;
-    private const OFFSET_ADDRESS = 2;
-    private const OFFSET_DATA = 5;
-    private const MIN_FIXED_SIZE = 6;
-    private const HEADER_BLOCK_ID = 0x0E;
-    private const FOOTER_BLOCK_ID = 0x0F;
-
 
     /**
      * @param list<int> $data
@@ -85,16 +77,6 @@ class BulkDumpBlock
         return new self(new Address(...$address), $data);
     }
 
-    /**
-     * @param list<int> $data
-     */
-    private function __construct(
-        private Address $address,
-        private array $data,
-    ) {
-        \assert(\array_reduce($data, fn($carry, $byte) => $carry && \is_int($byte) && 0 <= $byte && $byte < 256, true));
-    }
-
     public function toSysEx(): SysEx
     {
         $byteCount = \count($this->data);
@@ -127,5 +109,23 @@ class BulkDumpBlock
     public function data(): array
     {
         return $this->data;
+    }
+
+    private const OFFSET_BYTE_COUNT_MSB = 0;
+    private const OFFSET_BYTE_COUNT_LSB = 1;
+    private const OFFSET_ADDRESS = 2;
+    private const OFFSET_DATA = 5;
+    private const MIN_FIXED_SIZE = 6;
+    private const HEADER_BLOCK_ID = 0x0E;
+    private const FOOTER_BLOCK_ID = 0x0F;
+
+    /**
+     * @param list<int> $data
+     */
+    private function __construct(
+        private Address $address,
+        private array $data,
+    ) {
+        \assert(\array_reduce($data, fn($carry, $byte) => $carry && \is_int($byte) && 0 <= $byte && $byte < 256, true));
     }
 }
