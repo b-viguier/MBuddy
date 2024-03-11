@@ -16,7 +16,7 @@ foreach (glob($root . '/[0-9][0-9]*') ?: [] as $folder) {
     $file = $files[0];
     $name = basename($folder);
     echo "Exporting $name...\n";
-    passthru("musescore.mscore \"$file\" -o \"$outDir$name.png\" -r 150");
+    passthru("mscore \"$file\" -o \"$outDir$name.png\" -r 150");
     passthru("mv \"$outDir$name-1.png\" \"$outDir$name.png\" ");
 }
 echo "Done!\n";
