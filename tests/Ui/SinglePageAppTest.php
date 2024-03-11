@@ -9,6 +9,7 @@ use Amp\Http\Client\Request;
 use Amp\Loop;
 use Bveing\MBuddy\Tests\GeckoServerExtension;
 use Bveing\MBuddy\Ui\Component;
+use Bveing\MBuddy\Ui\Rendering\Template;
 use Bveing\MBuddy\Ui\SinglePageApp;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\AbstractLogger;
@@ -66,12 +67,12 @@ class SinglePageAppTest extends TestCase
 
             yield $app->start(
                 new class () implements Component {
-                    use Component\Trait\NonModifiable;
+                    use Component\Trait\AutoVersion;
                     use Component\Trait\AutoId;
-                    use Component\Trait\Childless;
-                    public function render(): string
+                    public function template(): Template
                     {
-                        return <<<HTML
+                        return Template::create(
+                            <<<HTML
                             <script>
                             window.setTimeout(() => {
                                 console.log('This is Log');
@@ -79,7 +80,8 @@ class SinglePageAppTest extends TestCase
                                 console.error('This is Error');
                             }, 100);
                             </script>
-                            HTML;
+                            HTML,
+                        );
                     }
                 },
             );
@@ -134,12 +136,11 @@ class SinglePageAppTest extends TestCase
     private function createEmptyComponent(): Component
     {
         return new class () implements Component {
-            use Component\Trait\NonModifiable;
+            use Component\Trait\AutoVersion;
             use Component\Trait\AutoId;
-            use Component\Trait\Childless;
-            public function render(): string
+            public function template(): Template
             {
-                return '';
+                return Template::createEmpty();
             }
         };
     }

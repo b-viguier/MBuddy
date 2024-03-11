@@ -8,6 +8,7 @@ use Amp\Loop;
 use Bveing\MBuddy\Tests\GeckoServerExtension;
 use Bveing\MBuddy\Ui\Component;
 use Bveing\MBuddy\Ui\Component\Button;
+use Bveing\MBuddy\Ui\Rendering\Template;
 use Bveing\MBuddy\Ui\SinglePageApp;
 use PHPUnit\Framework\TestCase;
 
@@ -35,22 +36,20 @@ class ButtonTest extends TestCase
             );
 
             $comp = new class ($button1, $button2) implements Component {
-                use Component\Trait\NonModifiable;
+                use Component\Trait\AutoVersion;
                 use Component\Trait\AutoId;
 
                 public function __construct(private Button $button1, private Button $button2)
                 {
                 }
 
-                public function render(): string
+                public function template(): Template
                 {
-                    return $this->button1->render() . $this->button2->render();
-                }
-
-                public function children(): iterable
-                {
-                    yield $this->button1;
-                    yield $this->button2;
+                    return Template::create(
+                        "{{ A }} {{ B }}",
+                        A: $this->button1,
+                        B: $this->button2,
+                    );
                 }
             };
 

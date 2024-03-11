@@ -4,16 +4,13 @@ declare(strict_types=1);
 
 namespace Bveing\MBuddy\Ui;
 
+use Bveing\MBuddy\Ui\Rendering\Template;
+
 interface Component
 {
-    public function render(): string;
-
-    /**
-     * @return iterable<Component>
-     */
-    public function children(): iterable;
+    public function template(): Template;
 
     public function id(): Id;
 
-    public function isRefreshNeeded(): bool;
+    public function version(): int;
 }

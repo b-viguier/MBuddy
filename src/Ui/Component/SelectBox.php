@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace Bveing\MBuddy\Ui\Component;
 
 use Bveing\MBuddy\Ui\Component;
+use Bveing\MBuddy\Ui\Rendering\Template;
 
 class SelectBox implements Component
 {
     use Trait\AutoId;
-    use Trait\NonModifiable;
 
     /**
      * @param list<string> $options
@@ -43,15 +43,14 @@ class SelectBox implements Component
         $this->modal->hide();
     }
 
-    public function render(): string
+    public function template(): Template
     {
-        return $this->modal->render();
+        return $this->modal->template();
     }
 
-    public function children(): iterable
+    public function version(): int
     {
-        yield $this->modal;
-        // Html is owned by the Modal
+        return $this->modal->version();
     }
 
     public function onSelected(string $index): void

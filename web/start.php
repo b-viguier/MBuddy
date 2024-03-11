@@ -17,7 +17,7 @@ Amp\Loop::run(function() {
 
 
     $body = new class () implements Ui\Component {
-        use Ui\Component\Trait\NonModifiable;
+        use Ui\Component\Trait\AutoVersion;
         use Ui\Component\Trait\AutoId;
 
         public function __construct()
@@ -35,23 +35,21 @@ Amp\Loop::run(function() {
             $this->label = new Ui\Component\Label("Label");
         }
 
-        public function render(): string
+        public function template(): Ui\Rendering\Template
         {
-            return <<<HTML
+            return Ui\Rendering\Template::create(
+                <<<HTML
                 <div>
                     <h1>Hello World</h1>
-                    {$this->button1->render()}
-                    {$this->label->render()}
-                    {$this->selectBox->render()}
+                    {{ button1 }}
+                    {{ label }}
+                    {{ selectBox }}
                 </div>
-                HTML;
-        }
-
-        public function children(): iterable
-        {
-            yield $this->button1;
-            yield $this->label;
-            yield $this->selectBox;
+                HTML,
+                button1: $this->button1,
+                label: $this->label,
+                selectBox: $this->selectBox,
+            );
         }
 
         private Ui\Component\Button $button1;

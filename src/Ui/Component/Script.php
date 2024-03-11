@@ -5,28 +5,31 @@ declare(strict_types=1);
 namespace Bveing\MBuddy\Ui\Component;
 
 use Bveing\MBuddy\Ui\Component;
+use Bveing\MBuddy\Ui\Rendering\Template;
 
 class Script implements Component
 {
     use Trait\AutoId;
-    use Trait\Childless;
-    use Trait\Refreshable;
+    use Trait\AutoVersion;
 
 
-    public function render(): string
+    public function template(): Template
     {
-        $this->refreshNeeded = false;
-        return <<<HTML
-            <script id="{$this->id()}">
-                {$this->script}
+        return Template::create(
+            <<<HTML
+            <script id="{{ id }}">
+                {{ script }}
             </script>
-            HTML;
+            HTML,
+            id: $this->id(),
+            script: $this->script,
+        );
     }
 
     public function exec(string $script): void
     {
+        $this->refresh();
         $this->script = $script;
-        $this->refreshNeeded = true;
     }
 
     private string $script = '';

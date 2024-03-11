@@ -16,6 +16,11 @@ class Id implements \Stringable
         ;
     }
 
+    public function equals(Id $id): bool
+    {
+        return $this->id === $id->id;
+    }
+
     public function __toString(): string
     {
         return $this->id;

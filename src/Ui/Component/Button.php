@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace Bveing\MBuddy\Ui\Component;
 
 use Bveing\MBuddy\Ui\Component;
+use Bveing\MBuddy\Ui\Rendering\Template;
 use Bveing\MBuddy\Ui\Style\Color;
 
 class Button implements Component
 {
     use Trait\AutoId;
-    use Trait\Childless;
-    use Trait\Refreshable;
+    use Trait\AutoVersion;
 
     /**
      * @param \Closure():void $onClick
@@ -23,14 +23,18 @@ class Button implements Component
         $this->color = Color::PRIMARY();
     }
 
-    public function render(): string
+    public function template(): Template
     {
-        $this->refreshNeeded = false;
-        return <<<HTML
-            <button type="button" data-on-click="onClick" class="btn btn-{$this->color}" id="{$this->id()}">
-                {$this->label}
+        return Template::create(
+            <<<HTML
+            <button type="button" data-on-click="onClick" class="btn btn-{{ color }}" id="{{ id }}">
+                {{ label }}
             </button>
-            HTML;
+            HTML,
+            id: $this->id(),
+            label: $this->label,
+            color: $this->color,
+        );
     }
 
     public function onClick(): void
@@ -44,9 +48,8 @@ class Button implements Component
     ): self {
         $this->label = $label ?? $this->label;
         $this->color = $color ?? $this->color;
-        $this->refreshNeeded = true;
 
-        return $this;
+        return $this->refresh();
     }
 
     private Color $color;

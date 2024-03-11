@@ -23,6 +23,7 @@ class SinglePageApp
         ?string $rootDir = null,
         int $port = 8383,
     ) {
+        $this->root = null;
         $this->logger = $logger ?? new \Psr\Log\NullLogger();
         $this->websocket = new AmpWebsocket('/websocket', $this->logger);
         $websocketServer = new WebsocketServer($this->websocket);
@@ -121,10 +122,9 @@ class SinglePageApp
      */
     public function start(Component $body): Promise
     {
-        \assert($this->body === null);
         \assert($this->httpServer->getState() === HttpServer::STOPPED);
 
-        $this->body = $body;
+        $this->root = Rendering\Canvas\Node::fromComponent($body);
 
         return $this->httpServer->start();
     }
@@ -134,7 +134,7 @@ class SinglePageApp
      */
     public function stop(): Promise
     {
-        $this->body = null;
+        $this->root = null;
 
         return $this->httpServer->stop();
     }
@@ -146,9 +146,10 @@ class SinglePageApp
     {
         return call(function() {
             $allPromises = [];
-            foreach ($this->findComponentsToRefresh() as $component) {
+            \assert($this->root !== null);
+            foreach ($this->root->update() as $fragment) {
                 $allPromises[] = $this->websocket->send(
-                    \json_encode([(string)$component->id(), 'refresh', $component->render()], \JSON_THROW_ON_ERROR)
+                    \json_encode([(string)$fragment->id(), 'refresh', $fragment->content()], \JSON_THROW_ON_ERROR)
                 );
             }
 
@@ -162,17 +163,11 @@ class SinglePageApp
 
     private LoggerInterface $logger;
 
-    private ?Component $body = null;
-
-    /**
-     * @var array<string,\WeakReference<Component>>
-     */
-    private array $componentsCache = [];
+    private ?Rendering\Canvas\Node $root;
 
     private function render(): string
     {
-        \assert($this->body !== null);
-
+        \assert($this->root !== null);
         return <<<HTML
             <!DOCTYPE html>
             <html lang="en">
@@ -255,33 +250,12 @@ class SinglePageApp
                 </script>
             </head>
             <body>
-                {$this->body->render()}
+                {$this->root->render()}
             </div>
             
             </body>
             </html>
             HTML;
-    }
-
-    /**
-     * @return iterable<Component>
-     */
-    private function findComponentsToRefresh(): iterable
-    {
-        \assert($this->body !== null);
-
-        /** @var array<iterable<Component>> $ChildrenIterators */
-        $ChildrenIterators = [[$this->body]];
-        while ($ChildrenIterators) {
-            $children = \array_pop($ChildrenIterators);
-            foreach ($children as $child) {
-                if ($child->isRefreshNeeded()) {
-                    yield $child;
-                } else {
-                    $ChildrenIterators[] = $child->children();
-                }
-            }
-        }
     }
 
     private function onWebsocketMessage(string $message): void
@@ -307,7 +281,8 @@ class SinglePageApp
             }
             return;
         }
-        $component = $this->findComponentById(new Id($componentId));
+
+        $component = $this->root?->findComponent(new Id($componentId));
         if ($component === null) {
             $this->logger->warning('Component not found: ' . $componentId);
             return;
@@ -316,33 +291,5 @@ class SinglePageApp
         $component->{$eventId}($value);
 
         $this->refresh();
-    }
-
-    private function findComponentById(Id $id): ?Component
-    {
-        \assert($this->body !== null);
-
-        $component = ($this->componentsCache[(string)$id] ?? null)?->get();
-        if ($component !== null) {
-            return $component;
-        }
-
-        $this->componentsCache = [];
-        $found = null;
-
-        /** @var array<iterable<Component>> $ChildrenIterators */
-        $ChildrenIterators = [[$this->body]];
-        while ($ChildrenIterators) {
-            $children = \array_pop($ChildrenIterators);
-            foreach ($children as $child) {
-                if ($child->id() == $id) {
-                    $found = $child;
-                }
-                $this->componentsCache[(string)$child->id()] = \WeakReference::create($child);
-                $ChildrenIterators[] = $child->children();
-            }
-        }
-
-        return $found;
     }
 }

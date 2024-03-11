@@ -5,18 +5,38 @@ declare(strict_types=1);
 namespace Bveing\MBuddy\Ui\Component;
 
 use Bveing\MBuddy\Ui\Component;
+use Bveing\MBuddy\Ui\Rendering\SubTemplate;
+use Bveing\MBuddy\Ui\Rendering\Template;
 
 class Modal implements Component
 {
     use Trait\AutoId;
-    use Trait\NonModifiable;
+    use Trait\AutoVersion;
 
     public function __construct(
         private Component $content,
-        private ?Component $header = null,
-        private ?Component $footer = null,
+        ?Component $header = null,
+        ?Component $footer = null,
     ) {
         $this->script = new Script();
+        $this->header = $header !== null
+            ? SubTemplate::create(
+                <<<HTML
+                <div class="modal-header">
+                    {{ header }}
+                </div>
+                HTML,
+                header: $header,
+            ) : null;
+        $this->footer = $footer !== null
+            ? SubTemplate::create(
+                <<<HTML
+                <div class="modal-footer">
+                    {{ footer }}
+                </div>
+                HTML,
+                footer: $footer,
+            ) : null;
     }
 
     public function show(): void
@@ -42,48 +62,29 @@ class Modal implements Component
         return $this->visible;
     }
 
-    public function render(): string
+    public function template(): Template
     {
-        $header = "";
-        if ($this->header) {
-            $header = <<<HTML
-                <div class="modal-header">
-                    {$this->header->render()}
-                </div>
-                HTML;
-        }
-
-        $footer = "";
-        if ($this->footer) {
-            $footer = <<<HTML
-                <div class="modal-footer">
-                    {$this->footer->render()}
-                </div>
-                HTML;
-        }
-
-        return <<<HTML
-            <div class="modal fade" tabindex="-1" id="{$this->id()}" data-backdrop="static" data-keyboard="false">
+        return Template::create(
+            <<<HTML
+            <div class="modal fade" tabindex="-1" id="{{ id }}" data-backdrop="static" data-keyboard="false">
               <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
                 <div class="modal-content">
-                  {$header}
+                  {{ header }}
                   <div class="modal-body">
-                    {$this->content->render()}
+                    {{ content }}
                   </div>
-                  {$footer}
+                  {{ footer }}
                 </div>
               </div>
-              {$this->script->render()}
+              {{ script }}
             </div>
-            HTML;
-    }
-
-    public function children(): iterable
-    {
-        yield $this->script;
-        yield $this->content;
-        $this->header === null ?: yield $this->header;
-        $this->footer === null ?: yield $this->footer;
+            HTML,
+            id: $this->id(),
+            header: $this->header,
+            content: $this->content,
+            footer: $this->footer,
+            script: $this->script,
+        );
     }
 
     private function modalExec(string $action): void
@@ -93,4 +94,6 @@ class Modal implements Component
 
     private bool $visible = false;
     private Script $script;
+    private ?SubTemplate $header;
+    private ?SubTemplate $footer;
 }

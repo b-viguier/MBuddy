@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace Bveing\MBuddy\Ui\Component;
 
 use Bveing\MBuddy\Ui\Component;
+use Bveing\MBuddy\Ui\Rendering\Template;
 
 class Html implements Component
 {
     use Trait\AutoId;
-    use Trait\Childless;
-    use Trait\Refreshable;
+    use Trait\AutoVersion;
 
     public function __construct(
         private string $html,
@@ -20,18 +20,20 @@ class Html implements Component
     public function set(string $html): self
     {
         $this->html = $html;
-        $this->refreshNeeded = true;
 
-        return $this;
+        return $this->refresh();
     }
 
-    public function render(): string
+    public function template(): Template
     {
-        $this->refreshNeeded = false;
-        return <<<HTML
-            <span id="{$this->id()}">
-                {$this->html}
+        return Template::create(
+            <<<HTML
+            <span id="{{ id }}">
+                {{ html }}
             </span>
-            HTML;
+            HTML,
+            id: $this->id(),
+            html: $this->html,
+        );
     }
 }

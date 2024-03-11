@@ -5,28 +5,35 @@ declare(strict_types=1);
 namespace Bveing\MBuddy\Ui\Component;
 
 use Bveing\MBuddy\Ui\Component;
+use Bveing\MBuddy\Ui\Rendering\Template;
 
 class Label implements Component
 {
     use Trait\AutoId;
-    use Trait\Childless;
-    use Trait\Refreshable;
+    use Trait\AutoVersion;
 
     public function __construct(
         private string $label,
     ) {
     }
-    public function render(): string
+
+    public function template(): Template
     {
-        $this->refreshNeeded = false;
-        return <<<HTML
-            <label id="{$this->id()}">{$this->label}</label>
-            HTML;
+        return Template::create(
+            <<<HTML
+            <label id="{{ id }}">
+                {{ label }}
+            </label>
+            HTML,
+            id: $this->id(),
+            label: $this->label,
+        );
     }
 
-    public function setText(string $label): void
+    public function setText(string $label): self
     {
         $this->label = $label;
-        $this->refreshNeeded = true;
+
+        return $this->refresh();
     }
 }

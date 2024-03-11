@@ -7,6 +7,7 @@ namespace Bveing\MBuddy\Tests\Ui\Component;
 use Amp\Loop;
 use Bveing\MBuddy\Tests\GeckoServerExtension;
 use Bveing\MBuddy\Ui\Component;
+use Bveing\MBuddy\Ui\Rendering\Template;
 use Bveing\MBuddy\Ui\SinglePageApp;
 use PHPUnit\Framework\TestCase;
 
@@ -26,21 +27,19 @@ class LabelTest extends TestCase
             );
 
             $comp = new class ($label1, $label2) implements Component {
-                use Component\Trait\NonModifiable;
+                use Component\Trait\AutoVersion;
                 use Component\Trait\AutoId;
                 public function __construct(private Component\Label $label1, private Component\Label $label2)
                 {
                 }
 
-                public function render(): string
+                public function template(): Template
                 {
-                    return $this->label1->render() . $this->label2->render();
-                }
-
-                public function children(): iterable
-                {
-                    yield $this->label1;
-                    yield $this->label2;
+                    return Template::create(
+                        "{{ A }} {{ B }}",
+                        A: $this->label1,
+                        B: $this->label2,
+                    );
                 }
             };
 
