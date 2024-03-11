@@ -24,7 +24,7 @@ class Template
                 foreach($replacement->components() as $subKey => $subComponent) {
                     $newSubKey = "$key#$subKey";
                     $subComponents[$newSubKey] = $subComponent;
-                    $subReplace[$subKey] = $newSubKey;
+                    $subReplace[$subKey] = "{{ $newSubKey }}";
                 }
                 $toReplace[$key] = self::replace($replacement->pattern(), $subReplace);
                 $components = \array_merge($components, $subComponents);
