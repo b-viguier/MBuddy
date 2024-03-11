@@ -35,9 +35,9 @@ Amp\Loop::run(function() {
             $this->label = new Ui\Component\Label("Label");
         }
 
-        public function template(): Ui\Rendering\Template
+        public function template(): Ui\Template
         {
-            return Ui\Rendering\Template::create(
+            return Ui\Template::create(
                 <<<HTML
                 <div>
                     <h1>Hello World</h1>

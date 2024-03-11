@@ -8,8 +8,8 @@ use Amp\Loop;
 use Bveing\MBuddy\Tests\GeckoServerExtension;
 use Bveing\MBuddy\Ui\Component;
 use Bveing\MBuddy\Ui\Component\Button;
-use Bveing\MBuddy\Ui\Rendering\Template;
 use Bveing\MBuddy\Ui\SinglePageApp;
+use Bveing\MBuddy\Ui\Template;
 use PHPUnit\Framework\TestCase;
 
 class ButtonTest extends TestCase

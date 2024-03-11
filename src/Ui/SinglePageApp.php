@@ -124,7 +124,7 @@ class SinglePageApp
     {
         \assert($this->httpServer->getState() === HttpServer::STOPPED);
 
-        $this->root = Rendering\Canvas\Node::fromComponent($body);
+        $this->root = SinglePageApp\Node::fromComponent($body);
 
         return $this->httpServer->start();
     }
@@ -163,7 +163,7 @@ class SinglePageApp
 
     private LoggerInterface $logger;
 
-    private ?Rendering\Canvas\Node $root;
+    private ?SinglePageApp\Node $root;
 
     private function render(): string
     {

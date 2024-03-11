@@ -2,12 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Bveing\MBuddy\Ui\Rendering\Canvas;
+namespace Bveing\MBuddy\Ui\SinglePageApp;
 
 use Bveing\MBuddy\Ui\Component;
 use Bveing\MBuddy\Ui\Id;
-use Bveing\MBuddy\Ui\Rendering\Fragment;
-use Bveing\MBuddy\Ui\Rendering\Template;
+use Bveing\MBuddy\Ui\Template;
 
 /**
  * @internal

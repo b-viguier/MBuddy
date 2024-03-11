@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Bveing\MBuddy\Ui\Rendering;
+namespace Bveing\MBuddy\Ui\SinglePageApp;
 
 use Bveing\MBuddy\Ui\Id;
 

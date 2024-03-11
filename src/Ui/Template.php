@@ -2,9 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Bveing\MBuddy\Ui\Rendering;
-
-use Bveing\MBuddy\Ui\Component;
+namespace Bveing\MBuddy\Ui;
 
 class Template
 {

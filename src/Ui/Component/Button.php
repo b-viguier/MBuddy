@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Bveing\MBuddy\Ui\Component;
 
 use Bveing\MBuddy\Ui\Component;
-use Bveing\MBuddy\Ui\Rendering\Template;
 use Bveing\MBuddy\Ui\Style\Color;
+use Bveing\MBuddy\Ui\Template;
 
 class Button implements Component
 {
