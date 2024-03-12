@@ -29,11 +29,11 @@ class MidiTest extends TestCase
                 $isSent = true;
             });
 
-            $this->assertFalse($isSent);
+            self::assertFalse($isSent);
             $message = $driver->popSentMessage();
-            $this->assertTrue($isSent);
+            self::assertTrue($isSent);
 
-            $this->assertSame((string)$parameterChange->toSysex(), $message);
+            self::assertSame((string)$parameterChange->toSysEx(), $message);
         });
     }
 
@@ -62,14 +62,14 @@ class MidiTest extends TestCase
             });
 
             $messages = [];
-            $this->assertFalse($isSent);
+            self::assertFalse($isSent);
             $messages[] = $driver->popSentMessage();
-            $this->assertFalse($isSent);
+            self::assertFalse($isSent);
             $messages[] = $driver->popSentMessage();
-            $this->assertTrue($isSent);
+            self::assertTrue($isSent);
 
-            $this->assertSame((string)$dumpRequests[0]->toSysex(), $messages[0]);
-            $this->assertSame((string)$dumpRequests[1]->toSysex(), $messages[1]);
+            self::assertSame((string)$dumpRequests[0]->toSysEx(), $messages[0]);
+            self::assertSame((string)$dumpRequests[1]->toSysEx(), $messages[1]);
         });
     }
 
@@ -95,20 +95,20 @@ class MidiTest extends TestCase
                 $isFinished = true;
             });
             $message = $driver->popSentMessage();
-            $this->assertSame((string)$parameterRequest->toSysex(), $message);
-            $this->assertFalse($isFinished);
+            self::assertSame((string)$parameterRequest->toSysEx(), $message);
+            self::assertFalse($isFinished);
 
             // unrelated ParameterChange must be ignored
-            $driver->pushReceivedMessage((string)$unrelatedParameterChange->toSysex());
-            $this->assertFalse($isFinished);
+            $driver->pushReceivedMessage((string)$unrelatedParameterChange->toSysEx());
+            self::assertFalse($isFinished);
 
             // ParameterChange with same address
-            $driver->pushReceivedMessage((string)$parameterChange->toSysex());
-            $this->assertTrue($isFinished);
+            $driver->pushReceivedMessage((string)$parameterChange->toSysEx());
+            self::assertTrue($isFinished);
             $result = yield $promiseRequest;
 
-            $this->assertInstanceOf(SysEx\ParameterChange::class, $result);
-            $this->assertSame($data, $result->data());
+            self::assertInstanceOf(SysEx\ParameterChange::class, $result);
+            self::assertSame($data, $result->data());
         });
     }
 
@@ -125,7 +125,7 @@ class MidiTest extends TestCase
             $driver->popSentMessage();
             // Don't send anything back
             $result = yield $promiseRequest;
-            $this->assertNull($result);
+            self::assertNull($result);
         });
     }
 
@@ -153,28 +153,28 @@ class MidiTest extends TestCase
             });
 
             $message = $driver->popSentMessage();
-            $this->assertSame((string)$dumpRequest->toSysex(), $message);
-            $this->assertFalse($isFinished);
+            self::assertSame((string)$dumpRequest->toSysEx(), $message);
+            self::assertFalse($isFinished);
 
-            $driver->pushReceivedMessage((string)$headerBlock->toSysex());
-            $this->assertFalse($isFinished);
-            $driver->pushReceivedMessage((string)$dataBlock->toSysex());
-            $this->assertFalse($isFinished);
-            $driver->pushReceivedMessage((string)$footerBlock->toSysex());
-            $this->assertTrue($isFinished);
+            $driver->pushReceivedMessage((string)$headerBlock->toSysEx());
+            self::assertFalse($isFinished);
+            $driver->pushReceivedMessage((string)$dataBlock->toSysEx());
+            self::assertFalse($isFinished);
+            $driver->pushReceivedMessage((string)$footerBlock->toSysEx());
+            self::assertTrue($isFinished);
 
             $result = yield $promiseRequest;
-            $this->assertIsArray($result);
-            $this->assertCount(3, $result);
+            self::assertIsArray($result);
+            self::assertCount(3, $result);
 
-            $this->assertTrue($result[0]->isHeaderBlock());
-            $this->assertEquals($headerBlock->address(), $result[0]->address());
+            self::assertTrue($result[0]->isHeaderBlock());
+            self::assertEquals($headerBlock->address(), $result[0]->address());
 
-            $this->assertTrue($result[2]->isFooterBlock());
-            $this->assertEquals($footerBlock->address(), $result[2]->address());
+            self::assertTrue($result[2]->isFooterBlock());
+            self::assertEquals($footerBlock->address(), $result[2]->address());
 
-            $this->assertEquals($dataBlock->address(), $result[1]->address());
-            $this->assertSame($dataBlock->data(), $result[1]->data());
+            self::assertEquals($dataBlock->address(), $result[1]->address());
+            self::assertSame($dataBlock->data(), $result[1]->data());
         });
     }
 
@@ -203,43 +203,43 @@ class MidiTest extends TestCase
             });
 
             $message = $driver->popSentMessage();
-            $this->assertSame((string)$dumpRequest->toSysex(), $message);
-            $this->assertFalse($isFinished);
+            self::assertSame((string)$dumpRequest->toSysEx(), $message);
+            self::assertFalse($isFinished);
 
             // Starting with non header block does nothing
-            $driver->pushReceivedMessage((string)$dataBlock->toSysex());
-            $driver->pushReceivedMessage((string)$footerBlock->toSysex());
-            $this->assertFalse($isFinished);
+            $driver->pushReceivedMessage((string)$dataBlock->toSysEx());
+            $driver->pushReceivedMessage((string)$footerBlock->toSysEx());
+            self::assertFalse($isFinished);
 
             // When a new header arrive, current buffer is discarded
-            $driver->pushReceivedMessage((string)$headerBlock->toSysex());
-            $driver->pushReceivedMessage((string)$dataBlock->toSysex());
-            $driver->pushReceivedMessage((string)$dataBlock->toSysex());
-            $driver->pushReceivedMessage((string)$dataBlock->toSysex());
-            $driver->pushReceivedMessage((string)$dataBlock->toSysex());
-            $this->assertFalse($isFinished);
-            $driver->pushReceivedMessage((string)$headerBlock->toSysex());
-            $driver->pushReceivedMessage((string)$dataBlock->toSysex());
-            $this->assertFalse($isFinished);
+            $driver->pushReceivedMessage((string)$headerBlock->toSysEx());
+            $driver->pushReceivedMessage((string)$dataBlock->toSysEx());
+            $driver->pushReceivedMessage((string)$dataBlock->toSysEx());
+            $driver->pushReceivedMessage((string)$dataBlock->toSysEx());
+            $driver->pushReceivedMessage((string)$dataBlock->toSysEx());
+            self::assertFalse($isFinished);
+            $driver->pushReceivedMessage((string)$headerBlock->toSysEx());
+            $driver->pushReceivedMessage((string)$dataBlock->toSysEx());
+            self::assertFalse($isFinished);
 
             // Invalid Footer are ignored
-            $driver->pushReceivedMessage((string)$invalidFooterBlock->toSysex());
-            $this->assertFalse($isFinished);
-            $driver->pushReceivedMessage((string)$footerBlock->toSysex());
-            $this->assertTrue($isFinished);
+            $driver->pushReceivedMessage((string)$invalidFooterBlock->toSysEx());
+            self::assertFalse($isFinished);
+            $driver->pushReceivedMessage((string)$footerBlock->toSysEx());
+            self::assertTrue($isFinished);
 
             $result = yield $promiseRequest;
-            $this->assertIsArray($result);
-            $this->assertCount(3, $result);
+            self::assertIsArray($result);
+            self::assertCount(3, $result);
 
-            $this->assertTrue($result[0]->isHeaderBlock());
-            $this->assertEquals($headerBlock->address(), $result[0]->address());
+            self::assertTrue($result[0]->isHeaderBlock());
+            self::assertEquals($headerBlock->address(), $result[0]->address());
 
-            $this->assertTrue($result[2]->isFooterBlock());
-            $this->assertEquals($footerBlock->address(), $result[2]->address());
+            self::assertTrue($result[2]->isFooterBlock());
+            self::assertEquals($footerBlock->address(), $result[2]->address());
 
-            $this->assertEquals($dataBlock->address(), $result[1]->address());
-            $this->assertSame($dataBlock->data(), $result[1]->data());
+            self::assertEquals($dataBlock->address(), $result[1]->address());
+            self::assertSame($dataBlock->data(), $result[1]->data());
         });
     }
 }

@@ -162,7 +162,10 @@ class GeckoDriver
             /** @var array{'value':string|null} $jsonResponse */
             $jsonResponse = \json_decode($body, associative: true, flags: \JSON_THROW_ON_ERROR);
 
-            return \base64_decode($jsonResponse['value'] ?? throw new \Exception("Cannot retrieve screenshot"));
+            return \base64_decode(
+                $jsonResponse['value'] ?? throw new \Exception("Cannot retrieve screenshot"),
+                true,
+            );
         });
     }
 

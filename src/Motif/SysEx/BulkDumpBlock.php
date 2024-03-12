@@ -126,6 +126,6 @@ class BulkDumpBlock
         private Address $address,
         private array $data,
     ) {
-        \assert(\array_reduce($data, fn($carry, $byte) => $carry && \is_int($byte) && 0 <= $byte && $byte < 256, true));
+        \assert(\array_reduce($data, fn($carry, $byte) => $carry && 0 <= $byte && $byte < 256, true));
     }
 }

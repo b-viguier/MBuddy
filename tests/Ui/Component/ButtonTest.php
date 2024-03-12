@@ -58,24 +58,24 @@ class ButtonTest extends TestCase
                 yield $app->start($comp);
                 yield GeckoServerExtension::navigateToHomePage();
 
-                $this->assertSame(0, $counter1);
-                $this->assertSame(0, $counter2);
+                self::assertSame(0, $counter1);
+                self::assertSame(0, $counter2);
 
                 $elementId1 = yield GeckoServerExtension::$driver->findElement(\sprintf('#%s', $button1->id()));
                 $elementId2 = yield GeckoServerExtension::$driver->findElement(\sprintf('#%s', $button2->id()));
 
-                $this->assertSame('B1', yield GeckoServerExtension::$driver->getElementText($elementId1));
-                $this->assertSame('B2', yield GeckoServerExtension::$driver->getElementText($elementId2));
+                self::assertSame('B1', yield GeckoServerExtension::$driver->getElementText($elementId1));
+                self::assertSame('B2', yield GeckoServerExtension::$driver->getElementText($elementId2));
 
                 yield GeckoServerExtension::$driver->clickElement($elementId1);
 
-                $this->assertSame(1, $counter1);
-                $this->assertSame(0, $counter2);
+                self::assertSame(1, $counter1);
+                self::assertSame(0, $counter2);
 
                 yield GeckoServerExtension::$driver->clickElement($elementId2);
 
-                $this->assertSame(1, $counter1);
-                $this->assertSame(1, $counter2);
+                self::assertSame(1, $counter1);
+                self::assertSame(1, $counter2);
 
 
             } finally {

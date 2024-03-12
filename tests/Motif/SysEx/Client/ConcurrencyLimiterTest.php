@@ -21,7 +21,7 @@ class ConcurrencyLimiterTest extends TestCase
         $promise = new Success();
         $mock = $this->createMock(SysEx\Client::class);
         $mock
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('sendDump')
             ->with($blocks)
             ->willReturn($promise);
@@ -29,7 +29,7 @@ class ConcurrencyLimiterTest extends TestCase
         $client = new SysEx\Client\ConcurrencyLimiter($mock, 1);
         $result = $client->sendDump($blocks);
 
-        $this->assertSame($promise, $result);
+        self::assertSame($promise, $result);
     }
 
     public function testSendParameterIsForwarded(): void
@@ -38,7 +38,7 @@ class ConcurrencyLimiterTest extends TestCase
         $promise = new Success();
         $mock = $this->createMock(SysEx\Client::class);
         $mock
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('sendParameter')
             ->with($parameter)
             ->willReturn($promise);
@@ -46,7 +46,7 @@ class ConcurrencyLimiterTest extends TestCase
         $client = new SysEx\Client\ConcurrencyLimiter($mock, 1);
         $result = $client->sendParameter($parameter);
 
-        $this->assertSame($promise, $result);
+        self::assertSame($promise, $result);
     }
 
     public function testRequestsAreLimited(): void
@@ -65,7 +65,7 @@ class ConcurrencyLimiterTest extends TestCase
 
             $mock = $this->createMock(SysEx\Client::class);
             $mock
-                ->expects($this->exactly(2))
+                ->expects(self::exactly(2))
                 ->method('requestDump')
                 ->with($dumpRequest)
                 ->willReturnCallback(function() use (&$isStarted, $deferred) {
@@ -78,7 +78,7 @@ class ConcurrencyLimiterTest extends TestCase
                     return $promise;
                 });
             $mock
-                ->expects($this->once())
+                ->expects(self::once())
                 ->method('requestParameter')
                 ->with($parameterRequest)
                 ->willReturnCallback(function() use (&$isStarted, $deferred) {
@@ -99,20 +99,20 @@ class ConcurrencyLimiterTest extends TestCase
                 $isFinished[2] = true;
             });
 
-            $this->assertSame([true, true, false], $isStarted);
-            $this->assertSame([false, false, false], $isFinished);
+            self::assertSame([true, true, false], $isStarted);
+            self::assertSame([false, false, false], $isFinished);
 
             $deferred[0]->resolve();
-            $this->assertSame([true, true, true], $isStarted);
-            $this->assertSame([true, false, false], $isFinished);
+            self::assertSame([true, true, true], $isStarted);
+            self::assertSame([true, false, false], $isFinished);
 
             $deferred[1]->resolve();
-            $this->assertSame([true, true, true], $isStarted);
-            $this->assertSame([true, true, false], $isFinished);
+            self::assertSame([true, true, true], $isStarted);
+            self::assertSame([true, true, false], $isFinished);
 
             $deferred[2]->resolve();
-            $this->assertSame([true, true, true], $isStarted);
-            $this->assertSame([true, true, true], $isFinished);
+            self::assertSame([true, true, true], $isStarted);
+            self::assertSame([true, true, true], $isFinished);
         });
     }
 }

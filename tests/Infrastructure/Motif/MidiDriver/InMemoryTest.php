@@ -18,7 +18,7 @@ class InMemoryTest extends TestCase
             $driver = new MidiDriver\InMemory();
             $sequence = [];
 
-            $this->assertNull($driver->popSentMessage());
+            self::assertNull($driver->popSentMessage());
 
             $sendPromise = call(function() use (&$driver, &$sequence) {
                 $sequence[] = 'sending';
@@ -29,11 +29,11 @@ class InMemoryTest extends TestCase
             $message = $driver->popSentMessage();
             $sequence[] = 'popped';
 
-            $this->assertSame('My Message', $message);
+            self::assertSame('My Message', $message);
 
             yield $sendPromise;
 
-            $this->assertSame(['sending', 'popping', 'sent', 'popped'], $sequence);
+            self::assertSame(['sending', 'popping', 'sent', 'popped'], $sequence);
         });
     }
 
@@ -64,9 +64,9 @@ class InMemoryTest extends TestCase
             $sequence[] = 'pushed';
 
             $messages = yield all($receivePromises);
-            $this->assertSame(['My Message', 'My Message'], $messages);
+            self::assertSame(['My Message', 'My Message'], $messages);
 
-            $this->assertSame(
+            self::assertSame(
                 [
                 'receiving1',
                 'receiving2',
@@ -101,6 +101,6 @@ class InMemoryTest extends TestCase
             yield $receivePromise;
         });
 
-        $this->assertSame(['pushing', 'pushed', 'receiving'], $sequence);
+        self::assertSame(['pushing', 'pushed', 'receiving'], $sequence);
     }
 }

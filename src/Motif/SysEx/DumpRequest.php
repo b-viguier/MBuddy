@@ -15,7 +15,7 @@ class DumpRequest
         $this->sysex = SysEx::fromBytes(self::DEVICE_NUMBER, $this->address->toBinaryString());
     }
 
-    public function toSysex(): SysEx
+    public function toSysEx(): SysEx
     {
         return $this->sysex;
     }

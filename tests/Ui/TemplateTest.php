@@ -16,8 +16,8 @@ class TemplateTest extends TestCase
     {
         $template = Template::createEmpty();
 
-        $this->assertSame('', $template->pattern());
-        $this->assertEmpty($template->components());
+        self::assertSame('', $template->pattern());
+        self::assertEmpty($template->components());
     }
 
     public function testScalarReplacements(): void
@@ -30,8 +30,8 @@ class TemplateTest extends TestCase
             null: null,
         );
 
-        $this->assertSame('>A 1 1.1 <', $template->pattern());
-        $this->assertEmpty($template->components());
+        self::assertSame('>A 1 1.1 <', $template->pattern());
+        self::assertEmpty($template->components());
     }
 
     public function testIntegerPlaceHolders(): void
@@ -42,8 +42,8 @@ class TemplateTest extends TestCase
             'B',
         );
 
-        $this->assertSame('>A B<', $template->pattern());
-        $this->assertEmpty($template->components());
+        self::assertSame('>A B<', $template->pattern());
+        self::assertEmpty($template->components());
     }
 
     public function testComponentsReplacements(): void
@@ -58,8 +58,8 @@ class TemplateTest extends TestCase
             ...$components,
         );
 
-        $this->assertSame($pattern, $template->pattern());
-        $this->assertSame($components, $template->components());
+        self::assertSame($pattern, $template->pattern());
+        self::assertSame($components, $template->components());
     }
 
     public function testReplace(): void
@@ -74,7 +74,7 @@ class TemplateTest extends TestCase
             ]
         );
 
-        $this->assertSame(
+        self::assertSame(
             '>00 11 AA BB<',
             $result,
         );
@@ -97,11 +97,11 @@ class TemplateTest extends TestCase
         );
         $template = Template::create('<main>{{ sub }}</main>', sub: $subTemplate);
 
-        $this->assertSame(
+        self::assertSame(
             '<main><sub>{{ sub#B }} - <subsub>{{ sub#C#A }}</subsub></sub></main>',
             $template->pattern(),
         );
-        $this->assertSame(
+        self::assertSame(
             ["sub#B" => $components[1], "sub#C#A" => $components[0]],
             $template->components(),
         );
@@ -115,8 +115,8 @@ class TemplateTest extends TestCase
             C: 'C',
         );
 
-        $this->assertSame('>{{ A }} B<', $template->pattern());
-        $this->assertEmpty($template->components());
+        self::assertSame('>{{ A }} B<', $template->pattern());
+        self::assertEmpty($template->components());
     }
 
     private function createComponent(): Component

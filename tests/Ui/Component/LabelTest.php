@@ -51,8 +51,8 @@ class LabelTest extends TestCase
                 $elementId1 = yield GeckoServerExtension::$driver->findElement(\sprintf('#%s', $label1->id()));
                 $elementId2 = yield GeckoServerExtension::$driver->findElement(\sprintf('#%s', $label2->id()));
 
-                $this->assertSame('L1', yield GeckoServerExtension::$driver->getElementText($elementId1));
-                $this->assertSame('L2', yield GeckoServerExtension::$driver->getElementText($elementId2));
+                self::assertSame('L1', yield GeckoServerExtension::$driver->getElementText($elementId1));
+                self::assertSame('L2', yield GeckoServerExtension::$driver->getElementText($elementId2));
 
                 $label1->setText('Hello');
                 yield $app->refresh();
@@ -60,8 +60,8 @@ class LabelTest extends TestCase
                 $elementId1 = yield GeckoServerExtension::$driver->findElement(\sprintf('#%s', $label1->id()));
                 $elementId2 = yield GeckoServerExtension::$driver->findElement(\sprintf('#%s', $label2->id()));
 
-                $this->assertSame('Hello', yield GeckoServerExtension::$driver->getElementText($elementId1));
-                $this->assertSame('L2', yield GeckoServerExtension::$driver->getElementText($elementId2));
+                self::assertSame('Hello', yield GeckoServerExtension::$driver->getElementText($elementId1));
+                self::assertSame('L2', yield GeckoServerExtension::$driver->getElementText($elementId2));
 
                 $label2->setText('World');
                 yield $app->refresh();
@@ -69,8 +69,8 @@ class LabelTest extends TestCase
                 $elementId1 = yield GeckoServerExtension::$driver->findElement(\sprintf('#%s', $label1->id()));
                 $elementId2 = yield GeckoServerExtension::$driver->findElement(\sprintf('#%s', $label2->id()));
 
-                $this->assertSame('Hello', yield GeckoServerExtension::$driver->getElementText($elementId1));
-                $this->assertSame('World', yield GeckoServerExtension::$driver->getElementText($elementId2));
+                self::assertSame('Hello', yield GeckoServerExtension::$driver->getElementText($elementId1));
+                self::assertSame('World', yield GeckoServerExtension::$driver->getElementText($elementId2));
 
 
             } finally {

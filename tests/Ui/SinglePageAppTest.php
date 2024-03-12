@@ -30,14 +30,14 @@ class SinglePageAppTest extends TestCase
                 yield $app->start($comp);
                 yield GeckoServerExtension::navigateToHomePage();
 
-                $this->assertSame('My Title', yield GeckoServerExtension::$driver->getTitle());
+                self::assertSame('My Title', yield GeckoServerExtension::$driver->getTitle());
                 yield $app->stop();
 
 
                 yield $app->start($comp);
                 yield GeckoServerExtension::$driver->refresh();
                 $title = yield GeckoServerExtension::$driver->getTitle();
-                $this->assertSame('My Title', $title);
+                self::assertSame('My Title', $title);
             } finally {
                 yield $app->stop();
             }
@@ -54,8 +54,7 @@ class SinglePageAppTest extends TestCase
                 public array $logs = [];
 
                 /**
-                 * @param list<mixed> $context
-                 * @return void
+                 * @param array<mixed> $context
                  */
                 public function log(mixed $level, \Stringable|string $message, array $context = []): void
                 {
@@ -92,15 +91,15 @@ class SinglePageAppTest extends TestCase
             try {
                 yield delay(200);
 
-                $this->assertContains(
+                self::assertContains(
                     ['info', '[Console] This is Log', []],
                     $logger->logs,
                 );
-                $this->assertContains(
+                self::assertContains(
                     ['warning', '[Console] This is Warning', []],
                     $logger->logs,
                 );
-                $this->assertContains(
+                self::assertContains(
                     ['error', '[Console] This is Error', []],
                     $logger->logs,
                 );
@@ -126,7 +125,7 @@ class SinglePageAppTest extends TestCase
                 $response = yield $httpClient->request(new Request('http://localhost:8383/' .\basename(__FILE__)));
                 $content = yield $response->getBody()->buffer();
 
-                $this->assertSame(\file_get_contents(__FILE__), $content);
+                self::assertSame(\file_get_contents(__FILE__), $content);
             } finally {
                 yield $app->stop();
             }

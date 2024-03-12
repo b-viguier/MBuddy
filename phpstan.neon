@@ -1,10 +1,15 @@
 parameters:
-	level: max
-	paths:
-		- src/Motif
-		- src/Ui
-		- src/Infrastructure
-		- tests
+    level: max
+    paths:
+        - src/Motif
+        - src/Ui
+        - src/Infrastructure
+        - tests
+    strictRules:
+        booleansInConditions: false
+        disallowedConstructs: false
+
 
 includes:
     - tools/vendor/timeweb/phpstan-enum/extension.neon
+    - tools/vendor/phpstan/phpstan-strict-rules/rules.neon

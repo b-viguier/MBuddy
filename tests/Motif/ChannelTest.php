@@ -12,8 +12,8 @@ class ChannelTest extends TestCase
     public function testGetValues(): void
     {
         $channel = Channel::fromMidiByte(1);
-        $this->assertSame(1, $channel->toMidiByte());
-        $this->assertSame("2", $channel->toHumanReadable());
-        $this->assertSame("2", (string) $channel);
+        self::assertSame(1, $channel->toMidiByte());
+        self::assertSame("2", $channel->toHumanReadable());
+        self::assertSame("2", (string) $channel);
     }
 }

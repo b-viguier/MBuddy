@@ -18,14 +18,14 @@ class ZoneTest extends TestCase
         $sysex = $srcZone->toSysEx();
         $dstZone = Zone::fromBulkDump($sysex);
 
-        $this->assertEquals($srcZone, $dstZone);
+        self::assertEquals($srcZone, $dstZone);
     }
 
     public function testValues(): void
     {
         $id = 3;
         $zone = Zone::default($id);
-        $this->assertSame($id, $zone->id());
+        self::assertSame($id, $zone->id());
 
         $values = [
             'transmitChannel' => Channel::fromMidiByte(9),
@@ -62,38 +62,38 @@ class ZoneTest extends TestCase
         ];
 
         $other = $zone->with(...$values);
-        $this->assertSame($zone->id(), $other->id());
+        self::assertSame($zone->id(), $other->id());
 
-        $this->assertSame($values['transmitChannel'], $other->transmitChannel());
-        $this->assertSame($values['isTransmittedForMidi'], $other->isTransmittedForMidi());
-        $this->assertSame($values['isTransmittedForToneGenerator'], $other->isTransmittedForToneGenerator());
-        $this->assertSame($values['transposeOctave'], $other->transposeOctave());
-        $this->assertSame($values['transposeSemitone'], $other->transposeSemitone());
-        $this->assertSame($values['noteLimitLow'], $other->noteLimitLow());
-        $this->assertSame($values['noteLimitHigh'], $other->noteLimitHigh());
-        $this->assertSame($values['volume'], $other->volume());
-        $this->assertSame($values['pan'], $other->pan());
-        $this->assertSame($values['program'], $other->program());
-        $this->assertSame($values['isBankSelectTransmittedForToneGenerator'], $other->isBankSelectTransmittedForToneGenerator());
-        $this->assertSame($values['isProgramChangeTransmittedForToneGenerator'], $other->isProgramChangeTransmittedForToneGenerator());
-        $this->assertSame($values['isBankSelectTransmittedForMidi'], $other->isBankSelectTransmittedForMidi());
-        $this->assertSame($values['isProgramChangeTransmittedForMidi'], $other->isProgramChangeTransmittedForMidi());
-        $this->assertSame($values['isRibbonTransmitted'], $other->isRibbonTransmitted());
-        $this->assertSame($values['isVolumeExpressionTransmitted'], $other->isVolumeExpressionTransmitted());
-        $this->assertSame($values['isPanTransmitted'], $other->isPanTransmitted());
-        $this->assertSame($values['isSustainTransmitted'], $other->isSustainTransmitted());
-        $this->assertSame($values['isAssignableButton1Transmitted'], $other->isAssignableButton1Transmitted());
-        $this->assertSame($values['isAssignableButton2Transmitted'], $other->isAssignableButton2Transmitted());
-        $this->assertSame($values['isAfterTouchTransmitted'], $other->isAfterTouchTransmitted());
-        $this->assertSame($values['isPitchBendTransmitted'], $other->isPitchBendTransmitted());
-        $this->assertSame($values['isFootController2Transmitted'], $other->isFootController2Transmitted());
-        $this->assertSame($values['isFootSwitchTransmitted'], $other->isFootSwitchTransmitted());
-        $this->assertSame($values['isFootController1Transmitted'], $other->isFootController1Transmitted());
-        $this->assertSame($values['isBreathControllerTransmitted'], $other->isBreathControllerTransmitted());
-        $this->assertSame($values['isModWheelTransmitted'], $other->isModWheelTransmitted());
-        $this->assertSame($values['isAssignableSliderTransmitted'], $other->isAssignableSliderTransmitted());
-        $this->assertSame($values['isAssignableKnobTransmitted'], $other->isAssignableKnobTransmitted());
-        $this->assertSame($values['assignableSliderControlNumber'], $other->assignableSliderControlNumber());
-        $this->assertSame($values['assignableKnobControlNumber'], $other->assignableKnobControlNumber());
+        self::assertSame($values['transmitChannel'], $other->transmitChannel());
+        self::assertSame($values['isTransmittedForMidi'], $other->isTransmittedForMidi());
+        self::assertSame($values['isTransmittedForToneGenerator'], $other->isTransmittedForToneGenerator());
+        self::assertSame($values['transposeOctave'], $other->transposeOctave());
+        self::assertSame($values['transposeSemitone'], $other->transposeSemitone());
+        self::assertSame($values['noteLimitLow'], $other->noteLimitLow());
+        self::assertSame($values['noteLimitHigh'], $other->noteLimitHigh());
+        self::assertSame($values['volume'], $other->volume());
+        self::assertSame($values['pan'], $other->pan());
+        self::assertSame($values['program'], $other->program());
+        self::assertSame($values['isBankSelectTransmittedForToneGenerator'], $other->isBankSelectTransmittedForToneGenerator());
+        self::assertSame($values['isProgramChangeTransmittedForToneGenerator'], $other->isProgramChangeTransmittedForToneGenerator());
+        self::assertSame($values['isBankSelectTransmittedForMidi'], $other->isBankSelectTransmittedForMidi());
+        self::assertSame($values['isProgramChangeTransmittedForMidi'], $other->isProgramChangeTransmittedForMidi());
+        self::assertSame($values['isRibbonTransmitted'], $other->isRibbonTransmitted());
+        self::assertSame($values['isVolumeExpressionTransmitted'], $other->isVolumeExpressionTransmitted());
+        self::assertSame($values['isPanTransmitted'], $other->isPanTransmitted());
+        self::assertSame($values['isSustainTransmitted'], $other->isSustainTransmitted());
+        self::assertSame($values['isAssignableButton1Transmitted'], $other->isAssignableButton1Transmitted());
+        self::assertSame($values['isAssignableButton2Transmitted'], $other->isAssignableButton2Transmitted());
+        self::assertSame($values['isAfterTouchTransmitted'], $other->isAfterTouchTransmitted());
+        self::assertSame($values['isPitchBendTransmitted'], $other->isPitchBendTransmitted());
+        self::assertSame($values['isFootController2Transmitted'], $other->isFootController2Transmitted());
+        self::assertSame($values['isFootSwitchTransmitted'], $other->isFootSwitchTransmitted());
+        self::assertSame($values['isFootController1Transmitted'], $other->isFootController1Transmitted());
+        self::assertSame($values['isBreathControllerTransmitted'], $other->isBreathControllerTransmitted());
+        self::assertSame($values['isModWheelTransmitted'], $other->isModWheelTransmitted());
+        self::assertSame($values['isAssignableSliderTransmitted'], $other->isAssignableSliderTransmitted());
+        self::assertSame($values['isAssignableKnobTransmitted'], $other->isAssignableKnobTransmitted());
+        self::assertSame($values['assignableSliderControlNumber'], $other->assignableSliderControlNumber());
+        self::assertSame($values['assignableKnobControlNumber'], $other->assignableKnobControlNumber());
     }
 }

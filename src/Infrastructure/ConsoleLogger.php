@@ -7,12 +7,12 @@ namespace Bveing\MBuddy\Infrastructure;
 class ConsoleLogger extends \Psr\Log\AbstractLogger
 {
     /**
-     * @inheritDoc
-     * @param string $level
      * @param array<mixed> $context
      */
     public function log($level, \Stringable|string $message, array $context = []): void
     {
+        \assert(\is_string($level));
+
         echo \sprintf(
             "[%s]\t%s (%s)\n",
             \strtoupper($level),

@@ -267,6 +267,9 @@ class SinglePageApp
         }
 
         [$componentId, $eventId, $value] = $data;
+        \assert(\is_string($componentId) && \is_string($eventId) && \is_string($value));
+        \assert($componentId !== '' && $eventId !== '');
+
         if ($componentId === 'console') {
             switch($eventId) {
                 case 'log': $this->logger->info("[Console] $value");
@@ -288,7 +291,9 @@ class SinglePageApp
             return;
         }
 
-        $component->{$eventId}($value);
+        $callback = [$component, $eventId];
+        \assert(\is_callable($callback));
+        \call_user_func($callback, $value);
 
         $this->refresh();
     }

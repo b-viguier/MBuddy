@@ -17,7 +17,7 @@ class ParameterChangeTest extends TestCase
         $data = [1, 2, 3, 4];
 
         $parameterChange = ParameterChange::create($address, $data);
-        $sysex = $parameterChange->toSysex();
+        $sysex = $parameterChange->toSysEx();
 
         self::assertSame($address, $parameterChange->address());
         self::assertSame($data, $parameterChange->data());
@@ -33,7 +33,7 @@ class ParameterChangeTest extends TestCase
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage($message);
 
-        ParameterChange::fromSysex($sysEx);
+        ParameterChange::fromSysEx($sysEx);
     }
 
     /**
@@ -60,7 +60,7 @@ class ParameterChangeTest extends TestCase
             ParameterChange::DEVICE_NUMBER,
             $address->toBinaryString().$data,
         );
-        $parameterChange = ParameterChange::fromSysex($sysEx);
+        $parameterChange = ParameterChange::fromSysEx($sysEx);
 
         self::assertEquals($address, $parameterChange->address());
         self::assertSame([\ord('d'), \ord('a'), \ord('t'), \ord('a')], $parameterChange->data());

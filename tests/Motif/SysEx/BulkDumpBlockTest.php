@@ -21,7 +21,7 @@ class BulkDumpBlockTest extends TestCase
         $address = new Address(0x01, 0x02, 0x03);
         $data = \array_map(fn($byte) => $byte % 0xF0, \range(0, $byteCount - 1));
         $block = BulkDumpBlock::create($byteCount, $address, $data);
-        $sysex = $block->toSysex();
+        $sysex = $block->toSysEx();
 
         self::assertSame($address, $block->address());
         self::assertSame($data, $block->data());
@@ -34,7 +34,7 @@ class BulkDumpBlockTest extends TestCase
         self::assertFalse($block->isHeaderBlock());
         self::assertFalse($block->isFooterBlock());
 
-        $blockFromSysex = BulkDumpBlock::fromSysex($sysex);
+        $blockFromSysex = BulkDumpBlock::fromSysEx($sysex);
         self::assertEquals($block, $blockFromSysex);
     }
 
@@ -46,7 +46,7 @@ class BulkDumpBlockTest extends TestCase
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage($message);
 
-        BulkDumpBlock::fromSysex($sysEx);
+        BulkDumpBlock::fromSysEx($sysEx);
     }
 
     /**
@@ -94,7 +94,7 @@ class BulkDumpBlockTest extends TestCase
         self::assertEquals(new Address(0x0E, $m, $l), $block->address());
         self::assertEmpty($block->data());
 
-        $blockFromSysex = BulkDumpBlock::fromSysex($block->toSysex());
+        $blockFromSysex = BulkDumpBlock::fromSysEx($block->toSysEx());
 
         self::assertTrue($blockFromSysex->isHeaderBlock());
     }
@@ -108,7 +108,7 @@ class BulkDumpBlockTest extends TestCase
         self::assertEquals(new Address(0x0F, $m, $l), $block->address());
         self::assertEmpty($block->data());
 
-        $blockFromSysex = BulkDumpBlock::fromSysex($block->toSysex());
+        $blockFromSysex = BulkDumpBlock::fromSysEx($block->toSysEx());
 
         self::assertTrue($blockFromSysex->isFooterBlock());
     }

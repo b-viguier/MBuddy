@@ -21,7 +21,7 @@ class ParameterChange
         return new self($address, $data);
     }
 
-    public static function fromSysex(SysEx $sysex): self
+    public static function fromSysEx(SysEx $sysex): self
     {
         if ($sysex->deviceNumber() !== self::DEVICE_NUMBER) {
             throw new \InvalidArgumentException('Invalid Device Number');
@@ -77,6 +77,6 @@ class ParameterChange
     ) {
         \assert(\count($data) > 0);
         \assert(\array_keys($data) === \range(0, \count($this->data) - 1));
-        \assert(\array_reduce($data, fn($carry, $byte) => $carry && \is_int($byte) && 0 <= $byte && $byte < 256, true));
+        \assert(\array_reduce($data, fn($carry, $byte) => $carry && 0 <= $byte && $byte < 256, true));
     }
 }

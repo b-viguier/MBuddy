@@ -6,7 +6,8 @@
         "friendsofphp/php-cs-fixer": "^3.47",
         "phpstan/phpstan": "^1.10",
         "phpunit/phpunit": "^9.6",
-        "timeweb/phpstan-enum": "^3.1"
+        "timeweb/phpstan-enum": "^3.1",
+        "phpstan/phpstan-strict-rules": "^1.5"
     },
     "require": {
         "php": "8.0.*"

@@ -39,7 +39,7 @@ class Midi implements Sysex\Client
         $this->deferredDump[$deferredKey] = $deferred;
 
         asyncCall(function() use ($request, $deferred, $deferredKey) {
-            yield $this->midiDriver->send((string)$request->toSysex());
+            yield $this->midiDriver->send((string)$request->toSysEx());
 
             yield delay(\intval($this->timeoutInSeconds * 1000));
 
@@ -71,7 +71,7 @@ class Midi implements Sysex\Client
         $this->deferredParam[$deferredKey] = $deferred;
 
         asyncCall(function() use ($request, $deferred, $deferredKey) {
-            yield $this->midiDriver->send((string)$request->toSysex());
+            yield $this->midiDriver->send((string)$request->toSysEx());
 
             yield delay(\intval($this->timeoutInSeconds * 1000));
 
@@ -112,7 +112,7 @@ class Midi implements Sysex\Client
                     $this->handleBulkDumpBlock(SysEx\BulkDumpBlock::fromSysEx($sysex));
                     break;
                 case SysEx\ParameterChange::DEVICE_NUMBER:
-                    $this->handleParameterChange(SysEx\ParameterChange::fromSysex($sysex));
+                    $this->handleParameterChange(SysEx\ParameterChange::fromSysEx($sysex));
                     break;
                 default:
                     $this->logger->warning('Received unknown SysEx message', ['message' => $sysex]);

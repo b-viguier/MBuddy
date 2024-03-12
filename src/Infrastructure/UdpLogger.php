@@ -27,12 +27,12 @@ class UdpLogger extends \Psr\Log\AbstractLogger
     }
 
     /**
-     * @inheritDoc
-     * @param string $level
      * @param array<mixed> $context
      */
     public function log($level, \Stringable|string $message, array $context = []): void
     {
+        \assert(\is_string($level));
+
         $this->socket->write(
             \sprintf(
                 "[%s]:\t%s\n",

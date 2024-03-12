@@ -18,7 +18,7 @@ class ParameterRequest
         );
     }
 
-    public function toSysex(): SysEx
+    public function toSysEx(): SysEx
     {
         return $this->sysex;
     }
