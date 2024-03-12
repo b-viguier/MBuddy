@@ -10,6 +10,7 @@ use Bveing\MBuddy\Ui\Template;
 class SelectBox implements Component
 {
     use Trait\AutoId;
+    use Trait\AutoVersion;
 
     /**
      * @param list<string> $options
@@ -45,12 +46,7 @@ class SelectBox implements Component
 
     public function template(): Template
     {
-        return $this->modal->template();
-    }
-
-    public function version(): int
-    {
-        return $this->modal->version();
+        return Template::create('{{ modal }}', modal: $this->modal);
     }
 
     public function onSelected(string $index): void
