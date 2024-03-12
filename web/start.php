@@ -31,7 +31,10 @@ Amp\Loop::run(function() {
             $this->button1 = (new Ui\Component\Button(
                 "Open",
                 fn() => $this->selectBox->show(),
-            ))->set(color: Ui\Style\Color::SECONDARY());
+            ))->set(
+                color: Ui\Style\Color::SECONDARY(),
+                icon: Ui\Style\Icon::ARROW_DOWN(),
+            );
             $this->label = new Ui\Component\Label("Label");
         }
 

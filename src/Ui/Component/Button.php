@@ -6,6 +6,7 @@ namespace Bveing\MBuddy\Ui\Component;
 
 use Bveing\MBuddy\Ui\Component;
 use Bveing\MBuddy\Ui\Style\Color;
+use Bveing\MBuddy\Ui\Style\Icon;
 use Bveing\MBuddy\Ui\Template;
 
 class Button implements Component
@@ -28,12 +29,13 @@ class Button implements Component
         return Template::create(
             <<<HTML
             <button type="button" data-on-click="onClick" class="btn btn-{{ color }}" id="{{ id }}">
-                {{ label }}
+                {{ icon }}{{ label }}
             </button>
             HTML,
             id: $this->id(),
             label: $this->label,
             color: $this->color,
+            icon: $this->icon?->html(),
         );
     }
 
@@ -45,12 +47,15 @@ class Button implements Component
     public function set(
         ?string $label = null,
         ?Color $color = null,
+        Icon|null|false $icon = false,
     ): self {
         $this->label = $label ?? $this->label;
         $this->color = $color ?? $this->color;
+        $this->icon = $icon === false ? $this->icon : $icon;
 
         return $this->refresh();
     }
 
     private Color $color;
+    private ?Icon $icon = null;
 }
