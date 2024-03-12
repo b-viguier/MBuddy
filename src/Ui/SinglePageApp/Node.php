@@ -18,8 +18,8 @@ class Node
         $template = $component->template();
         $childrenNode = [];
 
-        foreach($template->components() as $key => $component) {
-            $childrenNode[$key] = self::fromComponent($component);
+        foreach($template->components() as $key => $subComponent) {
+            $childrenNode[$key] = self::fromComponent($subComponent);
         }
 
         return new Node(
