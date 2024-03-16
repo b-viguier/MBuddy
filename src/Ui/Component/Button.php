@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Bveing\MBuddy\Ui\Component;
 
+use Bveing\MBuddy\Core\Signal;
 use Bveing\MBuddy\Ui\Component;
 use Bveing\MBuddy\Ui\Style\Color;
 use Bveing\MBuddy\Ui\Style\Icon;
@@ -14,14 +15,14 @@ class Button implements Component
     use Trait\AutoId;
     use Trait\AutoVersion;
 
-    /**
-     * @param \Closure():void $onClick
-     */
-    public function __construct(
-        private string $label,
-        private \Closure $onClick,
-    ) {
-        $this->color = Color::PRIMARY();
+    public static function create(): Button
+    {
+        return new self(
+            label: '',
+            color: Color::PRIMARY(),
+            icon: null,
+            signalOnClick: new Signal\Signal0(),
+        );
     }
 
     public function template(): Template
@@ -41,7 +42,7 @@ class Button implements Component
 
     public function onClick(): void
     {
-        ($this->onClick)();
+        $this->signalOnClick->emit();
     }
 
     public function set(
@@ -56,6 +57,12 @@ class Button implements Component
         return $this->refresh();
     }
 
-    private Color $color;
-    private ?Icon $icon = null;
+
+    private function __construct(
+        private string $label,
+        private Color $color,
+        private ?Icon $icon,
+        public Signal\Signal0 $signalOnClick,
+    ) {
+    }
 }

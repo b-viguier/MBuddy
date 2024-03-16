@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Bveing\MBuddy\Tests\Ui\Component;
 
 use Amp\Loop;
+use Bveing\MBuddy\Core\Slot\Slot0;
 use Bveing\MBuddy\Tests\GeckoServerExtension;
 use Bveing\MBuddy\Ui\Component;
 use Bveing\MBuddy\Ui\Component\Button;
@@ -20,20 +21,22 @@ class ButtonTest extends TestCase
             $app = new SinglePageApp();
 
             $counter1 = $counter2 = 0;
+            $slot1 = new Slot0(function() use (&$counter1) {
+                ++$counter1;
+            });
+            $slot2 = new Slot0(function() use (&$counter2) {
+                ++$counter2;
+            });
 
-            $button1 = new Button(
-                'B1',
-                function() use (&$counter1) {
-                    ++$counter1;
-                },
+            $button1 = Button::create()->set(
+                label: 'B1',
+            );
+            $button2 = Button::create()->set(
+                label: 'B2',
             );
 
-            $button2 = new Button(
-                'B2',
-                function() use (&$counter2) {
-                    ++$counter2;
-                },
-            );
+            $button1->signalOnClick->connect($slot1);
+            $button2->signalOnClick->connect($slot2);
 
             $comp = new class ($button1, $button2) implements Component {
                 use Component\Trait\AutoVersion;

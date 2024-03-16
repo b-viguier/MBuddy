@@ -22,19 +22,23 @@ Amp\Loop::run(function() {
 
         public function __construct()
         {
-            $this->selectBox = new Ui\Component\SelectBox(
+            $this->slotOnSelected = new \Bveing\MBuddy\Core\Slot\Slot1(function(string $selected) {
+                $this->label->setText($selected);
+            });
+
+            $this->selectBox = Ui\Component\SelectBox::create()->set(
                 "Select",
                 ["Option 1", "Option 2", "Option 3"],
                 "Option 1",
-                fn($selected) => $this->label->setText("Selected: $selected"),
             );
-            $this->button1 = (new Ui\Component\Button(
-                "Open",
-                fn() => $this->selectBox->show(),
-            ))->set(
+            $this->selectBox->signalOnSelected->connect($this->slotOnSelected);
+
+            $this->button1 = Ui\Component\Button::create()->set(
+                label: "Open",
                 color: Ui\Style\Color::SECONDARY(),
                 icon: Ui\Style\Icon::ARROW_DOWN(),
             );
+            $this->button1->signalOnClick->connect($this->selectBox->slotShow);
             $this->label = new Ui\Component\Label("Label");
         }
 
@@ -54,6 +58,11 @@ Amp\Loop::run(function() {
                 selectBox: $this->selectBox,
             );
         }
+
+        /**
+         * @var \Bveing\MBuddy\Core\Slot\Slot1<string> $slotOnSelected
+         */
+        private \Bveing\MBuddy\Core\Slot\Slot1 $slotOnSelected;
 
         private Ui\Component\Button $button1;
 

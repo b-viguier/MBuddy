@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace Bveing\MBuddy\Ui\Component;
 
+use Bveing\MBuddy\Core\Signal;
+use Bveing\MBuddy\Core\Slot;
 use Bveing\MBuddy\Ui\Component;
+use Bveing\MBuddy\Ui\Style\Icon;
 use Bveing\MBuddy\Ui\Template;
 
 class SelectBox implements Component
@@ -12,26 +15,28 @@ class SelectBox implements Component
     use Trait\AutoId;
     use Trait\AutoVersion;
 
-    /**
-     * @param list<string> $options
-     * @param \Closure(string):void $onSelected
-     */
-    public function __construct(
-        private string $label,
-        private array $options,
-        private string $selected,
-        private \Closure $onSelected,
-    ) {
-
-        $this->modal = new Modal(
-            $this->html = new Html(''),
-            header: new Html("<h5>{$this->label}</h5>"),
-            footer: new Button('Close', function() {
-                $this->modal->hide();
-                ($this->onSelected)($this->selected);
-            }),
+    public static function create(): SelectBox
+    {
+        return new self(
+            label: '',
+            options: [],
+            selected: null,
         );
-        $this->refresh();
+    }
+
+    /**
+     * @param array<string> $options
+     */
+    public function set(
+        string $label = null,
+        array $options = null,
+        string|null|false $selected = false,
+    ): self {
+        $this->label = $label ?? $this->label;
+        $this->options = $options ?? $this->options;
+        $this->selected = $selected === false ? $this->selected : $selected;
+
+        return $this->refresh();
     }
 
     public function show(): void
@@ -52,13 +57,45 @@ class SelectBox implements Component
     public function onSelected(string $index): void
     {
         $this->selected = $this->options[(int)$index];
+        $this->signalOnSelected->emit($this->selected);
+        $this->refresh();
+    }
+
+    /** @var Signal\Signal1<string> */
+    public Signal\Signal1 $signalOnSelected;
+    public Slot\Slot0 $slotHide;
+    public Slot\Slot0 $slotShow;
+
+    /**
+     * @param array<string> $options
+     */
+    private function __construct(
+        private string $label,
+        private array $options,
+        private ?string $selected,
+    ) {
+        $this->slotHide = new Slot\Slot0(fn() => $this->hide());
+        $this->slotShow = new Slot\Slot0(fn() => $this->show());
+        $this->signalOnSelected = new Signal\Signal1();
+
+        $closeBtn = Button::create()->set(
+            label: 'Close',
+            icon: Icon::X_CIRCLE_FILL(),
+        );
+        $closeBtn->signalOnClick->connect($this->slotHide);
+
+        $this->modal = new Modal(
+            $this->html = new Html(''),
+            header: new Html("<h5>{$this->label}</h5>"),
+            footer: $closeBtn,
+        );
         $this->refresh();
     }
 
     private Modal $modal;
     private Html $html;
 
-    private function refresh(): void
+    private function refresh(): self
     {
         $list = \join(
             '',
@@ -82,5 +119,7 @@ class SelectBox implements Component
             </ul>
             HTML
         );
+
+        return $this;
     }
 }
