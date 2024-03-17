@@ -35,8 +35,8 @@ class ButtonTest extends TestCase
                 label: 'B2',
             );
 
-            $button1->signalOnClick->connect($slot1);
-            $button2->signalOnClick->connect($slot2);
+            $button1->clicked->connect($slot1);
+            $button2->clicked->connect($slot2);
 
             $comp = new class ($button1, $button2) implements Component {
                 use Component\Trait\AutoVersion;

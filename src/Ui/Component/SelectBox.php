@@ -20,7 +20,7 @@ class SelectBox implements Component
         return new self(
             label: '',
             options: [],
-            selected: null,
+            currentText: null,
         );
     }
 
@@ -30,11 +30,11 @@ class SelectBox implements Component
     public function set(
         string $label = null,
         array $options = null,
-        string|null|false $selected = false,
+        string|null|false $currentText = false,
     ): self {
         $this->label = $label ?? $this->label;
         $this->options = $options ?? $this->options;
-        $this->selected = $selected === false ? $this->selected : $selected;
+        $this->currentText = $currentText === false ? $this->currentText : $currentText;
 
         return $this->refresh();
     }
@@ -54,17 +54,17 @@ class SelectBox implements Component
         return Template::create('{{ modal }}', modal: $this->modal);
     }
 
-    public function onSelected(string $index): void
+    public function select(string $index): void
     {
-        $this->selected = $this->options[(int)$index];
-        $this->signalOnSelected->emit($this->selected);
+        $this->currentText = $this->options[(int)$index];
+        $this->selected->emit($this->currentText);
         $this->refresh();
     }
 
     /** @var Signal\Signal1<string> */
-    public Signal\Signal1 $signalOnSelected;
-    public Slot\Slot0 $slotHide;
-    public Slot\Slot0 $slotShow;
+    public Signal\Signal1 $selected;
+    public Slot\Slot0 $hide;
+    public Slot\Slot0 $show;
 
     /**
      * @param array<string> $options
@@ -72,17 +72,17 @@ class SelectBox implements Component
     private function __construct(
         private string $label,
         private array $options,
-        private ?string $selected,
+        private ?string $currentText,
     ) {
-        $this->slotHide = new Slot\Slot0(fn() => $this->hide());
-        $this->slotShow = new Slot\Slot0(fn() => $this->show());
-        $this->signalOnSelected = new Signal\Signal1();
+        $this->hide = new Slot\Slot0(fn() => $this->hide());
+        $this->show = new Slot\Slot0(fn() => $this->show());
+        $this->selected = new Signal\Signal1();
 
         $closeBtn = Button::create()->set(
             label: 'Close',
             icon: Icon::X_CIRCLE_FILL(),
         );
-        $closeBtn->signalOnClick->connect($this->slotHide);
+        $closeBtn->clicked->connect($this->hide);
 
         $this->modal = new Modal(
             $this->html = new Html(''),
@@ -101,9 +101,9 @@ class SelectBox implements Component
             '',
             \array_map(
                 function(string $option, int $index) {
-                    $active = $option === $this->selected ? 'active' : '';
+                    $active = $option === $this->currentText ? 'active' : '';
                     return <<<HTML
-                        <a class="list-group-item list-group-item-action $active" data-on-click="onSelected" data-target-id="{$this->id()}" data-value="$index">
+                        <a class="list-group-item list-group-item-action $active" data-on-click="select" data-target-id="{$this->id()}" data-value="$index">
                             $option
                         </a>
                         HTML;

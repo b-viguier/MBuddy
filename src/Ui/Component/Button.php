@@ -15,13 +15,14 @@ class Button implements Component
     use Trait\AutoId;
     use Trait\AutoVersion;
 
+    public Signal\Signal0 $clicked;
+
     public static function create(): Button
     {
         return new self(
             label: '',
             color: Color::PRIMARY(),
             icon: null,
-            signalOnClick: new Signal\Signal0(),
         );
     }
 
@@ -29,7 +30,7 @@ class Button implements Component
     {
         return Template::create(
             <<<HTML
-            <button type="button" data-on-click="onClick" class="btn btn-{{ color }}" id="{{ id }}">
+            <button type="button" data-on-click="click" class="btn btn-{{ color }}" id="{{ id }}">
                 {{ icon }}{{ label }}
             </button>
             HTML,
@@ -40,9 +41,9 @@ class Button implements Component
         );
     }
 
-    public function onClick(): void
+    public function click(): void
     {
-        $this->signalOnClick->emit();
+        $this->clicked->emit();
     }
 
     public function set(
@@ -62,7 +63,7 @@ class Button implements Component
         private string $label,
         private Color $color,
         private ?Icon $icon,
-        public Signal\Signal0 $signalOnClick,
     ) {
+        $this->clicked = new Signal\Signal0();
     }
 }

@@ -129,6 +129,23 @@ class SignalSlotTest extends TestCase
 
         self::assertSame([1, "hello"], $args);
     }
+
+    public function testSeveralSignalsToSameSlot(): void
+    {
+        $count = 0;
+        $signal1 = new VariadicSignal();
+        $signal2 = new VariadicSignal();
+        $slot = new VariadicSlot(function() use (&$count) {++$count;});
+
+        $signal1->connect($slot);
+        $signal2->connect($slot);
+
+        $signal1->emit();
+        self::assertSame(1, $count);
+
+        $signal2->emit();
+        self::assertSame(2, $count);
+    }
 }
 
 class VariadicSlot extends Slot

@@ -31,14 +31,14 @@ Amp\Loop::run(function() {
                 ["Option 1", "Option 2", "Option 3"],
                 "Option 1",
             );
-            $this->selectBox->signalOnSelected->connect($this->slotOnSelected);
+            $this->selectBox->selected->connect($this->slotOnSelected);
 
             $this->button1 = Ui\Component\Button::create()->set(
                 label: "Open",
                 color: Ui\Style\Color::SECONDARY(),
                 icon: Ui\Style\Icon::ARROW_DOWN(),
             );
-            $this->button1->signalOnClick->connect($this->selectBox->slotShow);
+            $this->button1->clicked->connect($this->selectBox->show);
             $this->label = new Ui\Component\Label("Label");
         }
 
