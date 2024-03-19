@@ -10,9 +10,9 @@ use Bveing\MBuddy\Tests\GeckoServerExtension;
 use Bveing\MBuddy\Ui\Component;
 use Bveing\MBuddy\Ui\Component\Button;
 use Bveing\MBuddy\Ui\SinglePageApp;
+use Bveing\MBuddy\Ui\Style\Icon;
 use Bveing\MBuddy\Ui\Template;
 use PHPUnit\Framework\TestCase;
-use Bveing\MBuddy\Ui\Style\Icon;
 
 class ButtonTest extends TestCase
 {

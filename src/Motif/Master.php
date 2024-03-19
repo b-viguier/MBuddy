@@ -28,6 +28,40 @@ class Master
         );
     }
 
+    public function with(
+        Master\Id $id = null,
+        string $name = null,
+        Master\Mode $mode = null,
+        Program $program = null,
+        bool $zoneEnabled = null,
+        Master\KnobSliderFunction $knobSliderFunction = null,
+        Master\Zone $zone0 = null,
+        Master\Zone $zone1 = null,
+        Master\Zone $zone2 = null,
+        Master\Zone $zone3 = null,
+        Master\Zone $zone4 = null,
+        Master\Zone $zone5 = null,
+        Master\Zone $zone6 = null,
+        Master\Zone $zone7 = null,
+    ): self {
+        return new self(
+            id: $id ?? $this->id,
+            name: $name ?? $this->name,
+            mode: $mode ?? $this->mode,
+            program: $program ?? $this->program,
+            zoneEnabled: $zoneEnabled ?? $this->zoneEnabled,
+            knobSliderFunction: $knobSliderFunction ?? $this->knobSliderFunction,
+            zone0: $zone0 ?? $this->zone0,
+            zone1: $zone1 ?? $this->zone1,
+            zone2: $zone2 ?? $this->zone2,
+            zone3: $zone3 ?? $this->zone3,
+            zone4: $zone4 ?? $this->zone4,
+            zone5: $zone5 ?? $this->zone5,
+            zone6: $zone6 ?? $this->zone6,
+            zone7: $zone7 ?? $this->zone7,
+        );
+    }
+
     public static function fromBulkDumpBlocks(
         SysEx\BulkDumpBlock $headerBlock,
         SysEx\BulkDumpBlock $commonBlock,

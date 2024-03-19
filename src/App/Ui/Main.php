@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Bveing\MBuddy\App\Ui;
 
+use Bveing\MBuddy\App\Core\Preset;
 use Bveing\MBuddy\Ui\Component;
 use Bveing\MBuddy\Ui\Template;
 
@@ -13,8 +14,9 @@ class Main implements Component
     use Component\Trait\AutoVersion;
 
     public function __construct(
+        Preset\Repository $presetRepository
     ) {
-        $this->navBar = new NavBar();
+        $this->navBar = new NavBar($presetRepository);
     }
 
     public function template(): Template
@@ -43,7 +45,7 @@ class Main implements Component
                 
             </div>
             HTML,
-            navbar: $this->navBar
+            navbar: $this->navBar,
         );
     }
     private NavBar $navBar;

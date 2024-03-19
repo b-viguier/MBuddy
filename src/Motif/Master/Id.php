@@ -28,6 +28,20 @@ class Id
         return $this->id;
     }
 
+    public function next(): ?self
+    {
+        return $this->id < 127 && !$this->isEditBuffer()
+            ? self::fromInt($this->id + 1)
+            : null;
+    }
+
+    public function previous(): ?self
+    {
+        return $this->id > 0
+            ? self::fromInt($this->id - 1)
+            : null;
+    }
+
     /**
      * @return \Traversable<self>
      */

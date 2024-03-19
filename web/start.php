@@ -72,7 +72,11 @@ Amp\Loop::run(function() {
 
     };
 
-    yield $app->start($body);
+    $masterRepository = new \Bveing\MBuddy\Motif\Master\Repository\InMemory();
+    $presetRepository = new \Bveing\MBuddy\App\Core\Preset\Repository($masterRepository);
+    $main = new \Bveing\MBuddy\App\Ui\Main($presetRepository);
+
+    yield $app->start($main);
 });
 
 echo "Server stopped\n";
