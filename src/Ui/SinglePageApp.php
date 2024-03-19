@@ -239,11 +239,14 @@ class SinglePageApp
                         });
                         
                         $(document).on('click', '[data-on-click]', function(event) {
-                            var methodName = event.target.dataset.onClick;
-                            var value = event.target.dataset.value || '';
-                            var componentId = event.target.dataset.targetId || event.target.id;
+                            var target = event.target.closest('[data-on-click]');
+                            var methodName = target.dataset.onClick;
+                            var value = target.dataset.value || '';
+                            var componentId = target.dataset.targetId || target.id;
                             if (componentId && methodName) {
                                 MBuddySocket.send(JSON.stringify([componentId, methodName, value]));
+                            } else {
+                                console.warn('Invalid event', componentId, methodName, value);
                             }
                         });
                     };

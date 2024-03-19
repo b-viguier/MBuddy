@@ -12,6 +12,7 @@ use Bveing\MBuddy\Ui\Component\Button;
 use Bveing\MBuddy\Ui\SinglePageApp;
 use Bveing\MBuddy\Ui\Template;
 use PHPUnit\Framework\TestCase;
+use Bveing\MBuddy\Ui\Style\Icon;
 
 class ButtonTest extends TestCase
 {
@@ -81,6 +82,35 @@ class ButtonTest extends TestCase
                 self::assertSame(1, $counter2);
 
 
+            } finally {
+                yield $app->stop();
+            }
+        });
+    }
+
+    public function testClickWithIcon(): void
+    {
+        Loop::run(function() {
+            $app = new SinglePageApp();
+
+            $button = Button::create()->set(
+                icon: Icon::X(),
+            );
+
+            $clicked = false;
+            $slot = new Slot0(function() use (&$clicked) {
+                $clicked = true;
+            });
+            $button->clicked->connect($slot);
+
+            try {
+                yield $app->start($button);
+                yield GeckoServerExtension::navigateToHomePage();
+
+                $elementId = yield GeckoServerExtension::$driver->findElement(\sprintf('#%s', $button->id()));
+                yield GeckoServerExtension::$driver->clickElement($elementId);
+
+                self::assertTrue($clicked);
             } finally {
                 yield $app->stop();
             }
