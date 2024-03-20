@@ -13,7 +13,7 @@ use Bveing\MBuddy\Ui\Template;
 class SelectBox implements Component
 {
     use Trait\AutoId;
-    use Trait\AutoVersion;
+    use Trait\Refreshable;
 
     public static function create(): SelectBox
     {

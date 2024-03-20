@@ -11,7 +11,7 @@ use Bveing\MBuddy\Ui\Template;
 class Main implements Component
 {
     use Component\Trait\AutoId;
-    use Component\Trait\AutoVersion;
+    use Component\Trait\Refreshable;
 
     public function __construct(
         Preset\Repository $presetRepository

@@ -66,7 +66,7 @@ class SinglePageAppTest extends TestCase
 
             yield $app->start(
                 new class () implements Component {
-                    use Component\Trait\AutoVersion;
+                    use Component\Trait\Refreshable;
                     use Component\Trait\AutoId;
                     public function template(): Template
                     {
@@ -135,7 +135,7 @@ class SinglePageAppTest extends TestCase
     private function createEmptyComponent(): Component
     {
         return new class () implements Component {
-            use Component\Trait\AutoVersion;
+            use Component\Trait\Refreshable;
             use Component\Trait\AutoId;
             public function template(): Template
             {

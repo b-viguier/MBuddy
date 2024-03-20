@@ -27,7 +27,7 @@ class LabelTest extends TestCase
             );
 
             $comp = new class ($label1, $label2) implements Component {
-                use Component\Trait\AutoVersion;
+                use Component\Trait\Refreshable;
                 use Component\Trait\AutoId;
                 public function __construct(private Component\Label $label1, private Component\Label $label2)
                 {

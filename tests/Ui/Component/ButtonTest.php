@@ -40,7 +40,7 @@ class ButtonTest extends TestCase
             $button2->clicked->connect($slot2);
 
             $comp = new class ($button1, $button2) implements Component {
-                use Component\Trait\AutoVersion;
+                use Component\Trait\Refreshable;
                 use Component\Trait\AutoId;
 
                 public function __construct(private Button $button1, private Button $button2)

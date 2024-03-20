@@ -11,7 +11,7 @@ use Bveing\MBuddy\Ui\Template;
 class Modal implements Component
 {
     use Trait\AutoId;
-    use Trait\AutoVersion;
+    use Trait\Refreshable;
 
     public function __construct(
         private Component $content,

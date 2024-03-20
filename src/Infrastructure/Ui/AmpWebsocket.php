@@ -22,6 +22,7 @@ class AmpWebsocket implements Websocket, ClientHandler
         private LoggerInterface $logger,
     ) {
         $this->listener = new Websocket\NullListener();
+        $this->doSend = fn(string $message): Promise => new Success(null);
     }
 
     public function path(): string
@@ -31,13 +32,8 @@ class AmpWebsocket implements Websocket, ClientHandler
 
     public function send(string $message): Promise
     {
-        return call(function() use ($message) {
-            \assert($this->client !== null);
-            yield $this->client->send($message);
-            $this->logger->debug('Sent message: '.$message);
-
-            return null;
-        });
+        return ($this->doSend)($message);
+        ;
     }
 
     public function setListener(Websocket\Listener $listener): void
@@ -65,12 +61,23 @@ class AmpWebsocket implements Websocket, ClientHandler
             return new Success();
         }
         $this->client = $client;
+        $this->doSend = function(string $message): Promise {
+            return call(function() use ($message) {
+                \assert($this->client !== null);
+                yield $this->client->send($message);
+                $this->logger->debug('Sent message: '.$message);
+
+                return null;
+            });
+        };
         $this->logger->debug('Client connected');
 
         return call(fn() => yield from $this->receiveLoop());
     }
     private ?Client $client = null;
     private Websocket\Listener $listener;
+
+    private \Closure $doSend;
 
     private function receiveLoop(): \Generator
     {

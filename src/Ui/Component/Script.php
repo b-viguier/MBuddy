@@ -10,7 +10,7 @@ use Bveing\MBuddy\Ui\Template;
 class Script implements Component
 {
     use Trait\AutoId;
-    use Trait\AutoVersion;
+    use Trait\Refreshable;
 
 
     public function template(): Template

@@ -9,13 +9,14 @@ use Amp\Http\Server\Options;
 use Amp\Http\Server\Router;
 use Amp\Promise;
 use Amp\Socket\Server;
+use Amp\Success;
 use Amp\Websocket\Server\Websocket as WebsocketServer;
 use Bveing\MBuddy\Infrastructure\Ui\AmpWebsocket;
 use Psr\Log\LoggerInterface;
 use function Amp\call;
 use function Amp\Http\Server\Middleware\stack;
 
-class SinglePageApp
+class SinglePageApp implements SinglePageApp\Renderer
 {
     public function __construct(
         private string $title = 'MBuddy',
@@ -124,7 +125,7 @@ class SinglePageApp
     {
         \assert($this->httpServer->getState() === HttpServer::STOPPED);
 
-        $this->root = SinglePageApp\Node::fromComponent($body);
+        $this->root = SinglePageApp\Node::fromComponent($body, $this);
 
         return $this->httpServer->start();
     }
@@ -139,11 +140,28 @@ class SinglePageApp
         return $this->httpServer->stop();
     }
 
+    public function scheduleRefresh(): void
+    {
+        if($this->refreshScheduled) {
+            return;
+        }
+
+        $this->refreshScheduled = true;
+        \Amp\Loop::delay(self::REFRESH_DELAY_MS, function() {
+            $this->refreshScheduled = false;
+            Promise\rethrow($this->refresh());
+        });
+    }
+
     /**
      * @return Promise<int>
      */
     public function refresh(): Promise
     {
+        if ($this->root === null) {
+            return new Success(0);
+        }
+
         return call(function() {
             $allPromises = [];
             \assert($this->root !== null);
@@ -158,12 +176,17 @@ class SinglePageApp
             return \count($allPromises);
         });
     }
+
+    private const REFRESH_DELAY_MS = 20;
+
     private HttpServer $httpServer;
     private Websocket $websocket;
 
     private LoggerInterface $logger;
 
     private ?SinglePageApp\Node $root;
+
+    private bool $refreshScheduled = false;
 
     private function render(): string
     {
@@ -297,7 +320,5 @@ class SinglePageApp
         $callback = [$component, $eventId];
         \assert(\is_callable($callback));
         \call_user_func($callback, $value);
-
-        $this->refresh();
     }
 }

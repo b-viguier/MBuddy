@@ -27,5 +27,5 @@ interface Repository
     /**
      * @return Promise<int>
      */
-    public function setCurrentMasterId(Master\Id $masterId): Promise;
+    public function setCurrentMasterId(Master\Id $id): Promise;
 }

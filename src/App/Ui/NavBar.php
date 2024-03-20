@@ -15,7 +15,7 @@ use function Amp\asyncCall;
 class NavBar implements Component
 {
     use Component\Trait\AutoId;
-    use Component\Trait\AutoVersion;
+    use Component\Trait\Refreshable;
 
     public function __construct(
         private Preset\Repository $presetRepository,
@@ -97,7 +97,6 @@ class NavBar implements Component
 
     private function setPreset(Preset $preset): void
     {
-        echo "Set Preset\n";
         $this->currentPreset = $preset;
         $this->refresh();
     }

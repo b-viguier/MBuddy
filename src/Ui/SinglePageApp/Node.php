@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Bveing\MBuddy\Ui\SinglePageApp;
 
+use Bveing\MBuddy\Core\Slot;
 use Bveing\MBuddy\Ui\Component;
 use Bveing\MBuddy\Ui\Id;
 use Bveing\MBuddy\Ui\Template;
@@ -13,18 +14,18 @@ use Bveing\MBuddy\Ui\Template;
  */
 class Node
 {
-    public static function fromComponent(Component $component): self
+    public static function fromComponent(Component $component, Renderer $renderer): self
     {
         $template = $component->template();
         $childrenNode = [];
 
         foreach($template->components() as $key => $subComponent) {
-            $childrenNode[$key] = self::fromComponent($subComponent);
+            $childrenNode[$key] = self::fromComponent($subComponent, $renderer);
         }
 
         return new Node(
+            $renderer,
             $component,
-            $component->version(),
             $template->pattern(),
             $childrenNode,
         );
@@ -70,15 +71,15 @@ class Node
      */
     public function update(): iterable
     {
-        if ($this->component->version() === $this->version) {
+        if (!$this->isModifiedSinceLastUpdate) {
             foreach ($this->children as $childNode) {
                 yield from $childNode->update();
             }
             return;
         }
 
+        $this->isModifiedSinceLastUpdate = false;
         $newTemplate = $this->component->template();
-        $this->version = $this->component->version();
         $this->pattern = $newTemplate->pattern();
 
         $keptNodes = [];
@@ -98,7 +99,7 @@ class Node
         $this->children = $keptNodes;
         // Create new children
         foreach($newComp as $key => $comp) {
-            $this->children[$key] = self::fromComponent($comp);
+            $this->children[$key] = self::fromComponent($comp, $this->renderer);
         }
 
         yield new Fragment(
@@ -111,10 +112,26 @@ class Node
      * @param array<Node> $children
      */
     private function __construct(
+        private Renderer $renderer,
         private Component $component,
-        private int $version,
         private string $pattern,
         private array $children,
     ) {
+        $this->markAsModified = new Slot\Slot0(fn() => $this->markAsModified());
+
+        $this->component->modified()->connect($this->markAsModified);
     }
+
+    private Slot\Slot0 $markAsModified;
+    private function markAsModified(): void
+    {
+        if($this->isModifiedSinceLastUpdate) {
+            return;
+        }
+
+        $this->isModifiedSinceLastUpdate = true;
+        $this->renderer->scheduleRefresh();
+    }
+
+    private bool $isModifiedSinceLastUpdate = false;
 }

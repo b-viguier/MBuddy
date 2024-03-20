@@ -17,7 +17,7 @@ Amp\Loop::run(function() {
 
 
     $body = new class () implements Ui\Component {
-        use Ui\Component\Trait\AutoVersion;
+        use Ui\Component\Trait\Refreshable;
         use Ui\Component\Trait\AutoId;
 
         public function __construct()
@@ -72,7 +72,10 @@ Amp\Loop::run(function() {
 
     };
 
-    $masterRepository = new \Bveing\MBuddy\Motif\Master\Repository\InMemory();
+    $masterRepository = new Bveing\MBuddy\Motif\Master\Repository\Decorator\Delay(
+        100,
+        new \Bveing\MBuddy\Motif\Master\Repository\InMemory(),
+    );
     $presetRepository = new \Bveing\MBuddy\App\Core\Preset\Repository($masterRepository);
     $main = new \Bveing\MBuddy\App\Ui\Main($presetRepository);
 

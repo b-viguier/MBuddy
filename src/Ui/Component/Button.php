@@ -13,7 +13,7 @@ use Bveing\MBuddy\Ui\Template;
 class Button implements Component
 {
     use Trait\AutoId;
-    use Trait\AutoVersion;
+    use Trait\Refreshable;
 
     public Signal\Signal0 $clicked;
 

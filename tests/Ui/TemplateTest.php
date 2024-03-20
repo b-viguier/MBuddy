@@ -123,7 +123,7 @@ class TemplateTest extends TestCase
     {
         return new class () implements Component {
             use Trait\AutoId;
-            use Trait\AutoVersion;
+            use Trait\Refreshable;
             public function template(): Template
             {
                 return Template::create('<Comp/>');
