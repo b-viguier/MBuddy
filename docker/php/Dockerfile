@@ -1,4 +1,4 @@
-FROM php:8.0-cli
+FROM php:8.0-fpm
 
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt update && apt install -y libzip-dev wget less nano libffi-dev unzip && rm -rf /var/lib/apt/lists/*
