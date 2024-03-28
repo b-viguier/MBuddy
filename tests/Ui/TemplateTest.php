@@ -107,6 +107,54 @@ class TemplateTest extends TestCase
         );
     }
 
+    public function testIterableScalars(): void
+    {
+        $template = Template::create(
+            '>{{ elements }}<',
+            elements: [
+                'key' => 'A',
+                1,
+                1.1,
+                null,
+                'B',
+            ],
+        );
+
+        self::assertSame('>A11.1B<', $template->pattern());
+        self::assertEmpty($template->components());
+    }
+
+    public function testIterableSubTemplates(): void
+    {
+        $components = [
+            $this->createComponent(),
+            $this->createComponent(),
+        ];
+
+        $subTemplate = SubTemplate::create(
+            '<sub>{{ A }}</sub>',
+            A: $components[0],
+        );
+
+        $template = Template::create(
+            '>{{ elements }}<',
+            elements: [
+                'template' => $subTemplate,
+                '<br/>',
+                $components[1],
+            ],
+        );
+
+        self::assertSame('><sub>{{ elements#template#A }}</sub><br/>{{ elements#1 }}<', $template->pattern());
+        self::assertSame(
+            [
+                'elements#template#A' => $components[0],
+                'elements#1' => $components[1],
+            ],
+            $template->components(),
+        );
+    }
+
     public function testKeysMismatch(): void
     {
         $template = Template::create(

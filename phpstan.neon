@@ -1,4 +1,5 @@
 parameters:
+    rememberPossiblyImpureFunctionValues: false
     level: max
     paths:
         - src
