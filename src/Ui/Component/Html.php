@@ -20,8 +20,9 @@ class Html implements Component
     public function set(string $html): self
     {
         $this->html = $html;
+        $this->refresh();
 
-        return $this->refresh();
+        return $this;
     }
 
     public function template(): Template

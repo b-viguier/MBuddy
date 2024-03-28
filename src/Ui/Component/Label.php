@@ -33,7 +33,8 @@ class Label implements Component
     public function setText(string $label): self
     {
         $this->label = $label;
+        $this->refresh();
 
-        return $this->refresh();
+        return $this;
     }
 }

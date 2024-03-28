@@ -6,8 +6,7 @@ namespace Bveing\MBuddy\Ui\Component;
 
 use Bveing\MBuddy\Core\Signal;
 use Bveing\MBuddy\Ui\Component;
-use Bveing\MBuddy\Ui\Style\Color;
-use Bveing\MBuddy\Ui\Style\Icon;
+use Bveing\MBuddy\Ui\Style;
 use Bveing\MBuddy\Ui\Template;
 
 class Button implements Component
@@ -21,8 +20,9 @@ class Button implements Component
     {
         return new self(
             label: '',
-            color: Color::PRIMARY(),
+            color: Style\Color::PRIMARY(),
             icon: null,
+            size: Style\Size::MEDIUM(),
         );
     }
 
@@ -30,13 +30,14 @@ class Button implements Component
     {
         return Template::create(
             <<<HTML
-            <button type="button" data-on-click="click" class="btn btn-{{ color }}" id="{{ id }}">
+            <button type="button" data-on-click="click" class="btn btn-{{ color }} {{ size }}" id="{{ id }}">
                 {{ icon }}{{ label }}
             </button>
             HTML,
             id: $this->id(),
             label: $this->label,
             color: $this->color,
+            size: $this->size->prefixed('btn-'),
             icon: $this->icon?->html(),
         );
     }
@@ -48,21 +49,25 @@ class Button implements Component
 
     public function set(
         ?string $label = null,
-        ?Color $color = null,
-        Icon|null|false $icon = false,
+        ?Style\Color $color = null,
+        Style\Icon|null|false $icon = false,
+        ?Style\Size $size = null,
     ): self {
         $this->label = $label ?? $this->label;
         $this->color = $color ?? $this->color;
         $this->icon = $icon === false ? $this->icon : $icon;
+        $this->size = $size ?? $this->size;
+        $this->refresh();
 
-        return $this->refresh();
+        return $this;
     }
 
 
     private function __construct(
         private string $label,
-        private Color $color,
-        private ?Icon $icon,
+        private Style\Color $color,
+        private ?Style\Icon $icon,
+        private Style\Size $size,
     ) {
         $this->clicked = new Signal\Signal0();
     }

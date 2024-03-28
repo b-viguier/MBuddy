@@ -15,10 +15,8 @@ trait Refreshable
 
     private ?Signal\Signal0 $modified = null;
 
-    private function refresh(): self
+    private function refresh(): void
     {
         $this->modified()->emit(); // emit $this?
-
-        return $this;
     }
 }
