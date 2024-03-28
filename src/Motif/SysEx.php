@@ -11,6 +11,24 @@ class SysEx implements \Stringable
         return $this->sysexMsg;
     }
 
+    public function length(): int
+    {
+        return \strlen($this->sysexMsg);
+    }
+
+    public static function extractFromBinaryString(string $binary, int $offset): ?self
+    {
+        \assert($offset >= 0);
+        $lastBytePos = \strpos($binary, self::SYSEX_SUFFIX, $offset);
+        if (false === $lastBytePos) {
+            return null;
+        }
+
+        $subPart = \substr($binary, $offset, $lastBytePos - $offset + 1);
+
+        return self::fromBinaryString($subPart);
+    }
+
     public static function fromBinaryString(string $binary): ?self
     {
         if (\strlen($binary) < self::MIN_FIXED_SIZE) {

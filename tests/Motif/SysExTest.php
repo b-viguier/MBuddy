@@ -35,6 +35,7 @@ class SysExTest extends TestCase
 
         self::assertNotNull($sysex);
         self::assertSame($binaryString, (string)$sysex);
+        self::assertSame(\strlen($binaryString), $sysex->length());
         self::assertSame(\ord('*'), $sysex->deviceNumber());
         self::assertSame([\ord('d'), \ord('a'), \ord('t'), \ord('a')], $sysex->toBytes());
     }
@@ -49,5 +50,26 @@ class SysExTest extends TestCase
         self::assertSame("\xF0\x43\x01\x7F\x03data\xF7", (string)$sysex);
         self::assertSame($deviceNumber, $sysex->deviceNumber());
         self::assertSame([\ord('d'), \ord('a'), \ord('t'), \ord('a')], $sysex->toBytes());
+    }
+
+    public function testExtractFromBinaryString(): void
+    {
+        $binary = \join('', \array_map(
+            fn(SysEx $sysEx) => (string)$sysEx,
+            [
+                $sysEx1 = SysEx::fromBytes(0x01, 'number1'),
+                $sysEx2 = SysEx::fromBytes(0x02, 'this is 2'),
+            ],
+        ));
+
+        $sysEx = SysEx::extractFromBinaryString($binary, 0);
+        self::assertNotNull($sysEx);
+        self::assertSame((string)$sysEx1, (string)$sysEx);
+
+        $sysEx = SysEx::extractFromBinaryString($binary, \strlen((string)$sysEx));
+        self::assertNotNull($sysEx);
+        self::assertSame((string)$sysEx2, (string)$sysEx);
+
+        self::assertNull(SysEx::extractFromBinaryString($binary, 1));
     }
 }
