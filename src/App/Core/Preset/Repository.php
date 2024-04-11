@@ -16,7 +16,8 @@ class Repository
     public Slot\Slot0 $nextInBank;
     public Slot\Slot0 $previousInBank;
     /** @var Signal\Signal1<Preset> */
-    public Signal\Signal1 $changed;
+    public Signal\Signal1 $currentChanged;
+    public Signal\Signal1 $presetChanged;
 
 
     public function __construct(
@@ -24,7 +25,8 @@ class Repository
     ) {
         $this->nextInBank = new Slot\Slot0(fn() => $this->nextInBank());
         $this->previousInBank = new Slot\Slot0(fn() => $this->previousInBank());
-        $this->changed = new Signal\Signal1();
+        $this->currentChanged = new Signal\Signal1();
+        $this->presetChanged = new Signal\Signal1();
     }
 
 
@@ -39,6 +41,20 @@ class Repository
                     yield $this->masterRepository->currentMasterId(),
                 ),
             );
+        });
+    }
+
+    /**
+     * @return Promise<null>
+     */
+    public function setCurrent(Master\Id $id): Promise
+    {
+        \assert(!$id->isEditBuffer());
+        return call(function() use($id) {
+            yield $this->masterRepository->setCurrentMasterId($id);
+            $master = yield $this->masterRepository->get($id);
+
+            $this->currentChanged->emit(new Preset($master));
         });
     }
 
@@ -58,7 +74,7 @@ class Repository
             yield $this->masterRepository->setCurrentMasterId($nextMasterId);
             $master = yield $this->masterRepository->get($nextMasterId);
 
-            $this->changed->emit(new Preset($master));
+            $this->currentChanged->emit(new Preset($master));
         });
     }
 
@@ -78,7 +94,7 @@ class Repository
             yield $this->masterRepository->setCurrentMasterId($previousMasterId);
             $master = yield $this->masterRepository->get($previousMasterId);
 
-            $this->changed->emit(new Preset($master));
+            $this->currentChanged->emit(new Preset($master));
         });
     }
 }

@@ -17,6 +17,7 @@ class Main implements Component
         Preset\Repository $presetRepository
     ) {
         $this->navBar = new NavBar($presetRepository);
+        $this->motifView = new MotifView($presetRepository);
     }
 
     public function template(): Template
@@ -31,6 +32,8 @@ class Main implements Component
 
                 <!-- Left panel -->
                 <div class="col-8 pl-3 pr-1">
+                    {{ motifView }}
+                
                     
                     <div class="mt-4"></div> <!-- Spacer -->
                     
@@ -46,7 +49,9 @@ class Main implements Component
             </div>
             HTML,
             navbar: $this->navBar,
+            motifView: $this->motifView,
         );
     }
     private NavBar $navBar;
+    private MotifView $motifView;
 }

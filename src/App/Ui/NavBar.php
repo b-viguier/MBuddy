@@ -11,6 +11,7 @@ use Bveing\MBuddy\Ui\Component;
 use Bveing\MBuddy\Ui\Style;
 use Bveing\MBuddy\Ui\Template;
 use function Amp\asyncCall;
+use Bveing\MBuddy\Motif\Master;
 
 class NavBar implements Component
 {
@@ -24,12 +25,23 @@ class NavBar implements Component
             ->set(
                 color: Style\Color::PRIMARY(),
                 icon: Style\Icon::ARROW_LEFT_SQUARE_FILL(),
+                size: Style\Size::LARGE(),
             );
         $this->nextButton = Component\Button::create()
             ->set(
                 color: Style\Color::PRIMARY(),
                 icon: Style\Icon::ARROW_RIGHT_SQUARE_FILL(),
+                size: Style\Size::LARGE(),
             );
+
+        $this->presetSelect = Component\Select::create()->set(
+            options: array_map(
+                fn(Master\Id $id) => new Component\Option(sprintf("Preset %d", $id->toInt()), $id),
+                iterator_to_array(Master\Id::all()),
+            ),
+            size: Style\Size::LARGE(),
+
+        );
 
         $this->nextPreset = new Slot\Slot0(fn() => $this->nextPreset());
         $this->previousPreset = new Slot\Slot0(fn() => $this->previousPreset());
@@ -37,7 +49,7 @@ class NavBar implements Component
 
         $this->previousButton->clicked->connect($this->previousPreset);
         $this->nextButton->clicked->connect($this->nextPreset);
-        $this->presetRepository->changed->connect($this->setPreset);
+        $this->presetRepository->currentChanged->connect($this->setPreset);
 
         asyncCall(function() {
             $this->setPreset(yield $this->presetRepository->current());
@@ -53,10 +65,9 @@ class NavBar implements Component
                 <form class="form-inline w-75">
                     <div class="input-group w-100">
                         <div class="input-group-prepend">
-                            <button class="btn btn-primary" type="button">Preset</button>
+                            <span class="input-group-text">Preset</span>
                         </div>
-                        <input type="text" class="form-control user-select-none" value="[{{ preset_id }}] {{ name }}" readonly>
-
+                        {{ presetSelect }}
                         <div class="input-group-append">
                             <button type="button" class="btn btn-primary"><i class="bi bi-music-note-list"></i></button>
                         </div>
@@ -70,6 +81,7 @@ class NavBar implements Component
             next: $this->nextButton,
             name: $this->currentPreset?->name() ?? 'none',
             preset_id: $this->currentPreset?->master()->id()->toInt() ?? 'none',
+            presetSelect: $this->presetSelect,
         );
     }
 
@@ -92,6 +104,9 @@ class NavBar implements Component
 
     private Component\Button $previousButton;
     private Component\Button $nextButton;
+
+    /** @var Component\Select<Master\Id> $presetSelect */
+    private Component\Select $presetSelect;
 
     private ?Preset $currentPreset = null;
 

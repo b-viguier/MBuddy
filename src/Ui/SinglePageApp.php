@@ -272,6 +272,17 @@ class SinglePageApp implements SinglePageApp\Renderer
                                 console.warn('Invalid event', componentId, methodName, value);
                             }
                         });
+                        $(document).on('change', '[data-on-change]', function(event) {
+                            var target = event.target.closest('[data-on-change]');
+                            var methodName = target.dataset.onChange;
+                            var value = target.value;
+                            var componentId = target.dataset.targetId || target.id;
+                            if (componentId && methodName) {
+                                MBuddySocket.send(JSON.stringify([componentId, methodName, value]));
+                            } else {
+                                console.warn('Invalid event', componentId, methodName, value);
+                            }
+                        });
                     };
                 </script>
             </head>
