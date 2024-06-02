@@ -6,14 +6,14 @@ namespace Bveing\MBuddy\Siglot\Core;
 
 class Connector
 {
-    public function __construct(private SlotMethod $signal, private SlotCollection $slots)
+    public function __construct(private SignalMethod $signal, private SlotCollection $slots)
     {
     }
 
     public function chain(self $other): void
     {
         $this->slots->add(
-            SlotMethod::wrap($other->signal, \Closure::fromCallable([$other->slots, 'invoke']))
+            SlotMethod::fromWrappedSignal($other->signal, \Closure::fromCallable([$other->slots, 'invoke']))
         );
     }
 

@@ -6,7 +6,7 @@ namespace Bveing\MBuddy\Siglot\Core;
 
 class Connection
 {
-    public function __construct(public SlotMethod $signal, public SlotCollection $slots)
+    public function __construct(public SignalMethod $signal, public SlotCollection $slots)
     {
     }
 }

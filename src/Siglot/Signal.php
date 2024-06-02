@@ -10,9 +10,10 @@ class Signal
      * @param array<mixed> $args
      */
     public function __construct(private object $object, private string $method, private array $args)
-    {}
+    {
+    }
 
-    static public function auto(): self
+    public static function auto(): self
     {
         $backtrace = \debug_backtrace(\DEBUG_BACKTRACE_PROVIDE_OBJECT, 2);
         $entry = $backtrace[1] ?? null;

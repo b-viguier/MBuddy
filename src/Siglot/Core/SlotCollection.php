@@ -6,9 +6,6 @@ namespace Bveing\MBuddy\Siglot\Core;
 
 class SlotCollection
 {
-    /** @var \WeakMap<object, \ArrayObject<string,SlotMethod>> */
-    private \WeakMap $slotInstances;
-
     public function __construct()
     {
         $this->slotInstances = new \WeakMap();
@@ -28,6 +25,9 @@ class SlotCollection
         unset($this->slotInstances[$slotMethod->object()][$slotMethod->name()]);
     }
 
+    /**
+     * @param array<mixed> $args
+     */
     public function invoke(array $args): void
     {
         foreach ($this->slotInstances as $slotInstance) {
@@ -36,4 +36,6 @@ class SlotCollection
             }
         }
     }
+    /** @var \WeakMap<object, \ArrayObject<string,SlotMethod>> */
+    private \WeakMap $slotInstances;
 }

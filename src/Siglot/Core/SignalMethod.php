@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace Bveing\MBuddy\Siglot\Core;
 
-class SlotMethod
+use Bveing\MBuddy\Siglot\Emitter;
+use Bveing\MBuddy\Siglot\Signal;
+
+class SignalMethod
 {
     public static function fromClosure(\Closure $closure): self
     {
@@ -14,23 +17,17 @@ class SlotMethod
         if ($object === null) {
             throw new \Error("Closure is not bound to an object");
         }
+        \assert($object instanceof Emitter);
 
         $methodName = $reflection->getName();
-        new \ReflectionMethod($object, $methodName);
+        $reflection = new \ReflectionMethod($object, $methodName);
+        \assert(($returnType = $reflection->getReturnType()) instanceof \ReflectionNamedType);
+        \assert($returnType->getName() === Signal::class);
 
         return new self(
             $methodName,
             $object,
-            fn() => $this->$methodName(...\func_get_args()),   // @phpstan-ignore-line
-        );
-    }
-
-    public static function fromWrappedSignal(SignalMethod $signalMethod, \Closure $wrapper): self
-    {
-        return new self(
-            $signalMethod->name(),
-            $signalMethod->object(),
-            fn() => $wrapper($signalMethod->invoke(\func_get_args())->args()),
+            fn() => $this->$methodName(...\func_get_args()), // @phpstan-ignore-line
         );
     }
 
@@ -39,7 +36,7 @@ class SlotMethod
         return $this->name;
     }
 
-    public function object(): object
+    public function object(): Emitter
     {
         \assert($this->object->get() !== null);
 
@@ -52,30 +49,32 @@ class SlotMethod
     }
 
     /**
-     * @param array<mixed> $args
+     * @param mixed[] $args
      */
-    public function invoke(array $args): mixed
+    public function invoke(array $args): Signal
     {
         $instance = $this->object->get();
         \assert($instance !== null);
 
-        return \call_user_func_array($this->function->bindTo($instance, $instance::class), $args);
+        $callable = $this->function->bindTo($instance, $instance::class);
+
+        return \call_user_func_array($callable, $args); // @phpstan-ignore-line
     }
-    /** @var \WeakReference<object> */
+    /** @var \WeakReference<Emitter> */
     private \WeakReference $object;
 
     /**
-     * @param \Closure(mixed ...$params):mixed $function
+     * @param \Closure(mixed ...$params):Signal $function
      */
     private function __construct(
         private string $name,
-        object $object,
+        Emitter $object,
         private \Closure $function,
     ) {
         $this->object = \WeakReference::create($object);
 
-        $reflection = new \ReflectionFunction($function);
+        ;
 
-        \assert($reflection->getClosureThis() === null);
+        \assert(($reflection = new \ReflectionFunction($function))->getClosureThis() === null);
     }
 }

@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Bveing\MBuddy\Tests\Siglot;
 
-use PHPUnit\Framework\TestCase;
 use Bveing\MBuddy\Siglot\Emitter;
 use Bveing\MBuddy\Siglot\EmitterHelper;
-use Bveing\MBuddy\Siglot\Signal;
 use Bveing\MBuddy\Siglot\Siglot;
+use Bveing\MBuddy\Siglot\Signal;
+use PHPUnit\Framework\TestCase;
 
 class SignalSlotTest extends TestCase
 {
@@ -67,7 +67,7 @@ class SignalSlotTest extends TestCase
         $emitter2 = new SpyEmitter();
         $receiver = new SpyReceiver();
 
-        Siglot::connect0(
+        Siglot::chain0(
             $this->func($emitter1, 'signal'),
             $this->func($emitter2, 'signal')
         );
@@ -84,8 +84,12 @@ class SignalSlotTest extends TestCase
     {
         $emitter = new SpyEmitter();
         $count = 0;
-        $receiver = new class(function() use (&$count) {++$count;}) {
-            public function __construct(private \Closure $callback) {}
+        $receiver = new class (function() use (&$count) {
+            ++$count;
+        }) {
+            public function __construct(private \Closure $callback)
+            {
+            }
             public function slot(): void
             {
                 ($this->callback)();
@@ -106,21 +110,21 @@ class SignalSlotTest extends TestCase
         self::assertSame(1, $count);
     }
 
-//    public function testSignalDisconnected(): void
-//    {
-//        $count = 0;
-//        $signal = new VariadicSignal();
-//        $slot = new VariadicSlot(function() use (&$count) {++$count;});
-//
-//        $signal->connect($slot);
-//
-//        $signal->emit();
-//        self::assertSame(1, $count);
-//
-//        $signal->disconnect($slot);
-//        $signal->emit();
-//        self::assertSame(1, $count);
-//    }
+    //    public function testSignalDisconnected(): void
+    //    {
+    //        $count = 0;
+    //        $signal = new VariadicSignal();
+    //        $slot = new VariadicSlot(function() use (&$count) {++$count;});
+    //
+    //        $signal->connect($slot);
+    //
+    //        $signal->emit();
+    //        self::assertSame(1, $count);
+    //
+    //        $signal->disconnect($slot);
+    //        $signal->emit();
+    //        self::assertSame(1, $count);
+    //    }
 
     public function testParametersAreForwarded(): void
     {
@@ -141,8 +145,12 @@ class SignalSlotTest extends TestCase
     {
         $args = [];
         $emitter = new SpyEmitter();
-        $receiver = new class(function(int $a, string $b) use (&$args) {$args = [$a, $b];}) {
-            public function __construct(private \Closure $callback) {}
+        $receiver = new class (function(int $a, string $b) use (&$args) {
+            $args = [$a, $b];
+        }) {
+            public function __construct(private \Closure $callback)
+            {
+            }
             public function slot(int $a, string $b): void
             {
                 ($this->callback)($a, $b);

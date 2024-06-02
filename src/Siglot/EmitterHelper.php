@@ -5,21 +5,21 @@ declare(strict_types=1);
 namespace Bveing\MBuddy\Siglot;
 
 use Bveing\MBuddy\Siglot\Core\Connector;
-use Bveing\MBuddy\Siglot\Core\SignalManager;
-use Bveing\MBuddy\Siglot\Core\SlotMethod;
+use Bveing\MBuddy\Siglot\Core\SignalMethod;
+use Bveing\MBuddy\Siglot\Core\SignalRouter;
 
 trait EmitterHelper
 {
-    private ?SignalManager $signalManager = null;
-
-    public function getSignalConnector(SlotMethod $signal): Connector
+    public function getConnector(SignalMethod $signal): Connector
     {
-        $this->signalManager ??= new SignalManager();
+        $this->signalManager ??= new SignalRouter();
+
         return $this->signalManager->getConnector($signal);
     }
+    private ?SignalRouter $signalManager = null;
 
     private function emit(Signal $signal): void
     {
-        $this->signalManager?->emit($signal->method(), $signal->args());
+        $this->signalManager?->emit($signal);
     }
 }
