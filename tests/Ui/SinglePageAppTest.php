@@ -7,6 +7,7 @@ namespace Bveing\MBuddy\Tests\Ui;
 use Amp\Http\Client\HttpClientBuilder;
 use Amp\Http\Client\Request;
 use Amp\Loop;
+use Bveing\MBuddy\Siglot\EmitterHelper;
 use Bveing\MBuddy\Tests\GeckoServerExtension;
 use Bveing\MBuddy\Ui\Component;
 use Bveing\MBuddy\Ui\SinglePageApp;
@@ -68,6 +69,8 @@ class SinglePageAppTest extends TestCase
                 new class () implements Component {
                     use Component\Trait\Refreshable;
                     use Component\Trait\AutoId;
+                    use EmitterHelper;
+
                     public function template(): Template
                     {
                         return Template::create(
@@ -137,6 +140,7 @@ class SinglePageAppTest extends TestCase
         return new class () implements Component {
             use Component\Trait\Refreshable;
             use Component\Trait\AutoId;
+            use EmitterHelper;
             public function template(): Template
             {
                 return Template::createEmpty();

@@ -6,27 +6,30 @@ namespace Bveing\MBuddy\App\Core\Preset;
 
 use Amp\Promise;
 use Bveing\MBuddy\App\Core\Preset;
-use Bveing\MBuddy\Core\Signal;
-use Bveing\MBuddy\Core\Slot;
 use Bveing\MBuddy\Motif\Master;
+use Bveing\MBuddy\Siglot\Emitter;
+use Bveing\MBuddy\Siglot\EmitterHelper;
+use Bveing\MBuddy\Siglot\Signal;
 use function Amp\call;
 
-class Repository
+class Repository implements Emitter
 {
-    public Slot\Slot0 $nextInBank;
-    public Slot\Slot0 $previousInBank;
-    /** @var Signal\Signal1<Preset> */
-    public Signal\Signal1 $currentChanged;
-    public Signal\Signal1 $presetChanged;
+    use EmitterHelper;
+
+    public function currentChanged(Preset $preset): Signal
+    {
+        return Signal::auto();
+    }
+
+    public function presetChanged(Preset $preset): Signal
+    {
+        return Signal::auto();
+    }
 
 
     public function __construct(
         private Master\Repository $masterRepository,
     ) {
-        $this->nextInBank = new Slot\Slot0(fn() => $this->nextInBank());
-        $this->previousInBank = new Slot\Slot0(fn() => $this->previousInBank());
-        $this->currentChanged = new Signal\Signal1();
-        $this->presetChanged = new Signal\Signal1();
     }
 
 
@@ -50,11 +53,11 @@ class Repository
     public function setCurrent(Master\Id $id): Promise
     {
         \assert(!$id->isEditBuffer());
-        return call(function() use($id) {
+        return call(function() use ($id) {
             yield $this->masterRepository->setCurrentMasterId($id);
             $master = yield $this->masterRepository->get($id);
 
-            $this->currentChanged->emit(new Preset($master));
+            $this->emit($this->currentChanged(new Preset($master)));
         });
     }
 
@@ -74,7 +77,7 @@ class Repository
             yield $this->masterRepository->setCurrentMasterId($nextMasterId);
             $master = yield $this->masterRepository->get($nextMasterId);
 
-            $this->currentChanged->emit(new Preset($master));
+            $this->emit($this->currentChanged(new Preset($master)));
         });
     }
 
@@ -94,7 +97,7 @@ class Repository
             yield $this->masterRepository->setCurrentMasterId($previousMasterId);
             $master = yield $this->masterRepository->get($previousMasterId);
 
-            $this->currentChanged->emit(new Preset($master));
+            $this->emit($this->currentChanged(new Preset($master)));
         });
     }
 }

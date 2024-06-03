@@ -22,8 +22,7 @@ class SignalRouter
 
     public function emit(Signal $signal): void
     {
-        \assert(isset($this->connections[$signal->method()]));
-        $this->connections[$signal->method()]->slots->invoke($signal->args());
+        $this->connections[$signal->method()]?->slots->invoke($signal->args());
     }
     /** @var \ArrayObject<string,Connection> $connections */
     private \ArrayObject $connections;

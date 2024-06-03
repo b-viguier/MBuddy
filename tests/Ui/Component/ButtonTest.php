@@ -5,7 +5,8 @@ declare(strict_types=1);
 namespace Bveing\MBuddy\Tests\Ui\Component;
 
 use Amp\Loop;
-use Bveing\MBuddy\Core\Slot\Slot0;
+use Bveing\MBuddy\Siglot\EmitterHelper;
+use Bveing\MBuddy\Siglot\Siglot;
 use Bveing\MBuddy\Tests\GeckoServerExtension;
 use Bveing\MBuddy\Ui\Component;
 use Bveing\MBuddy\Ui\Component\Button;
@@ -21,13 +22,8 @@ class ButtonTest extends TestCase
         Loop::run(function() {
             $app = new SinglePageApp();
 
-            $counter1 = $counter2 = 0;
-            $slot1 = new Slot0(function() use (&$counter1) {
-                ++$counter1;
-            });
-            $slot2 = new Slot0(function() use (&$counter2) {
-                ++$counter2;
-            });
+            $slot1 = new SpyReceiver();
+            $slot2 = new SpyReceiver();
 
             $button1 = Button::create()->set(
                 label: 'B1',
@@ -36,12 +32,19 @@ class ButtonTest extends TestCase
                 label: 'B2',
             );
 
-            $button1->clicked->connect($slot1);
-            $button2->clicked->connect($slot2);
+            Siglot::connect0(
+                \Closure::fromCallable([$button1, 'clicked']),
+                \Closure::fromCallable([$slot1, 'slot']),
+            );
+            Siglot::connect0(
+                \Closure::fromCallable([$button2, 'clicked']),
+                \Closure::fromCallable([$slot2, 'slot']),
+            );
 
             $comp = new class ($button1, $button2) implements Component {
                 use Component\Trait\Refreshable;
                 use Component\Trait\AutoId;
+                use EmitterHelper;
 
                 public function __construct(private Button $button1, private Button $button2)
                 {
@@ -62,8 +65,8 @@ class ButtonTest extends TestCase
                 yield $app->start($comp);
                 yield GeckoServerExtension::navigateToHomePage();
 
-                self::assertSame(0, $counter1);
-                self::assertSame(0, $counter2);
+                self::assertCount(0, $slot1->calls);
+                self::assertCount(0, $slot2->calls);
 
                 $elementId1 = yield GeckoServerExtension::$driver->findElement(\sprintf('#%s', $button1->id()));
                 $elementId2 = yield GeckoServerExtension::$driver->findElement(\sprintf('#%s', $button2->id()));
@@ -73,13 +76,13 @@ class ButtonTest extends TestCase
 
                 yield GeckoServerExtension::$driver->clickElement($elementId1);
 
-                self::assertSame(1, $counter1);
-                self::assertSame(0, $counter2);
+                self::assertCount(1, $slot1->calls);
+                self::assertCount(0, $slot2->calls);
 
                 yield GeckoServerExtension::$driver->clickElement($elementId2);
 
-                self::assertSame(1, $counter1);
-                self::assertSame(1, $counter2);
+                self::assertCount(1, $slot1->calls);
+                self::assertCount(1, $slot2->calls);
 
 
             } finally {
@@ -97,11 +100,11 @@ class ButtonTest extends TestCase
                 icon: Icon::X(),
             );
 
-            $clicked = false;
-            $slot = new Slot0(function() use (&$clicked) {
-                $clicked = true;
-            });
-            $button->clicked->connect($slot);
+            $slot = new SpyReceiver();
+            Siglot::connect0(
+                \Closure::fromCallable([$button, 'clicked']),
+                \Closure::fromCallable([$slot, 'slot']),
+            );
 
             try {
                 yield $app->start($button);
@@ -110,10 +113,21 @@ class ButtonTest extends TestCase
                 $elementId = yield GeckoServerExtension::$driver->findElement(\sprintf('#%s', $button->id()));
                 yield GeckoServerExtension::$driver->clickElement($elementId);
 
-                self::assertTrue($clicked);
+                self::assertCount(1, $slot->calls);
             } finally {
                 yield $app->stop();
             }
         });
+    }
+}
+
+class SpyReceiver
+{
+    /** @var array<mixed[]> */
+    public array $calls = [];
+
+    public function slot(mixed ...$args): void
+    {
+        $this->calls[] = $args;
     }
 }

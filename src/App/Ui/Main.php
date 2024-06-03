@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Bveing\MBuddy\App\Ui;
 
 use Bveing\MBuddy\App\Core\Preset;
+use Bveing\MBuddy\Siglot\EmitterHelper;
 use Bveing\MBuddy\Ui\Component;
 use Bveing\MBuddy\Ui\Template;
 
@@ -12,6 +13,7 @@ class Main implements Component
 {
     use Component\Trait\AutoId;
     use Component\Trait\Refreshable;
+    use EmitterHelper;
 
     public function __construct(
         Preset\Repository $presetRepository

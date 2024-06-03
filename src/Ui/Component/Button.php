@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace Bveing\MBuddy\Ui\Component;
 
-use Bveing\MBuddy\Core\Signal;
+use Bveing\MBuddy\Siglot\EmitterHelper;
+use Bveing\MBuddy\Siglot\Signal;
 use Bveing\MBuddy\Ui\Component;
 use Bveing\MBuddy\Ui\Style;
 use Bveing\MBuddy\Ui\Template;
@@ -13,8 +14,7 @@ class Button implements Component
 {
     use Trait\AutoId;
     use Trait\Refreshable;
-
-    public Signal\Signal0 $clicked;
+    use EmitterHelper;
 
     public static function create(): Button
     {
@@ -44,7 +44,12 @@ class Button implements Component
 
     public function click(): void
     {
-        $this->clicked->emit();
+        $this->emit($this->clicked());
+    }
+
+    public function clicked(): Signal
+    {
+        return Signal::auto();
     }
 
     public function set(
@@ -69,6 +74,5 @@ class Button implements Component
         private ?Style\Icon $icon,
         private Style\Size $size,
     ) {
-        $this->clicked = new Signal\Signal0();
     }
 }

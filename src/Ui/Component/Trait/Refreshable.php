@@ -4,19 +4,20 @@ declare(strict_types=1);
 
 namespace Bveing\MBuddy\Ui\Component\Trait;
 
-use Bveing\MBuddy\Core\Signal;
+use Bveing\MBuddy\Siglot\Signal;
 
 trait Refreshable
 {
-    public function modified(): Signal\Signal0
+    public function modified(): Signal
     {
-        return $this->modified ??= new Signal\Signal0();
+        return Signal::auto();
     }
 
-    private ?Signal\Signal0 $modified = null;
 
     private function refresh(): void
     {
-        $this->modified()->emit(); // emit $this?
+        $this->emit($this->modified());
     }
+
+    abstract private function emit(Signal $signal): void;
 }

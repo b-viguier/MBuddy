@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace Bveing\MBuddy\Ui\Component;
 
-use Bveing\MBuddy\Core\Signal;
+use Bveing\MBuddy\Siglot\EmitterHelper;
+use Bveing\MBuddy\Siglot\Signal;
 use Bveing\MBuddy\Ui\Component;
 use Bveing\MBuddy\Ui\Style;
-use Bveing\MBuddy\Ui\Template;
 use Bveing\MBuddy\Ui\SubTemplate;
+use Bveing\MBuddy\Ui\Template;
 
 /**
  * @template T
@@ -17,16 +18,14 @@ class Select implements Component
 {
     use Trait\AutoId;
     use Trait\Refreshable;
-
-    /** @var Signal\Signal1<Option<T>> */
-    public Signal\Signal1 $selected;
+    use EmitterHelper;
 
     /**
      * @return self<T>
      */
     public static function create(): self
     {
-        /** @var self<T> */
+        /** @var self<T> $instance */
         $instance = new self(
             options: [],
             currentValue: null,
@@ -72,7 +71,7 @@ class Select implements Component
                     HTML,
                     index: $index,
                     text: $option->text(),
-                    selected: $option->value() === $this->currentValue ? 'selected' : '',
+                    selected: $option->value() == $this->currentValue ? 'selected' : '',
                 ),
                 $this->options,
                 \array_keys($this->options),
@@ -82,15 +81,25 @@ class Select implements Component
 
     public function select(string $strIndex): void
     {
+        // Doesn't make sense??
         $index = (int) $strIndex;
         $option = $this->options[$index] ?? null;
 
-        if ($option === null) {
+        if ($option === null || $this->currentValue === $option->value()) {
             return;
         }
 
         $this->currentValue = $option->value();
-        $this->selected->emit($option);
+        $this->refresh();
+        $this->emit($this->selected($option));
+    }
+
+    /**
+     * @param Option<T> $option
+     */
+    public function selected(Option $option): Signal
+    {
+        return Signal::auto();
     }
 
     /**
@@ -102,7 +111,6 @@ class Select implements Component
         private mixed $currentValue,
         private Style\Size $size,
     ) {
-        $this->selected = new Signal\Signal1();
     }
 }
 

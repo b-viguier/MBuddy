@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Bveing\MBuddy\Ui\Component;
 
+use Bveing\MBuddy\Siglot\EmitterHelper;
 use Bveing\MBuddy\Ui\Component;
 use Bveing\MBuddy\Ui\SubTemplate;
 use Bveing\MBuddy\Ui\Template;
@@ -12,6 +13,7 @@ class Modal implements Component
 {
     use Trait\AutoId;
     use Trait\Refreshable;
+    use EmitterHelper;
 
     public function __construct(
         private Component $content,

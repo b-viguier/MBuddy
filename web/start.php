@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 require __DIR__.'/../vendor/autoload.php';
 
+use Bveing\MBuddy\Siglot;
 use Bveing\MBuddy\Ui;
 
 Amp\Loop::run(function() {
@@ -19,26 +20,30 @@ Amp\Loop::run(function() {
     $body = new class () implements Ui\Component {
         use Ui\Component\Trait\Refreshable;
         use Ui\Component\Trait\AutoId;
+        use Siglot\EmitterHelper;
 
         public function __construct()
         {
-            $this->slotOnSelected = new \Bveing\MBuddy\Core\Slot\Slot1(function(string $selected) {
-                $this->label->setText($selected);
-            });
-
             $this->selectBox = Ui\Component\SelectBox::create()->set(
                 "Select",
                 ["Option 1", "Option 2", "Option 3"],
                 "Option 1",
             );
-            $this->selectBox->selected->connect($this->slotOnSelected);
+            Siglot\Siglot::connect1(
+                \Closure::fromCallable([$this->selectBox, 'selected']),
+                \Closure::fromCallable([$this, 'onSelected']),
+            );
 
             $this->button1 = Ui\Component\Button::create()->set(
                 label: "Open",
                 color: Ui\Style\Color::SECONDARY(),
                 icon: Ui\Style\Icon::ARROW_DOWN(),
             );
-            $this->button1->clicked->connect($this->selectBox->show);
+            Siglot\Siglot::connect1(
+                \Closure::fromCallable([$this->button1, 'clicked']),
+                \Closure::fromCallable([$this->selectBox, 'show']),
+            );
+
             $this->label = new Ui\Component\Label("Label");
         }
 
@@ -59,10 +64,10 @@ Amp\Loop::run(function() {
             );
         }
 
-        /**
-         * @var \Bveing\MBuddy\Core\Slot\Slot1<string> $slotOnSelected
-         */
-        private \Bveing\MBuddy\Core\Slot\Slot1 $slotOnSelected;
+        private function onSelected(string $selected): void
+        {
+            $this->label->setText($selected);
+        }
 
         private Ui\Component\Button $button1;
 

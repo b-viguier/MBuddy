@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Bveing\MBuddy\Ui\SinglePageApp;
 
-use Bveing\MBuddy\Core\Slot;
+use Bveing\MBuddy\Siglot\Siglot;
 use Bveing\MBuddy\Ui\Component;
 use Bveing\MBuddy\Ui\Id;
 use Bveing\MBuddy\Ui\Template;
@@ -117,12 +117,12 @@ class Node
         private string $pattern,
         private array $children,
     ) {
-        $this->markAsModified = new Slot\Slot0(fn() => $this->markAsModified());
-
-        $this->component->modified()->connect($this->markAsModified);
+        Siglot::connect0(
+            \Closure::fromCallable([$this->component, 'modified']),
+            \Closure::fromCallable([$this, 'markAsModified']),
+        );
     }
 
-    private Slot\Slot0 $markAsModified;
     private function markAsModified(): void
     {
         if($this->isModifiedSinceLastUpdate) {

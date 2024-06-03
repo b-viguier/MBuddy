@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Bveing\MBuddy\Tests\Ui\Component;
 
 use Amp\Loop;
+use Bveing\MBuddy\Siglot\EmitterHelper;
 use Bveing\MBuddy\Tests\GeckoServerExtension;
 use Bveing\MBuddy\Ui\Component;
 use Bveing\MBuddy\Ui\SinglePageApp;
@@ -29,6 +30,8 @@ class LabelTest extends TestCase
             $comp = new class ($label1, $label2) implements Component {
                 use Component\Trait\Refreshable;
                 use Component\Trait\AutoId;
+                use EmitterHelper;
+
                 public function __construct(private Component\Label $label1, private Component\Label $label2)
                 {
                 }

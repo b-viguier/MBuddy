@@ -6,17 +6,19 @@ namespace Bveing\MBuddy\App\Ui;
 
 use Amp\Promise;
 use Bveing\MBuddy\App\Core\Preset;
-use Bveing\MBuddy\Core\Slot;
+use Bveing\MBuddy\Motif\Master;
+use Bveing\MBuddy\Siglot\EmitterHelper;
+use Bveing\MBuddy\Siglot\Siglot;
 use Bveing\MBuddy\Ui\Component;
 use Bveing\MBuddy\Ui\Style;
 use Bveing\MBuddy\Ui\Template;
 use function Amp\asyncCall;
-use Bveing\MBuddy\Motif\Master;
 
 class NavBar implements Component
 {
     use Component\Trait\AutoId;
     use Component\Trait\Refreshable;
+    use EmitterHelper;
 
     public function __construct(
         private Preset\Repository $presetRepository,
@@ -35,21 +37,30 @@ class NavBar implements Component
             );
 
         $this->presetSelect = Component\Select::create()->set(
-            options: array_map(
-                fn(Master\Id $id) => new Component\Option(sprintf("Preset %d", $id->toInt()), $id),
-                iterator_to_array(Master\Id::all()),
+            options: \array_map(
+                fn(Master\Id $id): Component\Option => new Component\Option(\sprintf("Preset %d", $id->toInt()), $id),
+                \iterator_to_array(Master\Id::all()),
             ),
             size: Style\Size::LARGE(),
-
         );
 
-        $this->nextPreset = new Slot\Slot0(fn() => $this->nextPreset());
-        $this->previousPreset = new Slot\Slot0(fn() => $this->previousPreset());
-        $this->setPreset = new Slot\Slot1(fn(Preset $preset) => $this->setPreset($preset));
+        Siglot::connect0(
+            \Closure::fromCallable([$this->previousButton, 'clicked']),
+            \Closure::fromCallable([$this, 'previousPreset']),
+        );
+        Siglot::connect0(
+            \Closure::fromCallable([$this->nextButton, 'clicked']),
+            \Closure::fromCallable([$this, 'nextPreset']),
+        );
+        Siglot::connect1(
+            \Closure::fromCallable([$this->presetRepository, 'currentChanged']),
+            \Closure::fromCallable([$this, 'setPreset']),
+        );
+        Siglot::connect1(
+            \Closure::fromCallable([$this->presetSelect, 'selected']),
+            \Closure::fromCallable([$this, 'onSelectBoxChanged']),
+        );
 
-        $this->previousButton->clicked->connect($this->previousPreset);
-        $this->nextButton->clicked->connect($this->nextPreset);
-        $this->presetRepository->currentChanged->connect($this->setPreset);
 
         asyncCall(function() {
             $this->setPreset(yield $this->presetRepository->current());
@@ -79,8 +90,6 @@ class NavBar implements Component
             id: $this->id(),
             previous: $this->previousButton,
             next: $this->nextButton,
-            name: $this->currentPreset?->name() ?? 'none',
-            preset_id: $this->currentPreset?->master()->id()->toInt() ?? 'none',
             presetSelect: $this->presetSelect,
         );
     }
@@ -96,11 +105,6 @@ class NavBar implements Component
         Promise\rethrow($this->presetRepository->previousInBank());
     }
 
-    private Slot\Slot0 $nextPreset;
-    private Slot\Slot0 $previousPreset;
-    /** @var Slot\Slot1<Preset> */
-    private Slot\Slot1 $setPreset;
-
 
     private Component\Button $previousButton;
     private Component\Button $nextButton;
@@ -108,11 +112,17 @@ class NavBar implements Component
     /** @var Component\Select<Master\Id> $presetSelect */
     private Component\Select $presetSelect;
 
-    private ?Preset $currentPreset = null;
-
     private function setPreset(Preset $preset): void
     {
-        $this->currentPreset = $preset;
-        $this->refresh();
+        $entry = \sprintf("Preset %d", $preset->master()->id()->toInt());
+        $this->presetSelect->select($entry);
+    }
+
+    /**
+     * @param Component\Option<Master\Id> $option
+     */
+    private function onSelectBoxChanged(Component\Option $option): void
+    {
+        Promise\rethrow($this->presetRepository->setCurrent($option->value()));
     }
 }

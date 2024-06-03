@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace Bveing\MBuddy\Ui\Component;
 
-use Bveing\MBuddy\Core\Signal;
-use Bveing\MBuddy\Core\Slot;
+use Bveing\MBuddy\Siglot\EmitterHelper;
+use Bveing\MBuddy\Siglot\Siglot;
+use Bveing\MBuddy\Siglot\Signal;
 use Bveing\MBuddy\Ui\Component;
 use Bveing\MBuddy\Ui\Style\Icon;
 use Bveing\MBuddy\Ui\Template;
@@ -14,6 +15,7 @@ class SelectBox implements Component
 {
     use Trait\AutoId;
     use Trait\Refreshable;
+    use EmitterHelper;
 
     public static function create(): SelectBox
     {
@@ -57,14 +59,14 @@ class SelectBox implements Component
     public function select(string $index): void
     {
         $this->currentText = $this->options[(int)$index];
-        $this->selected->emit($this->currentText);
+        $this->emit($this->selected($this->currentText));
         $this->refresh();
     }
 
-    /** @var Signal\Signal1<string> */
-    public Signal\Signal1 $selected;
-    public Slot\Slot0 $hide;
-    public Slot\Slot0 $show;
+    public function selected(string $text): Signal
+    {
+        return Signal::auto();
+    }
 
     /**
      * @param array<string> $options
@@ -74,15 +76,14 @@ class SelectBox implements Component
         private array $options,
         private ?string $currentText,
     ) {
-        $this->hide = new Slot\Slot0(fn() => $this->hide());
-        $this->show = new Slot\Slot0(fn() => $this->show());
-        $this->selected = new Signal\Signal1();
-
         $closeBtn = Button::create()->set(
             label: 'Close',
             icon: Icon::X_CIRCLE_FILL(),
         );
-        $closeBtn->clicked->connect($this->hide);
+        Siglot::connect0(
+            \Closure::fromCallable([$closeBtn, 'clicked']),
+            \Closure::fromCallable([$this, 'hide']),
+        );
 
         $this->modal = new Modal(
             $this->html = new Html(''),

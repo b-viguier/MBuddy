@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Bveing\MBuddy\Tests\Ui;
 
+use Bveing\MBuddy\Siglot\EmitterHelper;
 use Bveing\MBuddy\Ui\Component;
 use Bveing\MBuddy\Ui\Component\Trait;
 use Bveing\MBuddy\Ui\SubTemplate;
@@ -172,6 +173,7 @@ class TemplateTest extends TestCase
         return new class () implements Component {
             use Trait\AutoId;
             use Trait\Refreshable;
+            use EmitterHelper;
             public function template(): Template
             {
                 return Template::create('<Comp/>');
