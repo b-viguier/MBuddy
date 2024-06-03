@@ -11,38 +11,27 @@ use Bveing\MBuddy\Ui\Style;
 use Bveing\MBuddy\Ui\SubTemplate;
 use Bveing\MBuddy\Ui\Template;
 
-/**
- * @template T
- */
 class Select implements Component
 {
     use Trait\AutoId;
     use Trait\Refreshable;
     use EmitterHelper;
 
-    /**
-     * @return self<T>
-     */
     public static function create(): self
     {
-        /** @var self<T> $instance */
-        $instance = new self(
+        return new self(
             options: [],
-            currentValue: null,
+            currentValue: '',
             size: Style\Size::MEDIUM(),
         );
-
-        return $instance;
     }
 
     /**
-     * @param list<Option<T>> $options
-     * @param T|null $currentValue
-     * @return self<T>
+     * @param array<int|string, string> $options
      */
     public function set(
         ?array $options = null,
-        mixed $currentValue = null,
+        ?string $currentValue = null,
         ?Style\Size $size = null,
     ): self {
         $this->options = $options ?? $this->options;
@@ -58,20 +47,20 @@ class Select implements Component
     {
         return Template::create(
             <<<HTML
-            <select class="custom-select {{ size }}" id="{{ id }}" data-on-change="select">
+            <select class="custom-select {{ size }}" id="{{ id }}" data-on-change="selectByIndex">
                 {{ options }}
             </select>
             HTML,
             id: $this->id(),
             size: $this->size->prefixed('custom-select-'),
             options: \array_map(
-                fn(Option $option, int $index) => SubTemplate::create(
+                fn(string $option, int|string $index) => SubTemplate::create(
                     <<<HTML
                     <option value="{{ index }}" {{ selected }}>{{ text }}</option>
                     HTML,
                     index: $index,
-                    text: $option->text(),
-                    selected: $option->value() == $this->currentValue ? 'selected' : '',
+                    text: $option,
+                    selected: $option === $this->currentValue ? 'selected' : '',
                 ),
                 $this->options,
                 \array_keys($this->options),
@@ -79,65 +68,43 @@ class Select implements Component
         );
     }
 
-    public function select(string $strIndex): void
+    public function selectByText(string $option): void
     {
-        // Doesn't make sense??
-        $index = (int) $strIndex;
-        $option = $this->options[$index] ?? null;
-
-        if ($option === null || $this->currentValue === $option->value()) {
+        $index = \array_search($option, $this->options, true);
+        if ($index === false || $option === $this->currentValue) {
             return;
         }
 
-        $this->currentValue = $option->value();
+        $this->currentValue = $option;
         $this->refresh();
-        $this->emit($this->selected($option));
+        $this->emit($this->selected($option, $index));
     }
 
-    /**
-     * @param Option<T> $option
-     */
-    public function selected(Option $option): Signal
+    public function selectByIndex(int|string $index): void
+    {
+        $option = $this->options[$index] ?? $this->currentValue;
+        if ($option === $this->currentValue) {
+            return;
+        }
+
+        $this->currentValue = $option;
+        $this->refresh();
+        $this->emit($this->selected($option, $index));
+    }
+
+    public function selected(string $option, int|string $index): Signal
     {
         return Signal::auto();
     }
 
     /**
-     * @param list<Option<T>> $options
-     * @param T $currentValue
+     * @param array<int|string, string> $options
+     * @param string $currentValue
      */
     private function __construct(
         private array $options,
         private mixed $currentValue,
         private Style\Size $size,
     ) {
-    }
-}
-
-/**
- * @template T
- */
-class Option
-{
-    /**
-     * @param T $value
-     */
-    public function __construct(
-        private string $text,
-        private mixed $value,
-    ) {
-    }
-
-    public function text(): string
-    {
-        return $this->text;
-    }
-
-    /**
-     * @return T
-     */
-    public function value(): mixed
-    {
-        return $this->value;
     }
 }

@@ -36,10 +36,17 @@ class NavBar implements Component
                 size: Style\Size::LARGE(),
             );
 
+        $allIds = \iterator_to_array(Master\Id::all());
         $this->presetSelect = Component\Select::create()->set(
-            options: \array_map(
-                fn(Master\Id $id): Component\Option => new Component\Option(\sprintf("Preset %d", $id->toInt()), $id),
-                \iterator_to_array(Master\Id::all()),
+            options: \array_combine(
+                \array_map(
+                    fn(Master\Id $id): int => $id->toInt(),
+                    $allIds,
+                ),
+                \array_map(
+                    fn(Master\Id $id): string => \sprintf("**unknown** %d", $id->toInt()),
+                    $allIds,
+                ),
             ),
             size: Style\Size::LARGE(),
         );
@@ -56,7 +63,7 @@ class NavBar implements Component
             \Closure::fromCallable([$this->presetRepository, 'currentChanged']),
             \Closure::fromCallable([$this, 'setPreset']),
         );
-        Siglot::connect1(
+        Siglot::connect2(
             \Closure::fromCallable([$this->presetSelect, 'selected']),
             \Closure::fromCallable([$this, 'onSelectBoxChanged']),
         );
@@ -109,20 +116,17 @@ class NavBar implements Component
     private Component\Button $previousButton;
     private Component\Button $nextButton;
 
-    /** @var Component\Select<Master\Id> $presetSelect */
     private Component\Select $presetSelect;
 
     private function setPreset(Preset $preset): void
     {
-        $entry = \sprintf("Preset %d", $preset->master()->id()->toInt());
-        $this->presetSelect->select($entry);
+        $this->presetSelect->selectByIndex($preset->master()->id()->toInt());
     }
 
-    /**
-     * @param Component\Option<Master\Id> $option
-     */
-    private function onSelectBoxChanged(Component\Option $option): void
+    private function onSelectBoxChanged(string $option, int|string $index): void
     {
-        Promise\rethrow($this->presetRepository->setCurrent($option->value()));
+        Promise\rethrow($this->presetRepository->setCurrent(
+            Master\Id::fromInt((int) $index)
+        ));
     }
 }
