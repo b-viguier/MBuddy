@@ -6,13 +6,12 @@ namespace Bveing\MBuddy\App\Ui;
 
 use Amp\Promise;
 use Bveing\MBuddy\App\Core\Preset;
-use Bveing\MBuddy\Motif\Master;
 use Bveing\MBuddy\Siglot\EmitterHelper;
 use Bveing\MBuddy\Siglot\Siglot;
 use Bveing\MBuddy\Ui\Component;
 use Bveing\MBuddy\Ui\Style;
 use Bveing\MBuddy\Ui\Template;
-use function Amp\asyncCall;
+use function Amp\call;
 
 class NavBar implements Component
 {
@@ -36,18 +35,7 @@ class NavBar implements Component
                 size: Style\Size::LARGE(),
             );
 
-        $allIds = \iterator_to_array(Master\Id::all());
         $this->presetSelect = Component\Select::create()->set(
-            options: \array_combine(
-                \array_map(
-                    fn(Master\Id $id): int => $id->toInt(),
-                    $allIds,
-                ),
-                \array_map(
-                    fn(Master\Id $id): string => \sprintf("**unknown** %d", $id->toInt()),
-                    $allIds,
-                ),
-            ),
             size: Style\Size::LARGE(),
         );
 
@@ -69,9 +57,7 @@ class NavBar implements Component
         );
 
 
-        asyncCall(function() {
-            $this->setPreset(yield $this->presetRepository->current());
-        });
+        $this->loadAllPresets();
     }
 
     public function template(): Template
@@ -80,6 +66,7 @@ class NavBar implements Component
             <<<HTML
             <nav id="{{ id }}" class="navbar navbar-light bg-dark">
                 {{ previous }}
+                {{ loading }}
                 <form class="form-inline w-75">
                     <div class="input-group w-100">
                         <div class="input-group-prepend">
@@ -98,18 +85,27 @@ class NavBar implements Component
             previous: $this->previousButton,
             next: $this->nextButton,
             presetSelect: $this->presetSelect,
+            loading: $this->isLoading ? '<div class="spinner-border text-primary"></div>' : '',
         );
     }
 
     public function nextPreset(): void
     {
-        Promise\rethrow($this->presetRepository->nextInBank());
+        $nextId = $this->currentPresetId->next();
+        if ($nextId === null) {
+            return;
+        }
+        Promise\rethrow($this->presetRepository->setCurrentId($nextId));
     }
 
 
     public function previousPreset(): void
     {
-        Promise\rethrow($this->presetRepository->previousInBank());
+        $previousId = $this->currentPresetId->previous();
+        if ($previousId === null) {
+            return;
+        }
+        Promise\rethrow($this->presetRepository->setCurrentId($previousId));
     }
 
 
@@ -118,15 +114,56 @@ class NavBar implements Component
 
     private Component\Select $presetSelect;
 
+    /**
+     * @var array<int, Preset>
+     */
+    private array $presetsList = [];
+
+    private Preset\Id $currentPresetId;
+
+    private bool $isLoading = false;
+
     private function setPreset(Preset $preset): void
     {
-        $this->presetSelect->selectByIndex($preset->master()->id()->toInt());
+        $this->currentPresetId = $preset->id();
+        $this->presetSelect->selectByIndex($preset->id()->toInt());
     }
 
     private function onSelectBoxChanged(string $option, int|string $index): void
     {
-        Promise\rethrow($this->presetRepository->setCurrent(
-            Master\Id::fromInt((int) $index)
+        Promise\rethrow($this->presetRepository->setCurrentId(
+            Preset\Id::fromInt((int) $index)
         ));
+    }
+
+    private function loadAllPresets(): void
+    {
+        $this->isLoading = true;
+        $this->presetsList = [];
+        $this->refresh();
+
+        Promise\rethrow(call(function() {
+            foreach (Preset\Id::all() as $id) {
+                /** @var Preset $preset */
+                $preset = yield $this->presetRepository->load($id);
+                $this->presetsList[$preset->id()->toInt()] = $preset;
+            }
+
+            $this->currentPresetId = yield $this->presetRepository->currentId();
+
+            $selectOptions = [];
+            foreach ($this->presetsList as $id => $preset) {
+                $selectOptions[$id] = \sprintf('[%03d] %s', $id, $preset->master()->name());
+            }
+
+            $this->presetSelect->set(
+                options: $selectOptions,
+                currentIndex: $this->currentPresetId->toInt(),
+            );
+
+            // What about current preset?
+            $this->isLoading = false;
+            $this->refresh();
+        }));
     }
 }

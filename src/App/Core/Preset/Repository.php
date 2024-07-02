@@ -16,16 +16,20 @@ class Repository implements Emitter
 {
     use EmitterHelper;
 
+    public function currentIdChanged(Id $id): Signal
+    {
+        return Signal::auto();
+    }
+
     public function currentChanged(Preset $preset): Signal
     {
         return Signal::auto();
     }
 
-    public function presetChanged(Preset $preset): Signal
+    public function presetSaved(Preset $preset): Signal
     {
         return Signal::auto();
     }
-
 
     public function __construct(
         private Master\Repository $masterRepository,
@@ -34,70 +38,55 @@ class Repository implements Emitter
 
 
     /**
+     * @return Promise<Id>
+     */
+    public function currentId(): Promise
+    {
+        return call(function() {
+            return Id::fromMasterId(yield $this->masterRepository->currentMasterId());
+        });
+    }
+
+    /**
      * @return Promise<Preset>
      */
     public function current(): Promise
     {
         return call(function() {
-            return new Preset(
-                yield $this->masterRepository->get(
-                    yield $this->masterRepository->currentMasterId(),
-                ),
-            );
+            return $this->load(yield $this->currentId());
         });
     }
 
     /**
      * @return Promise<null>
      */
-    public function setCurrent(Master\Id $id): Promise
+    public function setCurrentId(Id $id): Promise
     {
-        \assert(!$id->isEditBuffer());
         return call(function() use ($id) {
-            yield $this->masterRepository->setCurrentMasterId($id);
-            $master = yield $this->masterRepository->get($id);
+            yield $this->masterRepository->setCurrentMasterId($id->masterId());
 
-            $this->emit($this->currentChanged(new Preset($master)));
+            $this->emit($this->currentIdChanged($id));
+            $this->emit($this->currentChanged(yield $this->load($id)));
         });
     }
 
     /**
-     * @return Promise<void>
+     * @return Promise<null>
      */
-    public function nextInBank(): Promise
+    public function save(Preset $preset): Promise
     {
-        return call(function() {
-            $currentMasterId = yield $this->masterRepository->currentMasterId();
-            $nextMasterId = $currentMasterId->next();
-
-            if ($nextMasterId === null) {
-                return;
-            }
-
-            yield $this->masterRepository->setCurrentMasterId($nextMasterId);
-            $master = yield $this->masterRepository->get($nextMasterId);
-
-            $this->emit($this->currentChanged(new Preset($master)));
-        });
+        return $this->masterRepository->set($preset->master());
     }
 
     /**
-     * @return Promise<void>
+     * @return Promise<Preset>
      */
-    public function previousInBank(): Promise
+    public function load(Id $id): Promise
     {
-        return call(function() {
-            $currentMasterId = yield $this->masterRepository->currentMasterId();
-            $previousMasterId = $currentMasterId->previous();
+        return call(function() use ($id) {
+            $master = yield $this->masterRepository->get($id->masterId());
 
-            if ($previousMasterId === null) {
-                return;
-            }
-
-            yield $this->masterRepository->setCurrentMasterId($previousMasterId);
-            $master = yield $this->masterRepository->get($previousMasterId);
-
-            $this->emit($this->currentChanged(new Preset($master)));
+            return new Preset($master);
         });
     }
 }

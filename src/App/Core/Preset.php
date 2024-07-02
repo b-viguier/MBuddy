@@ -8,9 +8,19 @@ use Bveing\MBuddy\Motif\Master;
 
 class Preset
 {
+    public static function default(): self
+    {
+        return new self(Master::default());
+    }
+
     public function __construct(
         private Master $master,
     ) {
+    }
+
+    public function id(): Preset\Id
+    {
+        return Preset\Id::fromMasterId($this->master->id());
     }
 
     public function name(): string

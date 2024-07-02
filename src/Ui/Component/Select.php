@@ -21,7 +21,7 @@ class Select implements Component
     {
         return new self(
             options: [],
-            currentValue: '',
+            currentIndex: '',
             size: Style\Size::MEDIUM(),
         );
     }
@@ -31,11 +31,11 @@ class Select implements Component
      */
     public function set(
         ?array $options = null,
-        ?string $currentValue = null,
+        int|string|null $currentIndex = null,
         ?Style\Size $size = null,
     ): self {
         $this->options = $options ?? $this->options;
-        $this->currentValue = $currentValue ?? $this->currentValue;
+        $this->currentIndex = $currentIndex ?? $this->currentIndex;
         $this->size = $size ?? $this->size;
 
         $this->refresh();
@@ -60,7 +60,7 @@ class Select implements Component
                     HTML,
                     index: $index,
                     text: $option,
-                    selected: $option === $this->currentValue ? 'selected' : '',
+                    selected: $index === $this->currentIndex ? 'selected' : '',
                 ),
                 $this->options,
                 \array_keys($this->options),
@@ -71,25 +71,23 @@ class Select implements Component
     public function selectByText(string $option): void
     {
         $index = \array_search($option, $this->options, true);
-        if ($index === false || $option === $this->currentValue) {
+        if ($index === false || $index === $this->currentIndex) {
             return;
         }
 
-        $this->currentValue = $option;
+        $this->currentIndex = $index;
         $this->refresh();
         $this->emit($this->selected($option, $index));
     }
 
     public function selectByIndex(int|string $index): void
     {
-        $option = $this->options[$index] ?? $this->currentValue;
-        if ($option === $this->currentValue) {
+        if ($index === $this->currentIndex || !isset($this->options[$index])) {
             return;
         }
-
-        $this->currentValue = $option;
+        $this->currentIndex = $index;
         $this->refresh();
-        $this->emit($this->selected($option, $index));
+        $this->emit($this->selected($this->options[$index], $index));
     }
 
     public function selected(string $option, int|string $index): Signal
@@ -99,11 +97,11 @@ class Select implements Component
 
     /**
      * @param array<int|string, string> $options
-     * @param string $currentValue
+     * @param int|string $currentIndex
      */
     private function __construct(
         private array $options,
-        private mixed $currentValue,
+        private mixed $currentIndex,
         private Style\Size $size,
     ) {
     }

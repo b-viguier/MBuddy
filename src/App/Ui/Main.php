@@ -6,6 +6,7 @@ namespace Bveing\MBuddy\App\Ui;
 
 use Bveing\MBuddy\App\Core\Preset;
 use Bveing\MBuddy\Siglot\EmitterHelper;
+use Bveing\MBuddy\Siglot\Siglot;
 use Bveing\MBuddy\Ui\Component;
 use Bveing\MBuddy\Ui\Template;
 
@@ -19,7 +20,12 @@ class Main implements Component
         Preset\Repository $presetRepository
     ) {
         $this->navBar = new NavBar($presetRepository);
-        $this->motifView = new MotifView($presetRepository);
+        $this->motifView = new MotifView();
+
+        Siglot::connect1(
+            \Closure::fromCallable([$presetRepository, 'currentChanged']),
+            \Closure::fromCallable([$this->motifView, 'setPreset']),
+        );
     }
 
     public function template(): Template
