@@ -73,8 +73,6 @@ class SignalMethod
     ) {
         $this->object = \WeakReference::create($object);
 
-        ;
-
         \assert(($reflection = new \ReflectionFunction($function))->getClosureThis() === null);
     }
 }

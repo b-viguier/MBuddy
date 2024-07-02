@@ -22,7 +22,7 @@ class SignalRouter
 
     public function emit(Signal $signal): void
     {
-        $this->connections[$signal->method()]?->slots->invoke($signal->args());
+        ($this->connections[$signal->method()] ?? null)?->slots->invoke($signal->args());
     }
     /** @var \ArrayObject<string,Connection> $connections */
     private \ArrayObject $connections;
