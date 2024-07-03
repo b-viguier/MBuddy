@@ -47,7 +47,7 @@ class Select implements Component
     {
         return Template::create(
             <<<HTML
-            <select class="custom-select {{ size }}" id="{{ id }}" data-on-change="selectByIndex">
+            <select autocomplete="off" class="custom-select {{ size }}" id="{{ id }}" data-on-change="selectByIndex">
                 {{ options }}
             </select>
             HTML,
