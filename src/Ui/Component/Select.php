@@ -27,11 +27,11 @@ class Select implements Component
     }
 
     /**
-     * @param array<int|string, string> $options
+     * @param array<string, string> $options
      */
     public function set(
         ?array $options = null,
-        int|string|null $currentIndex = null,
+        ?string $currentIndex = null,
         ?Style\Size $size = null,
     ): self {
         $this->options = $options ?? $this->options;
@@ -54,7 +54,7 @@ class Select implements Component
             id: $this->id(),
             size: $this->size->prefixed('custom-select-'),
             options: \array_map(
-                fn(string $option, int|string $index) => SubTemplate::create(
+                fn(string $option, string $index) => SubTemplate::create(
                     <<<HTML
                     <option value="{{ index }}" {{ selected }}>{{ text }}</option>
                     HTML,
@@ -80,7 +80,7 @@ class Select implements Component
         $this->emit($this->selected($option, $index));
     }
 
-    public function selectByIndex(int|string $index): void
+    public function selectByIndex(string $index): void
     {
         if ($index === $this->currentIndex || !isset($this->options[$index])) {
             return;
@@ -90,18 +90,17 @@ class Select implements Component
         $this->emit($this->selected($this->options[$index], $index));
     }
 
-    public function selected(string $option, int|string $index): Signal
+    public function selected(string $option, string $index): Signal
     {
         return Signal::auto();
     }
 
     /**
-     * @param array<int|string, string> $options
-     * @param int|string $currentIndex
+     * @param array<string, string> $options
      */
     private function __construct(
         private array $options,
-        private mixed $currentIndex,
+        private string $currentIndex,
         private Style\Size $size,
     ) {
     }

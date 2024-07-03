@@ -114,11 +114,6 @@ class NavBar implements Component
 
     private Component\Select $presetSelect;
 
-    /**
-     * @var array<int, Preset>
-     */
-    private array $presetsList = [];
-
     private Preset\Id $currentPresetId;
 
     private bool $isLoading = false;
@@ -126,7 +121,7 @@ class NavBar implements Component
     private function setPreset(Preset $preset): void
     {
         $this->currentPresetId = $preset->id();
-        $this->presetSelect->selectByIndex($preset->id()->toInt());
+        $this->presetSelect->selectByIndex((string) $preset->id()->toInt());
     }
 
     private function onSelectBoxChanged(string $option, int|string $index): void
@@ -139,26 +134,23 @@ class NavBar implements Component
     private function loadAllPresets(): void
     {
         $this->isLoading = true;
-        $this->presetsList = [];
         $this->refresh();
 
         Promise\rethrow(call(function() {
+            $selectOptions = [];
             foreach (Preset\Id::all() as $id) {
                 /** @var Preset $preset */
                 $preset = yield $this->presetRepository->load($id);
-                $this->presetsList[$preset->id()->toInt()] = $preset;
+                /** @var string $key */
+                $key = (string)$id->toInt();
+                $selectOptions[$key] = \sprintf('[%03d] %s', $id->toInt(), $preset->master()->name());
             }
-
             $this->currentPresetId = yield $this->presetRepository->currentId();
 
-            $selectOptions = [];
-            foreach ($this->presetsList as $id => $preset) {
-                $selectOptions[$id] = \sprintf('[%03d] %s', $id, $preset->master()->name());
-            }
 
             $this->presetSelect->set(
                 options: $selectOptions,
-                currentIndex: $this->currentPresetId->toInt(),
+                currentIndex: (string) $this->currentPresetId->toInt(),
             );
 
             // What about current preset?
