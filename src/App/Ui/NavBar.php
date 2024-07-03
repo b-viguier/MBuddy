@@ -153,7 +153,7 @@ class NavBar implements Component
                 currentIndex: (string) $this->currentPresetId->toInt(),
             );
 
-            // What about current preset?
+
             $this->isLoading = false;
             $this->refresh();
         }));

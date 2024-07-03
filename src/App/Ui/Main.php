@@ -9,6 +9,8 @@ use Bveing\MBuddy\Siglot\EmitterHelper;
 use Bveing\MBuddy\Siglot\Siglot;
 use Bveing\MBuddy\Ui\Component;
 use Bveing\MBuddy\Ui\Template;
+use function Amp\call;
+use function Amp\Promise\rethrow;
 
 class Main implements Component
 {
@@ -26,6 +28,10 @@ class Main implements Component
             \Closure::fromCallable([$presetRepository, 'currentChanged']),
             \Closure::fromCallable([$this->motifView, 'setPreset']),
         );
+
+        rethrow(call(function() use ($presetRepository) {
+            $this->motifView->setPreset(yield $presetRepository->current());
+        }));
     }
 
     public function template(): Template

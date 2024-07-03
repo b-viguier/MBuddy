@@ -94,7 +94,9 @@ class Node
 
         // Update children previously here
         foreach($keptNodes as $node) {
-            $node->update();
+            foreach($node->update() as $fragment) {
+                // No need to yield here, we will yield the whole fragment later
+            }
         }
         $this->children = $keptNodes;
         // Create new children
