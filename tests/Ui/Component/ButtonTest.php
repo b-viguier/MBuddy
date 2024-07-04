@@ -8,6 +8,7 @@ use Amp\Loop;
 use Bveing\MBuddy\Siglot\EmitterHelper;
 use Bveing\MBuddy\Siglot\Siglot;
 use Bveing\MBuddy\Tests\GeckoServerExtension;
+use Bveing\MBuddy\Tests\Support\SpyReceiver;
 use Bveing\MBuddy\Ui\Component;
 use Bveing\MBuddy\Ui\Component\Button;
 use Bveing\MBuddy\Ui\SinglePageApp;
@@ -118,16 +119,5 @@ class ButtonTest extends TestCase
                 yield $app->stop();
             }
         });
-    }
-}
-
-class SpyReceiver
-{
-    /** @var array<mixed[]> */
-    public array $calls = [];
-
-    public function slot(mixed ...$args): void
-    {
-        $this->calls[] = $args;
     }
 }

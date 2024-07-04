@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace Bveing\MBuddy\Tests\Siglot;
 
-use Bveing\MBuddy\Siglot\Emitter;
-use Bveing\MBuddy\Siglot\EmitterHelper;
 use Bveing\MBuddy\Siglot\Siglot;
-use Bveing\MBuddy\Siglot\Signal;
+use Bveing\MBuddy\Tests\Support\SpyEmitter;
+use Bveing\MBuddy\Tests\Support\SpyReceiver;
 use PHPUnit\Framework\TestCase;
 
 class SignalSlotTest extends TestCase
@@ -193,31 +192,5 @@ class SignalSlotTest extends TestCase
         $callable = [$obj, $method];
         \assert(\is_callable($callable));
         return \Closure::fromCallable($callable);
-    }
-}
-
-class SpyReceiver
-{
-    /** @var array<mixed[]> */
-    public array $calls = [];
-
-    public function slot(mixed ...$args): void
-    {
-        $this->calls[] = $args;
-    }
-}
-
-class SpyEmitter implements Emitter
-{
-    use EmitterHelper;
-
-    public function signal(mixed ...$args): Signal
-    {
-        return Signal::auto();
-    }
-
-    public function doEmit(mixed ...$args): void
-    {
-        $this->emit($this->signal(...$args));
     }
 }
