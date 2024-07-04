@@ -8,7 +8,6 @@ use Bveing\MBuddy\Siglot\EmitterHelper;
 use Bveing\MBuddy\Siglot\Signal;
 use Bveing\MBuddy\Ui\Component;
 use Bveing\MBuddy\Ui\Style;
-use Bveing\MBuddy\Ui\SubTemplate;
 use Bveing\MBuddy\Ui\Template;
 
 class Select implements Component
@@ -34,9 +33,10 @@ class Select implements Component
         ?string $currentIndex = null,
         ?Style\Size $size = null,
     ): self {
-        $this->options = $options ?? $this->options;
         $this->currentIndex = $currentIndex ?? $this->currentIndex;
         $this->size = $size ?? $this->size;
+
+        $this->options = $options === null ? $this->options : self::createOptionsFromArray($options, $this->currentIndex);
 
         $this->refresh();
 
@@ -53,31 +53,8 @@ class Select implements Component
             HTML,
             id: $this->id(),
             size: $this->size->prefixed('custom-select-'),
-            options: \array_map(
-                fn(string $option, string $index) => SubTemplate::create(
-                    <<<HTML
-                    <option value="{{ index }}" {{ selected }}>{{ text }}</option>
-                    HTML,
-                    index: $index,
-                    text: $option,
-                    selected: $index === $this->currentIndex ? 'selected' : '',
-                ),
-                $this->options,
-                \array_keys($this->options),
-            ),
+            options: $this->options,
         );
-    }
-
-    public function selectByText(string $option): void
-    {
-        $index = \array_search($option, $this->options, true);
-        if ($index === false || $index === $this->currentIndex) {
-            return;
-        }
-
-        $this->currentIndex = $index;
-        $this->refresh();
-        $this->emit($this->selected($option, $index));
     }
 
     public function selectByIndex(string $index): void
@@ -85,9 +62,12 @@ class Select implements Component
         if ($index === $this->currentIndex || !isset($this->options[$index])) {
             return;
         }
+        if(isset($this->options[$this->currentIndex])) {
+            $this->options[$this->currentIndex]->set(selected: false);
+        }
         $this->currentIndex = $index;
-        $this->refresh();
-        $this->emit($this->selected($this->options[$index], $index));
+        $this->options[$index]->set(selected: true);
+        $this->emit($this->selected($this->options[$index]->text(), $index));
     }
 
     public function selected(string $option, string $index): Signal
@@ -99,9 +79,36 @@ class Select implements Component
      * @param array<string, string> $options
      */
     private function __construct(
-        private array $options,
+        array $options,
         private string $currentIndex,
         private Style\Size $size,
     ) {
+        $this->options = self::createOptionsFromArray($options, $currentIndex);
+    }
+
+    /**
+     * @var array<string,Select\Option> $options
+     */
+    private array $options;
+
+    /**
+     * @param array<string,string> $options
+     * @return array<string,Select\Option>
+     */
+    private static function createOptionsFromArray(array $options, string $currentIndex): array
+    {
+        $values = \array_keys($options);
+        return \array_combine(
+            $values,
+            \array_map(
+                fn(string $text, string $value) => Select\Option::create()->set(
+                    value: $value,
+                    text: $text,
+                    selected: $value === $currentIndex,
+                ),
+                $options,
+                $values,
+            ),
+        );
     }
 }
