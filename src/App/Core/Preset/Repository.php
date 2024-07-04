@@ -53,7 +53,7 @@ class Repository implements Emitter
     public function current(): Promise
     {
         return call(function() {
-            return $this->load(yield $this->currentId());
+            return new Preset(yield $this->masterRepository->get(Master\Id::editBuffer()));
         });
     }
 
