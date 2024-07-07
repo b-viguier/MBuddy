@@ -4,14 +4,12 @@ declare(strict_types=1);
 
 namespace Bveing\MBuddy\App\Ui;
 
-use Amp\Deferred;
 use Amp\Promise;
 use Bveing\MBuddy\App\Core\Preset;
 use Bveing\MBuddy\Siglot\EmitterHelper;
 use Bveing\MBuddy\Siglot\Siglot;
 use Bveing\MBuddy\Ui\Component;
 use Bveing\MBuddy\Ui\Style;
-use Bveing\MBuddy\Ui\SubTemplate;
 use Bveing\MBuddy\Ui\Template;
 use function Amp\call;
 
@@ -49,6 +47,8 @@ class NavBar implements Component
                 icon: Style\Icon::PENCIL_FILL(),
                 size: Style\Size::LARGE(),
             );
+        $this->confirmDialog = Component\Dialog\ConfirmDialog::create();
+        $this->editNameDialog = Component\Dialog\TextDialog::create();
 
         $this->presetSelect = Component\Select::create()->set(
             size: Style\Size::LARGE(),
@@ -99,7 +99,8 @@ class NavBar implements Component
                     </div>
                 </form>
                 {{ next }}
-                {{ editNameModal }}
+                {{ nameDialog }}
+                {{ confirmDialog }}
             </nav>
             HTML,
             id: $this->id(),
@@ -109,7 +110,8 @@ class NavBar implements Component
             presetSelect: $this->presetSelect,
             loading: $this->isLoading ? '<div class="spinner-border text-primary"></div>' : '',
             editName: $this->editNameButton,
-            editNameModal: $this->editNameModal,
+            nameDialog: $this->editNameDialog,
+            confirmDialog: $this->confirmDialog,
         );
     }
 
@@ -136,8 +138,9 @@ class NavBar implements Component
     private Component\Button $previousButton;
     private Component\Button $nextButton;
     private Component\Button $editNameButton;
-    private ?Component\Modal $editNameModal = null;
+    private Component\Dialog\TextDialog $editNameDialog;
     private Component\Button $saveButton;
+    private Component\Dialog\ConfirmDialog $confirmDialog;
 
     private Component\Select $presetSelect;
 
@@ -156,9 +159,17 @@ class NavBar implements Component
 
     private function onSelectBoxChanged(string $option, int|string $index): void
     {
-        Promise\rethrow($this->presetRepository->setCurrentId(
-            Preset\Id::fromInt((int) $index)
-        ));
+        Promise\rethrow(call(function() use ($index) {
+            //TODO: not the right place for this
+            $agree = yield $this->confirmDialog->ask('Are you sure you want to change the preset?', 'Change Preset');
+            if(!$agree) {
+                return;
+            }
+
+            yield $this->presetRepository->setCurrentId(
+                Preset\Id::fromInt((int) $index)
+            );
+        }));
     }
 
     private function loadAllPresets(): void
@@ -194,73 +205,21 @@ class NavBar implements Component
         Promise\rethrow(call(function() {
             $currentPreset = yield $this->presetRepository->current();
 
-            $saveButton = Component\Button::create()
-                ->set(
-                    label: 'Save',
-                    color: Style\Color::SUCCESS(),
-                );
-            $cancelButton = Component\Button::create()
-                ->set(
-                    label: 'Cancel',
-                    color: Style\Color::DANGER(),
-                );
+            $newName = yield $this->editNameDialog->askText('Edit Preset Name', $currentPreset->name());
 
-            $this->editNameModal = new Component\Modal(
-                content: $textEdit = Component\TextEdit::create()
-                    ->set(
-                        value: $currentPreset->name(),
-                        maxLength: 20,
-                    ),
-                header: Component\Html::create()->setHtml('<h2>Edit Preset Name</h2>'),
-                footer: Component\Html::create()->setTemplate(SubTemplate::create(
-                    <<<HTML
-                {{ saveButton }}
-                {{ cancelButton }}
-                HTML,
-                    saveButton: $saveButton,
-                    cancelButton: $cancelButton,
-                )),
-            );
 
-            $cancelDeferred = new Deferred();
-            Siglot::connect0(
-                \Closure::fromCallable([$cancelButton, 'clicked']),
-                \Closure::fromCallable([$cancelDeferred, 'resolve']),
-            );
+            if($newName !== null) {
+                if ($newName === $currentPreset->name()) {
+                    return;
+                }
 
-            $this->editNameModal->show();
-            $this->refresh();
+                $newPreset = $currentPreset->withName($newName);
+                yield $this->presetRepository->save($newPreset);
 
-            $saveDeferred = new Deferred();
-            Siglot::connect0(
-                \Closure::fromCallable([$saveButton, 'clicked']),
-                \Closure::fromCallable([$saveDeferred, 'resolve']),
-            );
-
-            yield Promise\first([   // @phpstan-ignore-line generator.valueType
-                call(function() use ($cancelDeferred) {
-                    \assert($this->editNameModal !== null);
-                    yield $cancelDeferred->promise();
-                    $this->editNameModal->hide();
-                }),
-                call(function() use ($saveDeferred, $currentPreset, $textEdit) {
-                    \assert($this->editNameModal !== null);
-                    yield $saveDeferred->promise();
-                    $newName = $textEdit->text();
-                    if ($newName === $currentPreset->name()) {
-                        return;
-                    }
-
-                    $newPreset = $currentPreset->withName($newName);
-                    yield $this->presetRepository->save($newPreset);
-
-                    $this->presetSelect->option((string)$this->currentPresetId->toInt())
-                        ?->set(text: \sprintf('[%03d] *%s', $this->currentPresetId->toInt(), $newName));
-                    $this->saveButton->set(color: Style\Color::DANGER(), enabled: true);
-
-                    $this->editNameModal->hide();
-                }),
-            ]);
+                $this->presetSelect->option((string)$this->currentPresetId->toInt())
+                    ?->set(text: \sprintf('[%03d] *%s', $this->currentPresetId->toInt(), $newName));
+                $this->saveButton->set(color: Style\Color::DANGER(), enabled: true);
+            }
         }));
     }
 }
