@@ -89,6 +89,8 @@ class SelectTest extends TestCase
 
                 self::assertSame("B", yield GeckoServerExtension::$driver->getElementText($selectedOption1));
                 self::assertSame("2", yield GeckoServerExtension::$driver->getElementText($selectedOption2));
+                self::assertSame("B", $select1->text());
+                self::assertSame("2", $select2->text());
 
                 $otherOption1 = yield GeckoServerExtension::$driver->findElement(\sprintf('#%s > option[value="keyA"]', $select1->id()));
                 $otherOption2 = yield GeckoServerExtension::$driver->findElement(\sprintf('#%s > option[value="key3"]', $select2->id()));
@@ -108,6 +110,8 @@ class SelectTest extends TestCase
                 self::assertSame("A", yield GeckoServerExtension::$driver->getElementText($selectedOption1));
                 self::assertSame("3", yield GeckoServerExtension::$driver->getElementText($selectedOption2));
 
+                self::assertSame("A", $select1->text());
+                self::assertSame("3", $select2->text());
 
                 $select1->selectByIndex('keyC');
                 $select2->selectByIndex('key1');
@@ -117,6 +121,9 @@ class SelectTest extends TestCase
 
                 self::assertSame("C", yield GeckoServerExtension::$driver->getElementText($selectedOption1));
                 self::assertSame("1", yield GeckoServerExtension::$driver->getElementText($selectedOption2));
+
+                self::assertSame("C", $select1->text());
+                self::assertSame("1", $select2->text());
 
             } finally {
                 yield $app->stop();

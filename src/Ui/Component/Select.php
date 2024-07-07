@@ -43,6 +43,11 @@ class Select implements Component
         return $this;
     }
 
+    public function option(string $index): ?Component\Select\Option
+    {
+        return $this->options[$index] ?? null;
+    }
+
     public function template(): Template
     {
         return Template::create(
@@ -73,6 +78,16 @@ class Select implements Component
     public function selected(string $option, string $index): Signal
     {
         return Signal::auto();
+    }
+
+    public function index(): string
+    {
+        return $this->currentIndex;
+    }
+
+    public function text(): string
+    {
+        return $this->options[$this->currentIndex]?->text() ?? '';
     }
 
     /**
