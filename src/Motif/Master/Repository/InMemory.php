@@ -17,9 +17,15 @@ class InMemory implements Master\Repository
 
     public function get(Master\Id $id): Promise
     {
-        return new Success(
-            $this->storage[$id->toInt()] ??= Master::default()->with(id: $id),
-        );
+        if ($id->isEditBuffer()) {
+            return new Success(
+                $this->_get($this->currentId)->with(
+                    id: $id,
+                ),
+            );
+        }
+
+        return new Success($this->_get($id));
     }
 
     public function set(Master $master): Promise
@@ -45,4 +51,12 @@ class InMemory implements Master\Repository
 
     /** @var array<int,Master> */
     private array $storage = [];
+
+    private function _get(Master\Id $id): Master
+    {
+        return $this->storage[$id->toInt()] ?? Master::default()->with(
+            id: $id,
+            name: \sprintf('Master %d', $id->toInt()),
+        );
+    }
 }
