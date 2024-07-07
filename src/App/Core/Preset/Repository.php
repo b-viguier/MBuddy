@@ -75,7 +75,11 @@ class Repository implements Emitter
      */
     public function save(Preset $preset): Promise
     {
-        return $this->masterRepository->set($preset->master());
+        return call(function() use ($preset) {
+            yield $this->masterRepository->set($preset->master());
+
+            $this->emit($this->presetSaved($preset));
+        });
     }
 
     /**

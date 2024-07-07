@@ -33,6 +33,16 @@ class Preset
         return $this->master;
     }
 
+    public function withName(string $name): self
+    {
+        return new self($this->master->with(name: $name));
+    }
+
+    public function withMaster(Master $master): self
+    {
+        return new self($master);
+    }
+
     public function score(): string
     {
         return ''; //TODO

@@ -28,6 +28,10 @@
             "composer install --working-dir=tools",
             "ln -s tools/bin/phpunit vendor/phpunit"
         ],
+        "start": [
+            "Composer\\Config::disableProcessTimeout",
+            "php web/start.php"
+        ],
         "cs-fix": "tools/bin/php-cs-fixer fix -v",
         "phpunit": "tools/bin/phpunit",
         "phpstan": "tools/bin/phpstan --memory-limit=1G -v analyse",

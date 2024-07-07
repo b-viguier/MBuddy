@@ -48,6 +48,22 @@ class Select implements Component
         return $this->options[$index] ?? null;
     }
 
+    public function setOption(string $index, Component\Select\Option $option): self
+    {
+        $this->options[$index] = $option;
+        $this->refresh();
+
+        return $this;
+    }
+
+    public function remove(string $index): self
+    {
+        unset($this->options[$index]);
+        $this->refresh();
+
+        return $this;
+    }
+
     public function template(): Template
     {
         return Template::create(
@@ -87,7 +103,7 @@ class Select implements Component
 
     public function text(): string
     {
-        return $this->options[$this->currentIndex]?->text() ?? '';
+        return ($this->options[$this->currentIndex] ?? null)?->text() ?? '';
     }
 
     /**

@@ -19,18 +19,22 @@ class Main implements Component
     use EmitterHelper;
 
     public function __construct(
-        Preset\Repository $presetRepository
+        private Preset\Repository $presetRepository
     ) {
         $this->navBar = new NavBar($presetRepository);
         $this->motifView = new MotifView();
 
         Siglot::connect1(
-            \Closure::fromCallable([$presetRepository, 'currentChanged']),
-            \Closure::fromCallable([$this->motifView, 'setPreset']),
+            \Closure::fromCallable([$presetRepository, 'currentIdChanged']),
+            \Closure::fromCallable([$this, 'onPresetChanged']),
+        );
+        Siglot::connect1(
+            \Closure::fromCallable([$presetRepository, 'presetSaved']),
+            \Closure::fromCallable([$this, 'onPresetSaved']),
         );
 
-        rethrow(call(function() use ($presetRepository) {
-            $this->motifView->setPreset(yield $presetRepository->current());
+        rethrow(call(function() {
+            $this->motifView->setPreset(yield $this->presetRepository->current());
         }));
     }
 
@@ -68,4 +72,22 @@ class Main implements Component
     }
     private NavBar $navBar;
     private MotifView $motifView;
+
+    private function onPresetChanged(Preset\Id $presetId): void
+    {
+        rethrow(call(function() {
+            $this->motifView->setPreset(yield $this->presetRepository->current());
+        }));
+    }
+
+    private function onPresetSaved(Preset $preset): void
+    {
+        if (!$preset->master()->id()->isEditBuffer()) {
+            return;
+        }
+
+        rethrow(call(function() use ($preset) {
+            $this->motifView->setPreset($preset);
+        }));
+    }
 }

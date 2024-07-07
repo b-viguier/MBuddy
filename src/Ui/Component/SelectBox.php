@@ -86,8 +86,8 @@ class SelectBox implements Component
         );
 
         $this->modal = new Modal(
-            $this->html = new Html(''),
-            header: new Html("<h5>{$this->label}</h5>"),
+            $this->html = Html::create(),
+            header: Html::create()->setHtml("<h5>{$this->label}</h5>"),
             footer: $closeBtn,
         );
         $this->refresh();
@@ -113,7 +113,7 @@ class SelectBox implements Component
                 \array_keys($this->options),
             ),
         );
-        $this->html->set(
+        $this->html->setHtml(
             <<<HTML
             <ul class="list-group">
                 $list

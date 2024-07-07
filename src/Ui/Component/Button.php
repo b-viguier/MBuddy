@@ -23,6 +23,7 @@ class Button implements Component
             color: Style\Color::PRIMARY(),
             icon: null,
             size: Style\Size::MEDIUM(),
+            enabled: true,
         );
     }
 
@@ -30,7 +31,7 @@ class Button implements Component
     {
         return Template::create(
             <<<HTML
-            <button type="button" data-on-click="click" class="btn btn-{{ color }} {{ size }}" id="{{ id }}">
+            <button type="button" data-on-click="click" class="btn btn-{{ color }} {{ size }}" id="{{ id }}" {{ disabled }}>
                 {{ icon }}{{ label }}
             </button>
             HTML,
@@ -39,6 +40,7 @@ class Button implements Component
             color: $this->color,
             size: $this->size->prefixed('btn-'),
             icon: $this->icon?->html(),
+            disabled: $this->enabled ? '' : 'disabled',
         );
     }
 
@@ -57,22 +59,29 @@ class Button implements Component
         ?Style\Color $color = null,
         Style\Icon|null|false $icon = false,
         ?Style\Size $size = null,
+        ?bool $enabled = null,
     ): self {
         $this->label = $label ?? $this->label;
         $this->color = $color ?? $this->color;
         $this->icon = $icon === false ? $this->icon : $icon;
         $this->size = $size ?? $this->size;
+        $this->enabled = $enabled ?? $this->enabled;
         $this->refresh();
 
         return $this;
     }
 
+    public function isEnabled(): bool
+    {
+        return $this->enabled;
+    }
 
     private function __construct(
         private string $label,
         private Style\Color $color,
         private ?Style\Icon $icon,
         private Style\Size $size,
+        private bool $enabled,
     ) {
     }
 }
