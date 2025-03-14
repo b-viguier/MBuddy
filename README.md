@@ -18,6 +18,12 @@ Then all commands below are available
 composer install-tools
 ```
 
+### Running app locally
+```shell
+php ./web/start.php
+```
+http://localhost:8383
+
 ### Code style
 ```
 composer cs-fix
