@@ -2,13 +2,17 @@
 
 declare(strict_types=1);
 
-const DST_HOST = 'http://192.168.1.25:8080/MBuddy/web/sync.php';
+const DST_HOST = 'http://192.168.1.161:8080/MBuddy/web/sync.php';
 const ROOT = __DIR__.'/../';
 const SRC = [
     'composer.json',
     'composer.lock',
+    '.env',
+    'phpwin.json',
     'web/',
     'src/',
+    'public/',
+    'config/',
 ];
 
 
@@ -51,6 +55,7 @@ $ch = curl_init();
 foreach (filteredFileIterator() as $file) {
     echo "$file\t";
     curl_setopt_array($ch, [
+        \CURLOPT_SSL_VERIFYPEER => FALSE,
         \CURLOPT_URL => DST_HOST,
         \CURLOPT_POST => true,
         \CURLOPT_RETURNTRANSFER => true,

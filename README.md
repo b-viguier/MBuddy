@@ -20,9 +20,9 @@ composer install-tools
 
 ### Running app locally
 ```shell
-php ./web/start.php
+make serve
 ```
-http://localhost:8383
+http://localhost:8383/MBuddy
 
 ### Code style
 ```

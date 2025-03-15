@@ -1,0 +1,7 @@
+mbuddy_main_index:
+  path: /MBuddy/
+  controller: Bveing\MBuddy\App\Controller\MainController::index
+
+mbuddy_main_about:
+  path: /MBuddy/about.html
+  controller: Bveing\MBuddy\App\Controller\MainController::about
