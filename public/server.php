@@ -8,6 +8,10 @@ Amp\Loop::run(function () {
     $kernel = new \Bveing\MBuddy\App\Kernel(environment: 'dev', debug: true);
     $sfHttpBridge = new \Symfony\Bridge\PsrHttpMessage\Factory\HttpFoundationFactory();
 
+    $kernel->boot();
+    $container = $kernel->getContainer();
+    $logger = $container->get('public_logger');
+
 
     $server = new \Amp\Http\Server\HttpServer(
         [
@@ -67,12 +71,13 @@ Amp\Loop::run(function () {
                     } finally {
                         if ($kernel instanceof \Symfony\Component\HttpKernel\TerminableInterface) {
                             $kernel->terminate($sfRequest, $sfResponse);
+                            // TODO: clean logs
                         }
                     }
                 }
             ),
         ),
-        new \Bveing\MBuddy\Infrastructure\ConsoleLogger(),
+        $logger,
         (new \Amp\Http\Server\Options())->withDebugMode(),
     );
 

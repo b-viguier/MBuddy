@@ -13,6 +13,7 @@ const SRC = [
     'src/',
     'public/',
     'config/',
+    'templates/',
 ];
 
 
