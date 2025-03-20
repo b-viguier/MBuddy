@@ -1,5 +1,16 @@
 {
     "name": "bveing/mbuddy",
+    "repositories": [
+        {
+            "type": "path",
+            "url": "packages/symfony/web-profiler-bundle",
+            "options": {
+                "versions": {
+                    "symfony/web-profiler-bundle": "v6.0.19"
+                }
+            }
+        }
+    ],
     "require": {
         "php": "8.0.*",
         "symfony/http-foundation": "^5.4",
