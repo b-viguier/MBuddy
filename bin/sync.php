@@ -14,6 +14,7 @@ const SRC = [
     'public/',
     'config/',
     'templates/',
+    'packages/',
 ];
 
 
