@@ -143,18 +143,18 @@
 
 <script>
 (function() {
-    const configOptions = document.querySelectorAll('.config-option');
-    const allSettingValues = ['theme-auto', 'theme-ligh', 'theme-dark', 'width-normal', 'width-full'];
-    [...configOptions].forEach(option => {
+    var configOptions = document.querySelectorAll('.config-option');
+    var allSettingValues = ['theme-auto', 'theme-ligh', 'theme-dark', 'width-normal', 'width-full'];
+    Array.prototype.forEach.call(configOptions, function(option) {
         option.addEventListener('change', function (event) {
-            const optionName = option.name;
-            const optionValue = option.value;
-            const settingName = 'symfony/profiler/' + optionName;
-            const settingValue = optionName + '-' + optionValue;
+            var optionName = option.name;
+            var optionValue = option.value;
+            var settingName = 'symfony/profiler/' + optionName;
+            var settingValue = optionName + '-' + optionValue;
 
             localStorage.setItem(settingName, settingValue);
 
-            document.body.classList.forEach((cssClass) => {
+            document.body.classList.forEach(function(cssClass) {
                 if (cssClass.startsWith(optionName)) {
                     document.body.classList.remove(cssClass);
                 }
@@ -168,10 +168,10 @@
         });
     });
 
-    const openModalButton = document.getElementById('open-settings');
-    const modalWindow = document.getElementById('profiler-settings');
-    const closeModalButton = document.getElementsByClassName('close-modal')[0];
-    const modalWrapper = document.getElementsByClassName('modal-wrap')[0]
+    var openModalButton = document.getElementById('open-settings');
+    var modalWindow = document.getElementById('profiler-settings');
+    var closeModalButton = document.getElementsByClassName('close-modal')[0];
+    var modalWrapper = document.getElementsByClassName('modal-wrap')[0]
 
     openModalButton.addEventListener('click', function(event) {
         document.getElementById('settings-' + (localStorage.getItem('symfony/profiler/theme') || 'theme-auto')).checked = 'checked';
