@@ -22,6 +22,9 @@ build: ## Build the containers
 bash: ## Run bash from PHP container
 	$(DOCKER_COMPOSE) exec php bash
 
+bash-node: ## Run bash from Node container
+	$(DOCKER_COMPOSE) run --rm -it node bash
+
 ps: ## List all running containers
 	$(DOCKER_COMPOSE) ps
 

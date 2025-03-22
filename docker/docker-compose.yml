@@ -18,3 +18,11 @@ services:
       dockerfile: webdriver/Dockerfile
     ports:
       - 4444:4444
+
+  node:
+    build:
+      context: node/
+      dockerfile: Dockerfile
+    working_dir: /usr/src/
+    volumes:
+      - ../:/usr/src/MBuddy
