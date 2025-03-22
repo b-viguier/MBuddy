@@ -21,7 +21,12 @@ services:
   # add more service definitions when explicit configuration is needed
   # please note that last definitions always *replace* previous ones
 
-  # TODO: Should not be public
-  public_logger:
-    alias: 'logger'
+
+  Bveing\MBuddy\App\Server:
     public: true
+    arguments:
+      $port: 8383
+
+  Symfony\Bridge\PsrHttpMessage\Factory\HttpFoundationFactory: ~
+  React\Http\Middleware\RequestBodyParserMiddleware: ~
+  Amp\Http\Server\RequestHandler\CallableRequestHandler: ~
