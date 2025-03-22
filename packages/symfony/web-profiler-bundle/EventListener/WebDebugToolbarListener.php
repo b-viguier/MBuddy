@@ -140,7 +140,7 @@ class WebDebugToolbarListener implements EventSubscriberInterface
         $pos = strripos($content, '</body>');
 
         if (false !== $pos) {
-            $toolbar = "\n".str_replace("\n", '', $this->twig->render(
+            $toolbar = "\n".$this->twig->render(
                 '@WebProfiler/Profiler/toolbar_js.html.twig',
                 [
                     'full_stack' => class_exists(FullStack::class),
@@ -150,7 +150,7 @@ class WebDebugToolbarListener implements EventSubscriberInterface
                     'csp_script_nonce' => $nonces['csp_script_nonce'] ?? null,
                     'csp_style_nonce' => $nonces['csp_style_nonce'] ?? null,
                 ]
-            ))."\n";
+            )."\n";
             $content = substr($content, 0, $pos).$toolbar.substr($content, $pos);
             $response->setContent($content);
         }
