@@ -4,6 +4,9 @@
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
+  env(DEV_HOST): 192.168.1.22
+  dev_host: '%env(DEV_HOST)%'
+  ipad_host: 192.168.1.161
 
 services:
   # default configuration for services in *this* file
@@ -30,3 +33,11 @@ services:
   Symfony\Bridge\PsrHttpMessage\Factory\HttpFoundationFactory: ~
   React\Http\Middleware\RequestBodyParserMiddleware: ~
   Amp\Http\Server\RequestHandler\CallableRequestHandler: ~
+
+when@ipad:
+  services:
+    logger:
+      class: Bveing\MBuddy\Infrastructure\UdpLogger
+      factory: ['Bveing\MBuddy\Infrastructure\UdpLogger', 'create']
+      arguments:
+        - '%dev_host%:8484'

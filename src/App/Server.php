@@ -32,6 +32,8 @@ class Server
 
         $server = $kernel->getContainer()->get(self::class);
         $server->run();
+
+        $kernel->shutdown();
     }
 
     public function __construct(

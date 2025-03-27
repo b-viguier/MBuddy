@@ -29,7 +29,7 @@ ps: ## List all running containers
 	$(DOCKER_COMPOSE) ps
 
 logs: ## Show logs
-	$(DOCKER_COMPOSE) logs -f
+	$(DOCKER_COMPOSE) exec php php bin/log.php
 
 serve: ## Run PHP server
 	$(DOCKER_COMPOSE) exec php php -S 0.0.0.0:8383 -t public public/index.php

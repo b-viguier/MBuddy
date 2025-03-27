@@ -1,4 +1,4 @@
-when@dev:
+when@dev: &web_profiler
   web_profiler_wdt:
     resource: '@WebProfilerBundle/Resources/config/routing/wdt.xml'
     prefix: /MBuddy/_wdt
@@ -6,3 +6,5 @@ when@dev:
   web_profiler_profiler:
     resource: '@WebProfilerBundle/Resources/config/routing/profiler.xml'
     prefix: /MBuddy/_profiler
+
+when@ipad: *web_profiler
