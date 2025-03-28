@@ -1,0 +1,5 @@
+twig_component:
+  anonymous_template_directory: 'templates/components/'
+  defaults:
+    # Namespace & directory for components
+    Bveing\MBuddy\Ui\Components\: 'templates/components/'
