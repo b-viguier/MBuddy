@@ -116,7 +116,7 @@ class Server
         } finally {
             if ($this->kernel instanceof TerminableInterface) {
                 $this->kernel->terminate($sfRequest, $sfResponse);
-                // TODO: clean logs
+                \gc_collect_cycles();
             }
         }
     }
