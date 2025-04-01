@@ -105,19 +105,9 @@ class Server
             if ($sfResponse instanceof StreamedResponse
                 || $sfResponse instanceof BinaryFileResponse
             ) {
-                $response->setBody(
-                    new IteratorStream(
-                        new Producer(function (callable $emit) use ($sfResponse) {
-                            ob_start(function ($buffer) use ($emit) {
-                                yield $emit($buffer);
-
-                                return '';
-                            });
-                            $sfResponse->sendContent();
-                            ob_end_clean();
-                        })
-                    )
-                );
+                ob_start(flags: \PHP_OUTPUT_HANDLER_REMOVABLE);
+                $sfResponse->sendContent();
+                $response->setBody(ob_get_clean());
             } else {
                 $response->setBody($sfResponse->getContent());
             }

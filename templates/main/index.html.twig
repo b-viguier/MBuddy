@@ -1,15 +1,10 @@
-<html>
-    <head>
-        <title>Home</title>
+{% extends "base.html.twig" %}
 
-        <meta name="apple-mobile-web-app-capable" content="yes">
-        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-        <meta name="viewport" content="viewport-fit=cover, user-scalable=no, width=device-width, initial-scale=1, maximum-scale=1">
-    </head>
-    <body>
+{% block title %}Home{% endblock %}
+
+{% block body %}
         <h1>Home</h1>
         <p>Welcome to the home page!</p>
 
         <twig:Alert message="This is really cool!" withCloseButton />
-    </body>
-</html>
+{% endblock %}

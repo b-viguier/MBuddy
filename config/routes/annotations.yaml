@@ -1,0 +1,5 @@
+# config/routes/attributes.yaml
+controllers:
+  resource: ../../src/App/Controller/
+  type: annotation
+  prefix: /MBuddy
