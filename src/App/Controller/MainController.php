@@ -6,9 +6,12 @@ namespace Bveing\MBuddy\App\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Annotation\Route;
 
+#[Route('/')]
 class MainController extends AbstractController
 {
+    #[Route('/', name: 'main_index', methods: ['GET'])]
     public function index(): Response
     {
         return $this->render(
@@ -16,6 +19,7 @@ class MainController extends AbstractController
         );
     }
 
+    #[Route('/about', name: 'main_about', methods: ['GET'])]
     public function about(): Response
     {
         return new Response('<html><body><h1>About</h1></body></html>');
