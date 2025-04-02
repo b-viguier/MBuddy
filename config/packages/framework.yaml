@@ -17,6 +17,9 @@ framework:
   php_errors:
     log: true
 
+  assets:
+    base_path: '%mbuddy_base_path%'
+
 when@test:
   framework:
     test: true

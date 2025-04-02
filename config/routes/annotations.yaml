@@ -2,4 +2,4 @@
 controllers:
   resource: ../../src/App/Controller/
   type: annotation
-  prefix: /MBuddy
+  prefix: '%mbuddy_base_path%'
