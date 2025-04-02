@@ -15,13 +15,13 @@ class AssetsController extends AbstractController
     #[Route('/js/{file}.js', name: 'assets_js')]
     public function getJs(string $file): Response
     {
-        return $this->handleFile("js/$file.js");
+        return $this->handleFile("js/$file.js", 'application/javascript');
     }
 
     #[Route('/css/{file}.css', name: 'assets_css')]
     public function getCss(string $file): Response
     {
-        return $this->handleFile("css/$file.css");
+        return $this->handleFile("css/$file.css", 'text/css');
     }
 
     #[Route('/images/{file}', name: 'assets_images')]
@@ -36,13 +36,22 @@ class AssetsController extends AbstractController
         return $this->handleFile("css/fonts/$file");
     }
 
-    private function handleFile(string $path): Response
+    private function handleFile(string $path, ?string $contentType = null): Response
     {
         $file = $this->getParameter('kernel.project_dir') . '/public/assets/' . $path;
         if (!file_exists($file)) {
             throw $this->createNotFoundException();
         }
 
-        return new BinaryFileResponse($file);
+        $response = new BinaryFileResponse(
+            $file,
+            headers: $contentType === null ? [] : ['Content-Type' => $contentType],
+            autoEtag: true,
+            autoLastModified: true,
+        );
+
+        $response->headers->addCacheControlDirective('max-age', 3600 * 4);
+
+        return $response;
     }
 }
