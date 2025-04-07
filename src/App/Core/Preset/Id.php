@@ -6,50 +6,29 @@ namespace Bveing\MBuddy\App\Core\Preset;
 
 use Bveing\MBuddy\Motif\Master;
 
-class Id
+class Id implements \Stringable
 {
-    public static function fromMasterId(Master\Id $masterId): self
+    public static function new(): self
     {
-        return new self($masterId);
+        return new self(uniqid('pId', true));
     }
 
-    public static function fromInt(int $id): self
+    public static function fromString(string $id): self
     {
-        return new self(Master\Id::fromInt($id));
+        return new self($id);
     }
 
-    /**
-     * @return \Traversable<self>
-     */
-    public static function all(): iterable
+    public function toString(): string
     {
-        foreach (Master\Id::all() as $masterId) {
-            yield self::fromMasterId($masterId);
-        }
+        return $this->value;
     }
 
-    public function next(): ?self
+    public function __toString(): string
     {
-        return ($nextMasterId = $this->masterId->next()) === null ? null : self::fromMasterId($nextMasterId);
+        return $this->value;
     }
 
-    public function previous(): ?self
+    private function __construct(private string $value)
     {
-        return ($previousMasterId = $this->masterId->previous()) === null ? null : self::fromMasterId($previousMasterId);
-    }
-
-    public function masterId(): Master\Id
-    {
-        return $this->masterId;
-    }
-
-    public function toInt(): int
-    {
-        return $this->masterId->toInt();
-    }
-
-    private function __construct(private Master\Id $masterId)
-    {
-        \assert(!$masterId->isEditBuffer());
     }
 }

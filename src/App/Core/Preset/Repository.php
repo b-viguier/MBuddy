@@ -12,85 +12,13 @@ use Bveing\MBuddy\Siglot\EmitterHelper;
 use Bveing\MBuddy\Siglot\Signal;
 use function Amp\call;
 
-class Repository implements Emitter
+interface Repository
 {
-    use EmitterHelper;
+    public function get(Preset\Id $id): ?Preset;
 
-    public function currentIdChanged(Id $id): Signal
-    {
-        return Signal::auto();
-    }
+    public function list(): iterable;
 
-    public function currentChanged(Preset $preset): Signal
-    {
-        return Signal::auto();
-    }
+    public function add(Preset $preset): bool;
 
-    public function presetSaved(Preset $preset): Signal
-    {
-        return Signal::auto();
-    }
-
-    public function __construct(
-        private Master\Repository $masterRepository,
-    ) {
-    }
-
-
-    /**
-     * @return Promise<Id>
-     */
-    public function currentId(): Promise
-    {
-        return call(function() {
-            return Id::fromMasterId(yield $this->masterRepository->currentMasterId());
-        });
-    }
-
-    /**
-     * @return Promise<Preset>
-     */
-    public function current(): Promise
-    {
-        return call(function() {
-            return new Preset(yield $this->masterRepository->get(Master\Id::editBuffer()));
-        });
-    }
-
-    /**
-     * @return Promise<null>
-     */
-    public function setCurrentId(Id $id): Promise
-    {
-        return call(function() use ($id) {
-            yield $this->masterRepository->setCurrentMasterId($id->masterId());
-
-            $this->emit($this->currentIdChanged($id));
-            $this->emit($this->currentChanged(yield $this->load($id)));
-        });
-    }
-
-    /**
-     * @return Promise<null>
-     */
-    public function save(Preset $preset): Promise
-    {
-        return call(function() use ($preset) {
-            yield $this->masterRepository->set($preset->master());
-
-            $this->emit($this->presetSaved($preset));
-        });
-    }
-
-    /**
-     * @return Promise<Preset>
-     */
-    public function load(Id $id): Promise
-    {
-        return call(function() use ($id) {
-            $master = yield $this->masterRepository->get($id->masterId());
-
-            return new Preset($master);
-        });
-    }
+    public function remove(Preset\Id $id): bool;
 }

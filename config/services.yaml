@@ -35,6 +35,10 @@ services:
   React\Http\Middleware\RequestBodyParserMiddleware: ~
   Amp\Http\Server\RequestHandler\CallableRequestHandler: ~
 
+  Bveing\MBuddy\Infrastructure\App\Core\Preset\FileRepository:
+    arguments:
+      $filepath: '%kernel.project_dir%/var/presets.json'
+
 when@ipad:
   services:
     logger:
