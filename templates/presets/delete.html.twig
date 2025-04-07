@@ -1,31 +1,16 @@
-{% extends "base.html.twig" %}
+{% extends "presets/base.html.twig" %}
 
 {% block title %}Presets{% endblock %}
 
-{% block body %}
-    <div class="container">
-        <h1>Presets</h1>
-        <a class="btn btn-success" href="{{  url('presets_list') }}">
-            <i class="bi bi-check"></i> Done
-        </a>
+{% block presets_actions %}
+    <a class="btn btn-success" href="{{  url('presets_list') }}">
+        <i class="bi bi-check"></i> Done
+    </a>
+{% endblock %}
 
-        <div class="row">
-
-            {% for preset in presets %}
-                <div class="card col-2 m-2">
-                    <div class="card-body">
-                        <h5 class="card-title">{{ preset.name }}</h5>
-                        <p class="card-text">{{ preset.id }}</p>
-                        <a class="btn btn-danger" href="{{ url('presets_delete', {'id': preset.id}) }}" role="button">
-                            <i class="bi bi-trash"></i>
-                        </a>
-                    </div>
-                </div>
-            {% endfor %}
-        </div>
-    </div>
-
-
-
+{% block preset_extra %}
+    <a class="btn btn-danger" href="{{ url('presets_delete', {'id': preset.id}) }}" role="button">
+        <i class="bi bi-trash"></i>
+    </a>
 {% endblock %}
 

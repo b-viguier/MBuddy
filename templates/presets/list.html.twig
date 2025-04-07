@@ -1,34 +1,15 @@
-{% extends "base.html.twig" %}
+{% extends "presets/base.html.twig" %}
 
-{% block title %}Presets{% endblock %}
-
-{% block body %}
-    <div class="container">
-        <h1>Presets</h1>
-        <a class="btn btn-primary" href="{{ url('presets_new') }}" role="button">
-            <i class="bi bi-plus-circle-fill"></i> New
-        </a>
-        <button class="btn btn-success" id="sort-presets">
-            <i class="bi bi-arrows-move"></i> Sort
-        </button>
-        <a class="btn btn-warning" id="delete-preset" href="{{ url('presets_delete_list') }}" role="button">
-            <i class="bi bi-trash"></i> Delete
-        </a>
-
-        <div class="row">
-
-        {% for preset in presets %}
-            <div class="card col-2 m-2">
-                <div class="card-body">
-                    <h5 class="card-title">{{ preset.name }}</h5>
-                    <p class="card-text">{{ preset.id }}</p>
-                </div>
-            </div>
-            {% endfor %}
-        </div>
-    </div>
-
-
-
+{% block presets_actions %}
+    <a class="btn btn-primary" href="{{ url('presets_new') }}" role="button">
+        <i class="bi bi-plus-circle-fill"></i> New
+    </a>
+    <button class="btn btn-success" id="sort-presets">
+        <i class="bi bi-arrows-move"></i> Sort
+    </button>
+    <a class="btn btn-warning" id="delete-preset" href="{{ url('presets_delete_list') }}" role="button">
+        <i class="bi bi-trash"></i> Delete
+    </a>
 {% endblock %}
+
 
