@@ -6,6 +6,7 @@ namespace Bveing\MBuddy\App\Controller;
 
 use Bveing\MBuddy\App\Core\Preset;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -57,5 +58,31 @@ class PresetsController extends AbstractController
                 'presets' => $this->presetRepository->list(),
             ]
         );
+    }
+
+    #[Route('/sort', name: 'presets_sort_list', methods: ['GET'])]
+    public function sortList(): Response
+    {
+        return $this->render(
+            'presets/sort.html.twig',
+            [
+                'presets' => $this->presetRepository->list(),
+            ]
+        );
+    }
+
+    #[Route('/sort', name: 'presets_sort', methods: ['POST'])]
+    public function sort(Request $request): Response
+    {
+        $ids = $request->request->get('presets', []);
+        \assert(is_array($ids));
+        $this->presetRepository->sort(
+            ...array_map(
+                static fn($id) => Preset\Id::fromString($id),
+                $ids,
+            )
+        );
+
+        return $this->redirectToRoute('presets_list');
     }
 }

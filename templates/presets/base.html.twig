@@ -9,17 +9,12 @@
         {%  block presets_actions %}
         {% endblock %}
 
-        <div class="row">
+        <div class="row" id="presets-row">
 
             {% for preset in presets %}
-                <div class="card col-2 m-2">
-                    <div class="card-body">
-                        <h5 class="card-title">{{ preset.name }}</h5>
-                        <pre class="card-text">{{ preset.id }}</pre>
-                        {% block preset_extra %}
-                        {% endblock %}
-                    </div>
-                </div>
+                {% block preset %}
+                    <twig:PresetCard :preset="preset" />
+                {% endblock %}
             {% endfor %}
         </div>
     </div>

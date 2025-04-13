@@ -14,6 +14,7 @@
     <script src="{{ asset('assets/js/jquery.js') }}" crossorigin="anonymous"></script>
     <script src="{{ asset('assets/js/popper.js') }}" crossorigin="anonymous"></script>
     <script src="{{ asset('assets/js/bootstrap.js') }}" crossorigin="anonymous"></script>
+    <script src="{{ asset('assets/js/Sortable.js') }}" crossorigin="anonymous"></script>
 
     <title>{% block title %}MBuddy{% endblock %}</title>
 
@@ -32,5 +33,7 @@
 </head>
 <body>
     {%  block body %}{% endblock %}
+
+    {% block script %}{% endblock %}
 </body>
 </html>

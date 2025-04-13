@@ -21,4 +21,6 @@ interface Repository
     public function add(Preset $preset): bool;
 
     public function remove(Preset\Id $id): bool;
+
+    public function sort(Preset\Id ...$sortedIds): void;
 }

@@ -51,6 +51,21 @@ class FileRepository implements Preset\Repository
         return true;
     }
 
+    public function sort(Preset\Id ...$sortedIds): void
+    {
+        $previousPresets = $this->presets;
+        $this->presets = [];
+        foreach ($sortedIds as $id) {
+            $stringId = $id->toString();
+            if (isset($previousPresets[$stringId])) {
+                $this->presets[$stringId] = $previousPresets[$stringId];
+                unset($previousPresets[$stringId]);
+            }
+        }
+        $this->presets = \array_merge($this->presets, $previousPresets);
+        $this->write($this->presets);
+    }
+
     private function read(): array
     {
         if (!file_exists($this->filepath)) {

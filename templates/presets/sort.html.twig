@@ -1,0 +1,25 @@
+{% extends "presets/base.html.twig" %}
+
+{% block title %}Presets{% endblock %}
+
+{% block presets_actions %}
+    <button type="submit" form="presets_form" class="btn btn-success" href="{{  url('presets_list') }}">
+        <i class="bi bi-check"></i> Done
+    </button>
+    <form id="presets_form" method="POST" action="{{ url('presets_sort') }}">
+        {{ parent() }}
+    </form>
+{% endblock %}
+
+
+{% block preset %}
+    <twig:PresetCard :preset="preset" icon="bi-arrows-move">
+        <input type="hidden" form="presets_form" name="presets[]" value="{{ preset.id }}" />
+    </twig:PresetCard>
+{% endblock %}
+
+{% block script %}
+<script lang="javascript">
+    Sortable.create(document.getElementById('presets-row'));
+</script>
+{% endblock %}

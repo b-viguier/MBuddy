@@ -8,9 +8,7 @@
     </a>
 {% endblock %}
 
-{% block preset_extra %}
-    <a class="btn btn-danger" href="{{ url('presets_delete', {'id': preset.id}) }}" role="button">
-        <i class="bi bi-trash"></i>
-    </a>
+{% block preset %}
+    <twig:PresetCard :preset="preset" icon="bi-trash" :href="url('presets_delete', {'id': preset.id})" />
 {% endblock %}
 
