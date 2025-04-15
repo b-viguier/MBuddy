@@ -21,6 +21,14 @@
                 <input type="text" class="form-control form-control-lg" id="name" name="name" placeholder="Name" value="{{ preset.name }}">
             </div>
 
+            <div class="input-group">
+                <div class="input-group-prepend">
+                    <span class="input-group-text">Score</span>
+                </div>
+                <textarea class="form-control" name="scoreTxt" placeholder="Score">
+                    {{- preset.scoreTxt -}}
+                </textarea>
+            </div>
         </form>
     </div>
 {% endblock %}

@@ -106,6 +106,7 @@ class FileRepository implements Preset\Repository
         return [
             'id' => (string) $preset->id(),
             'name' => $preset->name(),
+            'scoreTxt' => $preset->scoreTxt(),
         ];
     }
 
@@ -114,6 +115,7 @@ class FileRepository implements Preset\Repository
         return new Preset(
             id: Preset\Id::fromString($data['id']),
             name: $data['name'],
+            scoreTxt: $data['scoreTxt'] ?? '',
         );
     }
 }

@@ -119,6 +119,7 @@ class PresetsController extends AbstractController
         if ($request->isMethod('POST')) {
             $changes = [
                 'name' => $request->request->get('name'),
+                'scoreTxt' => $request->request->get('scoreTxt'),
             ];
 
             $preset = $preset->with(...$changes);
