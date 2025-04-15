@@ -1,0 +1,14 @@
+{% extends "presets/base.html.twig" %}
+
+{% block title %}Presets{% endblock %}
+
+{% block presets_actions %}
+    <a class="btn btn-success" href="{{  url('presets_list') }}">
+        <i class="bi bi-check"></i> Done
+    </a>
+{% endblock %}
+
+{% block preset %}
+    <twig:PresetCard :preset="preset" icon="bi-copy" :href="url('preset_copy', {'id': preset.id})" />
+{% endblock %}
+

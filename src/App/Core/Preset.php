@@ -23,11 +23,12 @@ class Preset
     }
 
     public function with(
+        ?Preset\Id $id = null,
         ?string $name = null,
     ): self
     {
         return new self(
-            $this->id,
+            $id ?? $this->id,
             $name ?? $this->name,
         );
     }

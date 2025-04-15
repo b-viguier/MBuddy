@@ -86,6 +86,31 @@ class PresetsController extends AbstractController
         return $this->redirectToRoute('presets_list');
     }
 
+    #[Route('/copy', name: 'presets_copy_list')]
+    public function copyList(): Response
+    {
+        return $this->render(
+            'presets/copy.html.twig',
+            [
+                'presets' => $this->presetRepository->list(),
+            ]
+        );
+    }
+
+    #[Route('/copy/{id}', name: 'preset_copy')]
+    public function copy(string $id): Response
+    {
+        $id = Preset\Id::fromString($id);
+        $preset = $this->presetRepository->get($id);
+        $newPreset = $preset->with(
+            id: Preset\Id::new(),
+            name: $preset->name() . ' (copy)',
+        );
+        $this->presetRepository->add($newPreset);
+
+        return $this->redirectToRoute('presets_copy_list');
+    }
+
     #[Route('/{id}', name: 'preset_edit')]
     public function edit(string $id, Request $request): Response
     {
