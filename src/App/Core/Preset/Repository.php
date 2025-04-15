@@ -19,6 +19,8 @@ interface Repository
     public function list(): iterable;
 
     public function add(Preset $preset): bool;
+    
+    public function save(Preset $preset): bool;
 
     public function remove(Preset\Id $id): bool;
 

@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Bveing\MBuddy\App\Core;
 
-use Bveing\MBuddy\Motif\Master;
-
 class Preset
 {
     public function __construct(
@@ -22,5 +20,15 @@ class Preset
     public function name(): string
     {
         return $this->name;
+    }
+
+    public function with(
+        ?string $name = null,
+    ): self
+    {
+        return new self(
+            $this->id,
+            $name ?? $this->name,
+        );
     }
 }

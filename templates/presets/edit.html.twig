@@ -1,0 +1,26 @@
+{% extends "base.html.twig" %}
+
+{% block title %}{{ preset.name }}{% endblock %}
+
+{% block body %}
+    <div class="container">
+        <h1>Edit</h1>
+
+        <a href="{{ url('presets_list') }}" class="btn btn-success">
+            <i class="bi bi-check"></i> Done
+        </a>
+        <button type="submit" form="preset_form" class="btn btn-success">
+            <i class="bi bi-floppy"></i> Save
+        </button>
+
+        <form id="preset_form" method="POST" action="{{ url('preset_edit', {'id': preset.id}) }}">
+            <div class="input-group">
+                <div class="input-group-prepend">
+                    <span class="input-group-text col-form-label col-form-label-lg">Name</span>
+                </div>
+                <input type="text" class="form-control form-control-lg" id="name" name="name" placeholder="Name" value="{{ preset.name }}">
+            </div>
+
+        </form>
+    </div>
+{% endblock %}

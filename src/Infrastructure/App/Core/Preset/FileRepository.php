@@ -19,7 +19,7 @@ class FileRepository implements Preset\Repository
 
     public function get(Preset\Id $id): ?Preset
     {
-        return $this->presets[$id->toInt()] ?? null;
+        return $this->presets[$id->toString()] ?? null;
     }
 
     public function list(): iterable
@@ -31,6 +31,18 @@ class FileRepository implements Preset\Repository
     {
         $id = (string) $preset->id();
         if (isset($this->presets[$id])) {
+            return false;
+        }
+        $this->presets[$id] = $preset;
+        $this->write($this->presets);
+
+        return true;
+    }
+
+    public function save(Preset $preset): bool
+    {
+        $id = (string) $preset->id();
+        if (!isset($this->presets[$id])) {
             return false;
         }
         $this->presets[$id] = $preset;

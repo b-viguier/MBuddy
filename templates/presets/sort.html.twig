@@ -3,7 +3,7 @@
 {% block title %}Presets{% endblock %}
 
 {% block presets_actions %}
-    <button type="submit" form="presets_form" class="btn btn-success" href="{{  url('presets_list') }}">
+    <button type="submit" form="presets_form" class="btn btn-success">
         <i class="bi bi-check"></i> Done
     </button>
     <form id="presets_form" method="POST" action="{{ url('presets_sort') }}">

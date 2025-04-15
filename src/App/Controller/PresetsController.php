@@ -85,4 +85,26 @@ class PresetsController extends AbstractController
 
         return $this->redirectToRoute('presets_list');
     }
+
+    #[Route('/{id}', name: 'preset_edit')]
+    public function edit(string $id, Request $request): Response
+    {
+        $preset = $this->presetRepository->get(Preset\Id::fromString($id));
+
+        if ($request->isMethod('POST')) {
+            $changes = [
+                'name' => $request->request->get('name'),
+            ];
+
+            $preset = $preset->with(...$changes);
+            $this->presetRepository->save($preset);
+        }
+
+        return $this->render(
+            'presets/edit.html.twig',
+            [
+                'preset' => $preset,
+            ]
+        );
+    }
 }
