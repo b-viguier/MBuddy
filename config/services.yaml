@@ -39,6 +39,10 @@ services:
     arguments:
       $filepath: '%kernel.project_dir%/var/presets.json'
 
+  Bveing\MBuddy\App\ScoreStorage:
+    arguments:
+      $basePath: '%kernel.project_dir%/var/scores'
+
 when@ipad:
   services:
     logger:

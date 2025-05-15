@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Bveing\MBuddy\App\Controller;
 
 use Bveing\MBuddy\App\Core\Preset;
+use Bveing\MBuddy\App\ScoreStorage;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -15,6 +16,7 @@ class PresetsController extends AbstractController
 {
     public function __construct(
         private Preset\Repository $presetRepository,
+        private ScoreStorage $scoreStorage,
     )
     {
     }
@@ -45,7 +47,10 @@ class PresetsController extends AbstractController
     #[Route('/delete/{id}', name: 'presets_delete')]
     public function delete(string $id): Response
     {
-        $this->presetRepository->remove(Preset\Id::fromString($id));
+        $id = Preset\Id::fromString($id);
+        $this->presetRepository->remove($id);
+        $this->scoreStorage->delete($id);
+
         return $this->redirectToRoute('presets_delete_list');
     }
 
@@ -107,6 +112,7 @@ class PresetsController extends AbstractController
             name: $preset->name() . ' (copy)',
         );
         $this->presetRepository->add($newPreset);
+        $this->scoreStorage->copy($preset->id(), $newPreset->id());
 
         return $this->redirectToRoute('presets_copy_list');
     }
@@ -117,19 +123,29 @@ class PresetsController extends AbstractController
         $preset = $this->presetRepository->get(Preset\Id::fromString($id));
 
         if ($request->isMethod('POST')) {
-            $changes = [
-                'name' => $request->request->get('name'),
-                'scoreTxt' => $request->request->get('scoreTxt'),
-            ];
 
-            $preset = $preset->with(...$changes);
+            $preset = $preset->with(
+                name: $request->request->get('name'),
+                scoreTxt: $request->request->get('scoreTxt'),
+            );
             $this->presetRepository->save($preset);
+
+            $file = $request->files->get('scoreImg');
+            if($file !== null) {
+                $this->scoreStorage->store($preset->id(), $file);
+            } else if ($request->request->get('scoreImgDelete', false)) {
+                $this->scoreStorage->delete($preset->id());
+            }
         }
 
         return $this->render(
             'presets/edit.html.twig',
             [
                 'preset' => $preset,
+                'scoreUrl' => $this->scoreStorage->exists($preset->id()) ? $this->generateUrl(
+                    ScoreController::ROUTE_SCORE_URL,
+                    ['id' => $preset->id()->toString()],
+                ) : null,
             ]
         );
     }
