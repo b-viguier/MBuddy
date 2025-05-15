@@ -9,28 +9,28 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-#[Route('/assets')]
+#[Route('/assets', name: 'assets_')]
 class AssetsController extends AbstractController
 {
-    #[Route('/js/{file}.js', name: 'assets_js')]
+    #[Route('/js/{file}.js', name: 'js')]
     public function getJs(string $file): Response
     {
         return $this->handleFile("js/$file.js", 'application/javascript');
     }
 
-    #[Route('/css/{file}.css', name: 'assets_css')]
+    #[Route('/css/{file}.css', name: 'css')]
     public function getCss(string $file): Response
     {
         return $this->handleFile("css/$file.css", 'text/css');
     }
 
-    #[Route('/images/{file}', name: 'assets_images')]
+    #[Route('/images/{file}', name: 'images')]
     public function getImages(string $file): Response
     {
         return $this->handleFile("images/$file");
     }
 
-    #[Route('/css/fonts/{file}', name: 'assets_fonts')]
+    #[Route('/css/fonts/{file}', name: 'fonts')]
     public function getFonts(string $file): Response
     {
         return $this->handleFile("css/fonts/$file");

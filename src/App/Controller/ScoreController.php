@@ -11,18 +11,16 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-#[Route('/score')]
+#[Route('/score', name: 'score_')]
 class ScoreController extends AbstractController
 {
-    public const ROUTE_SCORE_URL = 'score';
-
     public function __construct(
         private ScoreStorage $scoreStorage,
     )
     {
     }
 
-    #[Route('/{id}', name: self::ROUTE_SCORE_URL, methods: ['GET'])]
+    #[Route('/{id}', name: 'show', methods: ['GET'])]
     public function score(string $id): Response
     {
         $file = $this->scoreStorage->find(Preset\Id::fromString($id));

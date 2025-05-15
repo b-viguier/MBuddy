@@ -11,7 +11,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-#[Route('/presets')]
+#[Route('/presets', name: 'presets_')]
 class PresetsController extends AbstractController
 {
     public function __construct(
@@ -21,7 +21,7 @@ class PresetsController extends AbstractController
     {
     }
 
-    #[Route('/', name: 'presets_list')]
+    #[Route('/', name: 'list')]
     public function list(): Response
     {
         return $this->render(
@@ -32,7 +32,7 @@ class PresetsController extends AbstractController
         );
     }
 
-    #[Route('/new', name: 'presets_new')]
+    #[Route('/new', name: 'new')]
     public function new(): Response
     {
         $this->presetRepository->add(
@@ -44,7 +44,7 @@ class PresetsController extends AbstractController
         return $this->redirectToRoute('presets_list');
     }
 
-    #[Route('/delete/{id}', name: 'presets_delete')]
+    #[Route('/delete/{id}', name: 'delete')]
     public function delete(string $id): Response
     {
         $id = Preset\Id::fromString($id);
@@ -54,7 +54,7 @@ class PresetsController extends AbstractController
         return $this->redirectToRoute('presets_delete_list');
     }
 
-    #[Route('/delete', name: 'presets_delete_list')]
+    #[Route('/delete', name: 'delete_list')]
     public function deleteList(): Response
     {
         return $this->render(
@@ -65,7 +65,7 @@ class PresetsController extends AbstractController
         );
     }
 
-    #[Route('/sort', name: 'presets_sort_list', methods: ['GET'])]
+    #[Route('/sort', name: 'sort_list', methods: ['GET'])]
     public function sortList(): Response
     {
         return $this->render(
@@ -76,7 +76,7 @@ class PresetsController extends AbstractController
         );
     }
 
-    #[Route('/sort', name: 'presets_sort', methods: ['POST'])]
+    #[Route('/sort', name: 'sort', methods: ['POST'])]
     public function sort(Request $request): Response
     {
         $ids = $request->request->get('presets', []);
@@ -91,7 +91,7 @@ class PresetsController extends AbstractController
         return $this->redirectToRoute('presets_list');
     }
 
-    #[Route('/copy', name: 'presets_copy_list')]
+    #[Route('/copy', name: 'copy_list')]
     public function copyList(): Response
     {
         return $this->render(
@@ -102,7 +102,7 @@ class PresetsController extends AbstractController
         );
     }
 
-    #[Route('/copy/{id}', name: 'preset_copy')]
+    #[Route('/copy/{id}', name: 'copy')]
     public function copy(string $id): Response
     {
         $id = Preset\Id::fromString($id);
@@ -117,7 +117,7 @@ class PresetsController extends AbstractController
         return $this->redirectToRoute('presets_copy_list');
     }
 
-    #[Route('/{id}', name: 'preset_edit')]
+    #[Route('/{id}', name: 'edit')]
     public function edit(string $id, Request $request): Response
     {
         $preset = $this->presetRepository->get(Preset\Id::fromString($id));
@@ -143,7 +143,7 @@ class PresetsController extends AbstractController
             [
                 'preset' => $preset,
                 'scoreUrl' => $this->scoreStorage->exists($preset->id()) ? $this->generateUrl(
-                    ScoreController::ROUTE_SCORE_URL,
+                    'score_show',
                     ['id' => $preset->id()->toString()],
                 ) : null,
             ]
