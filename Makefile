@@ -33,3 +33,6 @@ logs: ## Show logs
 
 serve: ## Run PHP server
 	$(DOCKER_COMPOSE) exec php php -S 0.0.0.0:8383 -t public public/index.php
+
+serve-dbg: ## Run PHP server with XDebug enabled for all input requests
+	$(DOCKER_COMPOSE) exec php php -dxdebug.start_with_request=yes -S 0.0.0.0:8383 -t public public/index.php
