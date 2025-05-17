@@ -18,6 +18,11 @@ class Id implements \Stringable
         return new self($id);
     }
 
+    public function equals(Id $other): bool
+    {
+        return $this->value === $other->value;
+    }
+
     public function toString(): string
     {
         return $this->value;

@@ -12,6 +12,9 @@
         <button type="submit" form="preset_form" class="btn btn-success">
             <i class="bi bi-floppy"></i> Save
         </button>
+        <a class="btn btn-outline-success" href="{{ url('stage_show', {'id': preset.id}) }}" role="button">
+            <i class="bi bi-play"></i> On Stage!
+        </a>
 
         <form id="preset_form" method="POST" action="{{ url('presets_edit', {'id': preset.id}) }}" enctype="multipart/form-data">
             <div class="input-group">
@@ -54,7 +57,7 @@
                 <div class="input-group-prepend">
                     <span class="input-group-text">Score</span>
                 </div>
-                <textarea class="form-control" name="scoreTxt" placeholder="Score">
+                <textarea rows="10" class="form-control" name="scoreTxt" placeholder="Score">
                     {{- preset.scoreTxt -}}
                 </textarea>
             </div>

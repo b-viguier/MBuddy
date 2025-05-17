@@ -8,6 +8,9 @@ use Bveing\MBuddy\App\Core\Preset;
 
 class FileRepository implements Preset\Repository
 {
+    /**
+     * @var array<string, Preset>
+     */
     private array $presets = [];
 
     public function __construct(
@@ -76,6 +79,26 @@ class FileRepository implements Preset\Repository
         }
         $this->presets = \array_merge($this->presets, $previousPresets);
         $this->write($this->presets);
+    }
+
+    public function surrounding(Preset\Id $id): array
+    {
+        $previous = null;
+        for (
+            $current = reset($this->presets);
+            $current !== false;
+            $previous = $current, $current = next($this->presets)
+        ) {
+            if ($current->id()->equals($id)) {
+                $next = next($this->presets);
+                return [
+                    $previous,
+                    $next !== false ? $next : null,
+                ];
+            }
+        }
+
+        return [null, null];
     }
 
     private function read(): array

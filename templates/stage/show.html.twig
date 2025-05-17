@@ -1,0 +1,60 @@
+{% extends "base.html.twig" %}
+
+{% block title %}{{ preset.name }}{% endblock %}
+
+{% block body %}
+    <style>
+        .nav-btn {
+            height: 100vh;
+            background-color: rgba(255,255,255, 0.1);
+        }
+
+        .score-txt {
+            font-size: xx-large;
+        }
+    </style>
+<div class="container-fluid h-100 px-0 d-flex flex-column"
+     style="background-image: url('{{ scoreUrl }}'); background-size: contain; background-repeat: no-repeat; background-position: center;"
+     >
+    <div class="row align-items-center no-gutters justify-content-between">
+        <div class="col">
+            <a class="btn btn-lg" href="{{ url('presets_list') }}"><i class="bi bi-house"></i></a>
+        </div>
+        <div class="col text-center">
+            {%  if not scoreUrl %}
+                <h1>{{ preset.name }}</h1>
+            {% endif %}
+        </div>
+        <div class="col text-right">
+            <a class="btn btn-lg" href="{{ url('presets_edit', {'id': preset.id }) }}"><i class="bi bi-gear"></i></a>
+        </div>
+    </div>
+
+    <div class="row align-items-center no-gutters flex-grow-1">
+
+        <div class="col-1 d-flex flex-column justify-content-center nav-btn">
+            {% if previousUrl %}
+            <a class="btn btn-lg text-danger stretched-link" href="{{ previousUrl }}"><i class="bi bi-caret-left"></i></a>
+            {% endif %}
+        </div>
+
+        <div class="col score-txt text-center">
+            {%  if not scoreUrl %}
+            {{ preset.scoreTxt | nl2br }}
+            {% endif %}
+        </div>
+
+        <div class="col-1 d-flex flex-column justify-content-center nav-btn">
+            {% if nextUrl %}
+            <a class="btn btn-lg text-danger stretched-link" href="{{ nextUrl }}"><i class="bi bi-caret-right"></i></a>
+            {% endif %}
+        </div>
+
+    </div>
+
+    <div class="row align-items-center no-gutters">
+        <div class="col">Hello</div>
+    </div>
+</div>
+{% endblock %}
+

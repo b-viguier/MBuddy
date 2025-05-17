@@ -18,6 +18,11 @@ interface Repository
 
     public function list(): iterable;
 
+    /**
+     * @return array{?Preset, ?Preset}
+     */
+    public function surrounding(Preset\Id $id): array;
+
     public function add(Preset $preset): bool;
     
     public function save(Preset $preset): bool;
