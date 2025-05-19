@@ -4,7 +4,8 @@ parameters:
     paths:
         - src
         - tests
-        - web/start.php
+        - public
+        - web
     strictRules:
         booleansInConditions: false
         disallowedConstructs: false

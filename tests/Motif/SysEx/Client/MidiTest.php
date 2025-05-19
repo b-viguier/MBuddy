@@ -133,7 +133,7 @@ class MidiTest extends TestCase
     {
         Loop::run(function() {
             $driver = new Infrastructure\Motif\MidiDriver\InMemory();
-            $client = new SysEx\Client\Midi($driver, new Infrastructure\ConsoleLogger(), 0.1);
+            $client = new SysEx\Client\Midi($driver, new NullLogger(), 0.1);
             $addressM = 0x02;
             $addressL = 0x03;
             $data = [0x04, 0x05, 0x06];

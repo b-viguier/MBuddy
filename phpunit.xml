@@ -7,8 +7,4 @@
             <directory>tests</directory>
         </testsuite>
     </testsuites>
-
-    <extensions>
-        <extension class="Bveing\MBuddy\Tests\GeckoServerExtension" />
-    </extensions>
 </phpunit>

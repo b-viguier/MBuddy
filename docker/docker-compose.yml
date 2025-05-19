@@ -16,12 +16,6 @@ services:
     environment:
       DEV_HOST: 127.0.0.1
 
-#  webdriver:
-#    build:
-#      dockerfile: webdriver/Dockerfile
-#    ports:
-#      - 4444:4444
-
   node:
     build:
       context: node/
