@@ -7,6 +7,7 @@ namespace Bveing\MBuddy\App\Controller;
 use Bveing\MBuddy\App\Core\Preset;
 use Bveing\MBuddy\App\ScoreStorage;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -79,8 +80,7 @@ class PresetsController extends AbstractController
     #[Route('/sort', name: 'sort', methods: ['POST'])]
     public function sort(Request $request): Response
     {
-        $ids = $request->request->get('presets', []);
-        \assert(is_array($ids));
+        $ids = $request->request->all('presets');
         $this->presetRepository->sort(
             ...array_map(
                 static fn($id) => Preset\Id::fromString($id),
@@ -106,7 +106,10 @@ class PresetsController extends AbstractController
     public function copy(string $id): Response
     {
         $id = Preset\Id::fromString($id);
-        $preset = $this->presetRepository->get($id);
+        if( null === $preset = $this->presetRepository->get($id)) {
+            throw $this->createNotFoundException('Preset not found');
+        }
+
         $newPreset = $preset->with(
             id: Preset\Id::new(),
             name: $preset->name() . ' (copy)',
@@ -121,17 +124,20 @@ class PresetsController extends AbstractController
     public function edit(string $id, Request $request): Response
     {
         $preset = $this->presetRepository->get(Preset\Id::fromString($id));
+        if( null === $preset) {
+            throw $this->createNotFoundException('Preset not found');
+        }
 
         if ($request->isMethod('POST')) {
 
             $preset = $preset->with(
-                name: $request->request->get('name'),
-                scoreTxt: $request->request->get('scoreTxt'),
+                name: (string) $request->request->get('name'),
+                scoreTxt: (string) $request->request->get('scoreTxt'),
             );
             $this->presetRepository->save($preset);
 
             $file = $request->files->get('scoreImg');
-            if($file !== null) {
+            if($file instanceof UploadedFile) {
                 $this->scoreStorage->store($preset->id(), $file);
             } else if ($request->request->get('scoreImgDelete', false)) {
                 $this->scoreStorage->delete($preset->id());

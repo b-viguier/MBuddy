@@ -16,6 +16,9 @@ interface Repository
 {
     public function get(Preset\Id $id): ?Preset;
 
+    /**
+     * @return iterable<Preset>
+     */
     public function list(): iterable;
 
     /**

@@ -5,7 +5,15 @@ declare(strict_types=1);
 namespace Bveing\MBuddy\Infrastructure\App\Core\Preset;
 
 use Bveing\MBuddy\App\Core\Preset;
+use Psr\Log\LoggerInterface;
 
+/**
+ * @phpstan-type NormalizedPreset array{
+ *     id: string,
+ *     name: string,
+ *     scoreTxt: string,
+ * }
+ */
 class FileRepository implements Preset\Repository
 {
     /**
@@ -14,7 +22,8 @@ class FileRepository implements Preset\Repository
     private array $presets = [];
 
     public function __construct(
-        private string $filepath
+        private string $filepath,
+        private LoggerInterface $logger,
     )
     {
         $this->presets = $this->read();
@@ -101,18 +110,38 @@ class FileRepository implements Preset\Repository
         return [null, null];
     }
 
+    /**
+     * @return array<string, Preset>
+     */
     private function read(): array
     {
         if (!file_exists($this->filepath)) {
             return [];
         }
 
+        if (false === $jsonContent = file_get_contents($this->filepath)) {
+            $this->logger->error("Failed to read file content", ['file' => $this->filepath]);
+
+            return [];
+        }
+
+        /** @var array<string, NormalizedPreset>|false $normalizedPresets */
+        $normalizedPresets = json_decode($jsonContent, true, flags: JSON_THROW_ON_ERROR);
+        if ($normalizedPresets === false) {
+            $this->logger->error("Failed to json decode file content", ['file' => $this->filepath]);
+
+            return [];
+        }
+
         return \array_map(
             fn(array $data) => $this->denormalizePreset($data),
-            json_decode(file_get_contents($this->filepath), true, flags: JSON_THROW_ON_ERROR),
+            $normalizedPresets,
         );
     }
 
+    /**
+     * @param array<string, Preset> $presets
+     */
     private function write(array $presets): void
     {
         file_put_contents(
@@ -124,6 +153,9 @@ class FileRepository implements Preset\Repository
         );
     }
 
+    /**
+     * @return NormalizedPreset
+     */
     private function normalizePreset(Preset $preset): array
     {
         return [
@@ -133,12 +165,15 @@ class FileRepository implements Preset\Repository
         ];
     }
 
+    /**
+     * @param NormalizedPreset $data
+     */
     private function denormalizePreset(array $data): Preset
     {
         return new Preset(
             id: Preset\Id::fromString($data['id']),
             name: $data['name'],
-            scoreTxt: $data['scoreTxt'] ?? '',
+            scoreTxt: $data['scoreTxt'],
         );
     }
 }

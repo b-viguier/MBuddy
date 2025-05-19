@@ -38,7 +38,10 @@ class AssetsController extends AbstractController
 
     private function handleFile(string $path, ?string $contentType = null): Response
     {
-        $file = $this->getParameter('kernel.project_dir') . '/public/assets/' . $path;
+        static $baseDir = null;
+        $baseDir ??= $this->getParameter('kernel.project_dir');
+        \assert(is_string($baseDir));
+        $file =  "$baseDir/public/assets/$path";
         if (!file_exists($file)) {
             throw $this->createNotFoundException();
         }
@@ -50,7 +53,7 @@ class AssetsController extends AbstractController
             autoLastModified: true,
         );
 
-        $response->headers->addCacheControlDirective('max-age', 3600 * 4);
+        $response->headers->addCacheControlDirective('max-age', strval(3600 * 4));
 
         return $response;
     }

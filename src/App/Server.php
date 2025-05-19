@@ -31,6 +31,9 @@ class Server
         $kernel->boot();
 
         $server = $kernel->getContainer()->get(self::class);
+        if (!$server instanceof self) {
+            throw new \RuntimeException('Server not found in container');
+        }
         $server->run();
 
         $kernel->shutdown();
@@ -99,7 +102,7 @@ class Server
         try {
             $response = new Response(
                 $sfResponse->getStatusCode(),
-                $sfResponse->headers->all()
+                $sfResponse->headers->all(),    // @phpstan-ignore-line
             );
 
             if ($sfResponse instanceof StreamedResponse
@@ -107,9 +110,9 @@ class Server
             ) {
                 ob_start(flags: \PHP_OUTPUT_HANDLER_REMOVABLE);
                 $sfResponse->sendContent();
-                $response->setBody(ob_get_clean());
+                $response->setBody(ob_get_clean() ?: null);
             } else {
-                $response->setBody($sfResponse->getContent());
+                $response->setBody($sfResponse->getContent() ?: null);
             }
 
             return $response;
