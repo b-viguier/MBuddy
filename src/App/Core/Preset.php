@@ -22,7 +22,7 @@ class Preset
     {
         return $this->name;
     }
-    
+
     public function scoreTxt(): string
     {
         return $this->scoreTxt;
@@ -32,8 +32,7 @@ class Preset
         ?Preset\Id $id = null,
         ?string $name = null,
         ?string $scoreTxt = null,
-    ): self
-    {
+    ): self {
         return new self(
             $id ?? $this->id,
             $name ?? $this->name,

@@ -18,8 +18,7 @@ class PresetsController extends AbstractController
     public function __construct(
         private Preset\Repository $presetRepository,
         private ScoreStorage $scoreStorage,
-    )
-    {
+    ) {
     }
 
     #[Route('/', name: 'list')]
@@ -82,7 +81,7 @@ class PresetsController extends AbstractController
     {
         $ids = $request->request->all('presets');
         $this->presetRepository->sort(
-            ...array_map(
+            ...\array_map(
                 static fn($id) => Preset\Id::fromString($id),
                 $ids,
             )
@@ -106,7 +105,7 @@ class PresetsController extends AbstractController
     public function copy(string $id): Response
     {
         $id = Preset\Id::fromString($id);
-        if( null === $preset = $this->presetRepository->get($id)) {
+        if(null === $preset = $this->presetRepository->get($id)) {
             throw $this->createNotFoundException('Preset not found');
         }
 
@@ -124,7 +123,7 @@ class PresetsController extends AbstractController
     public function edit(string $id, Request $request): Response
     {
         $preset = $this->presetRepository->get(Preset\Id::fromString($id));
-        if( null === $preset) {
+        if(null === $preset) {
             throw $this->createNotFoundException('Preset not found');
         }
 
@@ -139,7 +138,7 @@ class PresetsController extends AbstractController
             $file = $request->files->get('scoreImg');
             if($file instanceof UploadedFile) {
                 $this->scoreStorage->store($preset->id(), $file);
-            } else if ($request->request->get('scoreImgDelete', false)) {
+            } elseif ($request->request->get('scoreImgDelete', false)) {
                 $this->scoreStorage->delete($preset->id());
             }
         }

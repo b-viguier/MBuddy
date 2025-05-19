@@ -4,13 +4,11 @@ declare(strict_types=1);
 
 namespace Bveing\MBuddy\App\Core\Preset;
 
-use Bveing\MBuddy\Motif\Master;
-
 class Id implements \Stringable
 {
     public static function new(): self
     {
-        return new self(uniqid('pId', true));
+        return new self(\uniqid('pId', true));
     }
 
     public static function fromString(string $id): self

@@ -16,8 +16,7 @@ class ScoreController extends AbstractController
 {
     public function __construct(
         private ScoreStorage $scoreStorage,
-    )
-    {
+    ) {
     }
 
     #[Route('/{id}', name: 'show', methods: ['GET'])]

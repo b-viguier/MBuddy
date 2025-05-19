@@ -16,8 +16,7 @@ class StageController extends AbstractController
     public function __construct(
         private Preset\Repository $presetRepository,
         private ScoreStorage $scoreStorage,
-    )
-    {
+    ) {
     }
 
     #[Route('/{id}', name: 'show', methods: ['GET'])]

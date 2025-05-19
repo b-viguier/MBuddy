@@ -4,14 +4,12 @@ declare(strict_types=1);
 
 namespace Bveing\MBuddy\App;
 
-use Amp\ByteStream\IteratorStream;
 use Amp\Http\Server\HttpServer;
 use Amp\Http\Server\Options;
 use Amp\Http\Server\Request;
 use Amp\Http\Server\RequestHandler\CallableRequestHandler;
 use Amp\Http\Server\Response;
 use Amp\Loop;
-use Amp\Producer;
 use Amp\Socket\Server as SocketServer;
 use Psr\Log\LoggerInterface;
 use React\Http\Message\ServerRequest;
@@ -45,13 +43,12 @@ class Server
         private LoggerInterface $logger,
         private HttpFoundationFactory $httpBridge,
         private RequestBodyParserMiddleware $requestBodyParser,
-    )
-    {
+    ) {
     }
 
     private function run(): void
     {
-        Loop::run(function () {
+        Loop::run(function() {
             $httpServer = new HttpServer(
                 [
                     SocketServer::listen("0.0.0.0:{$this->port}"),
@@ -66,7 +63,7 @@ class Server
             // Stop the server gracefully when SIGINT is received.
             // This is technically optional, but it is best to call Server::stop()
             if (\extension_loaded("pcntl")) {
-                \Amp\Loop::onSignal(SIGINT, function (string $watcherId) use ($httpServer) {
+                \Amp\Loop::onSignal(SIGINT, function(string $watcherId) use ($httpServer) {
                     \Amp\Loop::cancel($watcherId);
                     yield $httpServer->stop();
                 });
@@ -108,9 +105,9 @@ class Server
             if ($sfResponse instanceof StreamedResponse
                 || $sfResponse instanceof BinaryFileResponse
             ) {
-                ob_start(flags: \PHP_OUTPUT_HANDLER_REMOVABLE);
+                \ob_start(flags: \PHP_OUTPUT_HANDLER_REMOVABLE);
                 $sfResponse->sendContent();
-                $response->setBody(ob_get_clean() ?: null);
+                $response->setBody(\ob_get_clean() ?: null);
             } else {
                 $response->setBody($sfResponse->getContent() ?: null);
             }

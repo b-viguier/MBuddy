@@ -27,32 +27,32 @@ class ScoreStorage
             return false;
         }
 
-        return copy($file->getRealPath(), $this->basePath . DIRECTORY_SEPARATOR . $dst->toString() . '.' . $file->getExtension());
+        return \copy($file->getRealPath(), $this->basePath . \DIRECTORY_SEPARATOR . $dst->toString() . '.' . $file->getExtension());
     }
-    
+
     public function find(Preset\Id $id): ?\SplFileInfo
     {
-        $pattern = $this->basePath . DIRECTORY_SEPARATOR . $id->toString() . '.*';
-        $files = glob($pattern);
-        if($files === false || count($files) !== 1) {
+        $pattern = $this->basePath . \DIRECTORY_SEPARATOR . $id->toString() . '.*';
+        $files = \glob($pattern);
+        if($files === false || \count($files) !== 1) {
             return null;
         }
-        
-        return new \SplFileInfo(reset($files));
+
+        return new \SplFileInfo(\reset($files));
     }
 
     public function exists(Preset\Id $id): bool
     {
         return $this->find($id) !== null;
     }
-    
+
     public function delete(Preset\Id $id): bool
     {
         $file = $this->find($id);
         if ($file === null) {
             return false;
         }
-        
-        return unlink($file->getPathname());
+
+        return \unlink($file->getPathname());
     }
 }

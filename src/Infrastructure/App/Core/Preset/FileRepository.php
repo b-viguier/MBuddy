@@ -16,16 +16,10 @@ use Psr\Log\LoggerInterface;
  */
 class FileRepository implements Preset\Repository
 {
-    /**
-     * @var array<string, Preset>
-     */
-    private array $presets = [];
-
     public function __construct(
         private string $filepath,
         private LoggerInterface $logger,
-    )
-    {
+    ) {
         $this->presets = $this->read();
     }
 
@@ -94,12 +88,12 @@ class FileRepository implements Preset\Repository
     {
         $previous = null;
         for (
-            $current = reset($this->presets);
+            $current = \reset($this->presets);
             $current !== false;
-            $previous = $current, $current = next($this->presets)
+            $previous = $current, $current = \next($this->presets)
         ) {
             if ($current->id()->equals($id)) {
-                $next = next($this->presets);
+                $next = \next($this->presets);
                 return [
                     $previous,
                     $next !== false ? $next : null,
@@ -111,22 +105,27 @@ class FileRepository implements Preset\Repository
     }
 
     /**
+     * @var array<string, Preset>
+     */
+    private array $presets = [];
+
+    /**
      * @return array<string, Preset>
      */
     private function read(): array
     {
-        if (!file_exists($this->filepath)) {
+        if (!\file_exists($this->filepath)) {
             return [];
         }
 
-        if (false === $jsonContent = file_get_contents($this->filepath)) {
+        if (false === $jsonContent = \file_get_contents($this->filepath)) {
             $this->logger->error("Failed to read file content", ['file' => $this->filepath]);
 
             return [];
         }
 
         /** @var array<string, NormalizedPreset>|false $normalizedPresets */
-        $normalizedPresets = json_decode($jsonContent, true, flags: JSON_THROW_ON_ERROR);
+        $normalizedPresets = \json_decode($jsonContent, true, flags: \JSON_THROW_ON_ERROR);
         if ($normalizedPresets === false) {
             $this->logger->error("Failed to json decode file content", ['file' => $this->filepath]);
 
@@ -144,11 +143,11 @@ class FileRepository implements Preset\Repository
      */
     private function write(array $presets): void
     {
-        file_put_contents(
+        \file_put_contents(
             $this->filepath,
-            json_encode(
+            \json_encode(
                 \array_map(fn(Preset $preset) => $this->normalizePreset($preset), $presets),
-                JSON_PRETTY_PRINT,
+                \JSON_PRETTY_PRINT,
             )
         );
     }

@@ -40,9 +40,9 @@ class AssetsController extends AbstractController
     {
         static $baseDir = null;
         $baseDir ??= $this->getParameter('kernel.project_dir');
-        \assert(is_string($baseDir));
+        \assert(\is_string($baseDir));
         $file =  "$baseDir/public/assets/$path";
-        if (!file_exists($file)) {
+        if (!\file_exists($file)) {
             throw $this->createNotFoundException();
         }
 
@@ -53,7 +53,7 @@ class AssetsController extends AbstractController
             autoLastModified: true,
         );
 
-        $response->headers->addCacheControlDirective('max-age', strval(3600 * 4));
+        $response->headers->addCacheControlDirective('max-age', \strval(3600 * 4));
 
         return $response;
     }

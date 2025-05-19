@@ -18,6 +18,6 @@ class PresetCard
 
     public function color(): string
     {
-        return '#' . substr(md5($this->preset->id()->toString()), 0, 6);
+        return '#' . \substr(\md5($this->preset->id()->toString()), 0, 6);
     }
 }

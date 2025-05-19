@@ -57,7 +57,7 @@ $ch = curl_init();
 foreach (filteredFileIterator() as $file) {
     echo "$file\t";
     curl_setopt_array($ch, [
-        \CURLOPT_SSL_VERIFYPEER => FALSE,
+        \CURLOPT_SSL_VERIFYPEER => false,
         \CURLOPT_URL => DST_HOST,
         \CURLOPT_POST => true,
         \CURLOPT_RETURNTRANSFER => true,
