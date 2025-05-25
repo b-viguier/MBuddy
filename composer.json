@@ -28,7 +28,8 @@
         "symfony/profiler-pack": "^1.0",
         "symfony/ux-twig-component": "^2.9",
         "symfony/mime": "^6.0",
-        "symfony/asset": "^6.0"
+        "symfony/asset": "^6.0",
+        "myclabs/php-enum": "^1.8"
     },
     "autoload": {
         "psr-4": {
