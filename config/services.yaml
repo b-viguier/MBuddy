@@ -43,6 +43,21 @@ services:
     arguments:
       $basePath: '%kernel.project_dir%/var/scores'
 
+  mbuddy.motif.master.repository:
+    stack:
+      - Bveing\MBuddy\Motif\Master\Repository\Decorator\Delay:
+          $delayMs: 5000
+      - Bveing\MBuddy\Motif\Master\Repository\InMemory: ~
+  Bveing\MBuddy\Motif\Master\Repository: '@mbuddy.motif.master.repository'
+
+  mbuddy.motif.master.registry:
+    stack:
+      - Bveing\MBuddy\Infrastructure\App\Motif\Master\Registry\InMemoryCache:
+      - Bveing\MBuddy\Infrastructure\App\Motif\Master\Registry\FileCache:
+          $cacheDir: '%kernel.project_dir%/var/motif/'
+      - Bveing\MBuddy\Infrastructure\App\Motif\Master\Registry\Motif: ~
+  Bveing\MBuddy\App\Motif\Master\Registry: '@mbuddy.motif.master.registry'
+
 when@ipad:
   services:
     logger:
