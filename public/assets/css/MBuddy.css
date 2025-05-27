@@ -1,0 +1,34 @@
+
+
+/*Tile component*/
+.tile-wrapper {
+    width: 100%;
+    display: inline-block;
+    position: relative;
+}
+.tile-wrapper:after {
+    padding-top: 100%;
+    /* 1:9 ratio */
+    display: block;
+    content: '';
+}
+.tile-main {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: 0;
+}
+
+.tile-preset-list {
+    background-color: #9fc3a4;
+}
+.tile-preset-delete {
+    background-color: #f2b5b4;
+}
+.tile-preset-sort {
+    background-color: #f9cb9c;
+}
+.tile-preset-copy {
+    background-color: #b6d7a8;
+}

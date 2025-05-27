@@ -9,6 +9,11 @@
 {% endblock %}
 
 {% block preset %}
-    <twig:PresetCard :preset="preset" icon="bi-copy" :href="url('presets_copy', {'id': preset.id})" />
+    <twig:Tile
+            :title="preset.name"
+            :href="url('presets_copy', {'id': preset.id})"
+            icon="bi-copy"
+            class="tile-preset-copy"
+    />
 {% endblock %}
 

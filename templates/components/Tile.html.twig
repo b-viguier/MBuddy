@@ -1,0 +1,24 @@
+<div class="tile-wrapper">
+    <div {{ attributes.defaults( {class:'tile-main m-2 text-center border rounded-lg border-dark shadow'} ) }}>
+        <div class="h-100">
+
+            {% if icon %}
+                <span class="position-absolute mr-2 mt-1" style="top: 0; right: 0;">
+                    <i class="bi {{ icon }}"></i>
+                </span>
+            {% endif %}
+
+            <div class="h-100 p-1 d-flex flex-column justify-content-center">
+
+                <h5>
+                    {{ title }}
+                </h5>
+            </div>
+            {% if href %}
+                <a href="{{ href }}" class="stretched-link"></a>
+            {% endif %}
+            {% block content %}{% endblock %}
+        </div>
+
+    </div>
+</div>

@@ -20,6 +20,11 @@
 
 
 {% block preset %}
-    <twig:PresetCard :preset="preset" href="{{ path('presets_edit', {'id': preset.id}) }}"/>
+    <twig:Tile
+        :title="preset.name"
+        :href="url('presets_edit', {'id': preset.id})"
+        icon="bi-gear"
+        class="tile-preset-list"
+    />
 {% endblock %}
 

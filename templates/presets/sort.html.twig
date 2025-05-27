@@ -13,9 +13,13 @@
 
 
 {% block preset %}
-    <twig:PresetCard :preset="preset" icon="bi-arrows-move">
+    <twig:Tile
+            :title="preset.name"
+            icon="bi-arrows-move"
+            class="tile-preset-sort"
+    >
         <input type="hidden" form="presets_form" name="presets[]" value="{{ preset.id }}" />
-    </twig:PresetCard>
+    </twig:Tile>
 {% endblock %}
 
 {% block script %}

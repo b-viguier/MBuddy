@@ -9,6 +9,11 @@
 {% endblock %}
 
 {% block preset %}
-    <twig:PresetCard :preset="preset" icon="bi-trash" :href="url('presets_delete', {'id': preset.id})" />
+    <twig:Tile
+            :title="preset.name"
+            :href="url('presets_delete', {'id': preset.id})"
+            icon="bi-trash"
+            class="tile-preset-delete"
+    />
 {% endblock %}
 
