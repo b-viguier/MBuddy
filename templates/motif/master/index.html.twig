@@ -1,11 +1,10 @@
-{% extends "base.html.twig" %}
+{% extends "motif/master/base.html.twig" %}
 
-{%  block body %}
-    <ul>
-    {% for id,name in masters %}
-        <li>
-            {{ name }} <a href="{{ path('motif_master_sync', {'id': id}) }}">Sync</a>
-        </li>
-    {% endfor %}
-    </ul>
+{%  block master %}
+    <twig:Tile
+            :title="name"
+            :href="path('motif_master_sync', {'id': id})"
+            icon="bi-arrow-repeat"
+            class="tile-preset-list"
+    />
 {%  endblock %}

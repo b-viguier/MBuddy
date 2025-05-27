@@ -1,6 +1,6 @@
 {% extends "base.html.twig" %}
 
-{% block title %}Presets{% endblock %}
+{% block title %}Motif - Masters{% endblock %}
 
 {% block header %}
     <link rel="stylesheet" href="{{ asset('assets/css/MBuddy.css') }}" crossorigin="anonymous">
@@ -8,23 +8,20 @@
 
 {% block body %}
     <div class="container">
-        <h1>Presets</h1>
+        <h1>Motif - Masters</h1>
 
-        {%  block presets_actions %}
+        {%  block motif_master_actions %}
         {% endblock %}
 
-        <div class="row" id="presets-row">
+        <div class="row" id="motif-masters-row">
 
-            {% for preset in presets %}
+            {% for id,name in masters %}
                 <div class="col-sm-3 col-lg-2 p-0">
-                {% block preset %}
+                {% block master %}
                 {% endblock %}
                 </div>
             {% endfor %}
         </div>
     </div>
-
-
-
 {% endblock %}
 

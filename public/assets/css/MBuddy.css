@@ -8,7 +8,7 @@
 }
 .tile-wrapper:after {
     padding-top: 100%;
-    /* 1:9 ratio */
+    /* 1:1 ratio */
     display: block;
     content: '';
 }
