@@ -1,0 +1,8 @@
+<select {{ attributes }}>
+        <option {% if this.selected is null %} selected {% endif %} value> -- None -- </option>
+    {%  for id,name in this.masters %}
+        <option value="{{ id }}" {% if this.selected and this.selected.toInt == id %}selected{% endif %}>
+            {{ name }}
+        </option>
+    {% endfor %}
+</select>

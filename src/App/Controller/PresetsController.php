@@ -6,6 +6,7 @@ namespace Bveing\MBuddy\App\Controller;
 
 use Bveing\MBuddy\App\Core\Preset;
 use Bveing\MBuddy\App\ScoreStorage;
+use Bveing\MBuddy\Motif\Master;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
@@ -131,6 +132,7 @@ class PresetsController extends AbstractController
 
             $preset = $preset->with(
                 name: (string) $request->request->get('name'),
+                masterId: $request->request->get('masterId') !== '' ? Master\Id::fromInt($request->request->getInt('masterId')) : null,
                 scoreTxt: (string) $request->request->get('scoreTxt'),
             );
             $this->presetRepository->save($preset);

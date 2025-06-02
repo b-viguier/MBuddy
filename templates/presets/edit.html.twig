@@ -24,6 +24,17 @@
                 <input type="text" class="form-control form-control-lg" id="name" name="name" placeholder="Name" value="{{ preset.name }}">
             </div>
 
+            <div class="input-group">
+                <div class="input-group-prepend">
+                    <span class="input-group-text col-form-label col-form-label-lg">Master</span>
+                </div>
+                <twig:MasterSelect
+                    name="masterId"
+                    :selected="preset.masterId"
+                    class="form-control form-control-lg"
+                    />
+            </div>
+
             <div class="row">
                 <div class="col">
                     <div class="input-group mb-3">

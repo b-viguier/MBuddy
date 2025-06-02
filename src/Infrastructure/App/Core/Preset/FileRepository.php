@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Bveing\MBuddy\Infrastructure\App\Core\Preset;
 
 use Bveing\MBuddy\App\Core\Preset;
+use Bveing\MBuddy\Motif\Master;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -12,6 +13,7 @@ use Psr\Log\LoggerInterface;
  *     id: string,
  *     name: string,
  *     scoreTxt: string,
+ *     masterId: int|null,
  * }
  */
 class FileRepository implements Preset\Repository
@@ -160,6 +162,7 @@ class FileRepository implements Preset\Repository
         return [
             'id' => (string) $preset->id(),
             'name' => $preset->name(),
+            'masterId' => $preset->masterId()?->toInt(),
             'scoreTxt' => $preset->scoreTxt(),
         ];
     }
@@ -172,6 +175,7 @@ class FileRepository implements Preset\Repository
         return new Preset(
             id: Preset\Id::fromString($data['id']),
             name: $data['name'],
+            masterId: isset($data['masterId']) ? Master\Id::fromInt($data['masterId']) : null,
             scoreTxt: $data['scoreTxt'],
         );
     }
