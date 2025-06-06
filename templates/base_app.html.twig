@@ -1,0 +1,37 @@
+{% extends "base.html.twig" %}
+
+{% block header %}
+    <link rel="stylesheet" href="{{ asset('assets/css/MBuddy.css') }}" crossorigin="anonymous">
+{% endblock %}
+
+{% block body %}
+    <div class="container">
+        <div class="row no-gutters">
+            <div class="col">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                    {% block breadcrumb %}
+                        <twig:BreadcrumbItem href="{{ url('main_index') }}">
+                            Home
+                        </twig:BreadcrumbItem>
+                    {% endblock %}
+                    </ol>
+                </nav>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col">
+                {%  block actions %}
+                {% endblock %}
+            </div>
+        </div>
+
+        <div class="row pt-3">
+            <div class="col-sm-12 col-lg-12 p-0">
+                {% block content %}
+                {% endblock %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

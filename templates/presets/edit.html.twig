@@ -1,21 +1,27 @@
-{% extends "base.html.twig" %}
+{% extends "presets/base.html.twig" %}
 
-{% block title %}{{ preset.name }}{% endblock %}
+{% block title %}Preset Edit{% endblock %}
 
-{% block body %}
-    <div class="container">
-        <h1>Edit</h1>
+{% block breadcrumb %}
+    {{ parent() }}
+    <twig:BreadcrumbItem href="{{ url('presets_edit', {'id': preset.id }) }}">
+        Edit
+    </twig:BreadcrumbItem>
+{% endblock %}
 
-        <a href="{{ url('presets_list') }}" class="btn btn-success">
-            <i class="bi bi-check"></i> Done
-        </a>
-        <button type="submit" form="preset_form" class="btn btn-success">
-            <i class="bi bi-floppy"></i> Save
-        </button>
-        <a class="btn btn-outline-success" href="{{ url('stage_show', {'id': preset.id}) }}" role="button">
-            <i class="bi bi-play"></i> On Stage!
-        </a>
+{% block actions %}
+    <a href="{{ url('presets_list') }}" class="btn btn-success">
+        <i class="bi bi-check"></i> Done
+    </a>
+    <button type="submit" form="preset_form" class="btn btn-success">
+        <i class="bi bi-floppy"></i> Save
+    </button>
+    <a class="btn btn-outline-success" href="{{ url('stage_show', {'id': preset.id}) }}" role="button">
+        <i class="bi bi-play"></i> On Stage!
+    </a>
+{%  endblock %}
 
+{% block content %}
         <form id="preset_form" method="POST" action="{{ url('presets_edit', {'id': preset.id}) }}" enctype="multipart/form-data">
             <div class="input-group">
                 <div class="input-group-prepend">
@@ -73,5 +79,4 @@
                 </textarea>
             </div>
         </form>
-    </div>
 {% endblock %}

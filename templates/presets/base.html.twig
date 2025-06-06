@@ -1,18 +1,15 @@
-{% extends "base.html.twig" %}
+{% extends "base_app.html.twig" %}
 
 {% block title %}Presets{% endblock %}
 
-{% block header %}
-    <link rel="stylesheet" href="{{ asset('assets/css/MBuddy.css') }}" crossorigin="anonymous">
+{% block breadcrumb %}
+        {{ parent() }}
+        <twig:BreadcrumbItem href="{{ url('presets_list') }}">
+                Presets
+        </twig:BreadcrumbItem>
 {% endblock %}
 
-{% block body %}
-    <div class="container">
-        <h1>Presets</h1>
-
-        {%  block presets_actions %}
-        {% endblock %}
-
+{% block content %}
         <div class="row" id="presets-row">
 
             {% for preset in presets %}
@@ -22,9 +19,5 @@
                 </div>
             {% endfor %}
         </div>
-    </div>
-
-
-
 {% endblock %}
 

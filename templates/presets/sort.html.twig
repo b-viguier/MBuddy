@@ -1,8 +1,13 @@
 {% extends "presets/base.html.twig" %}
 
-{% block title %}Presets{% endblock %}
+{% block breadcrumb %}
+    {{ parent() }}
+    <twig:BreadcrumbItem href="{{ url('presets_sort_list') }}">
+        Sort
+    </twig:BreadcrumbItem>
+{% endblock %}
 
-{% block presets_actions %}
+{% block actions %}
     <button type="submit" form="presets_form" class="btn btn-success">
         <i class="bi bi-check"></i> Done
     </button>

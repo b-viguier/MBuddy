@@ -1,8 +1,13 @@
 {% extends "presets/base.html.twig" %}
 
-{% block title %}Presets{% endblock %}
+{% block breadcrumb %}
+    {{ parent() }}
+    <twig:BreadcrumbItem href="{{ url('presets_delete_list') }}">
+        Delete
+    </twig:BreadcrumbItem>
+{% endblock %}
 
-{% block presets_actions %}
+{% block actions %}
     <a class="btn btn-success" href="{{  url('presets_list') }}">
         <i class="bi bi-check"></i> Done
     </a>

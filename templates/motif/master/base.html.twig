@@ -1,27 +1,26 @@
-{% extends "base.html.twig" %}
+{% extends "base_app.html.twig" %}
+
+{% block breadcrumb %}
+    {{ parent() }}
+    <twig:BreadcrumbItem href="#">
+        Motif
+    </twig:BreadcrumbItem>
+    <twig:BreadcrumbItem href="{{ url('motif_master_index') }}">
+        Masters
+    </twig:BreadcrumbItem>
+{% endblock %}
 
 {% block title %}Motif - Masters{% endblock %}
 
-{% block header %}
-    <link rel="stylesheet" href="{{ asset('assets/css/MBuddy.css') }}" crossorigin="anonymous">
-{% endblock %}
+{% block content %}
+    <div class="row" id="motif-masters-row">
 
-{% block body %}
-    <div class="container">
-        <h1>Motif - Masters</h1>
-
-        {%  block motif_master_actions %}
-        {% endblock %}
-
-        <div class="row" id="motif-masters-row">
-
-            {% for id,name in masters %}
-                <div class="col-sm-3 col-lg-2 p-0">
-                {% block master %}
-                {% endblock %}
-                </div>
-            {% endfor %}
-        </div>
+        {% for id,name in masters %}
+            <div class="col-sm-3 col-lg-2 p-0">
+            {% block master %}
+            {% endblock %}
+            </div>
+        {% endfor %}
     </div>
 {% endblock %}
 

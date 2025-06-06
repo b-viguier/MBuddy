@@ -1,9 +1,23 @@
-{% extends "base.html.twig" %}
+{% extends "base_app.html.twig" %}
 
-{% block title %}Home{% endblock %}
+{% block title %}MBuddy Home{% endblock %}
 
-{% block body %}
-        <h1>Home</h1>
-        <p>Welcome to the home page!</p>
-        <a href="{{ url('presets_list') }}">Presets</a>
+{% block content %}
+        <div class="row">
+                <div class="col-sm-3 col-lg-2 p-0">
+                        <twig:Tile
+                                title="Presets"
+                                href="{{ url('presets_list') }}"
+                                icon="bi-box-arrow-in-right"
+
+                        />
+                </div>
+                <div class="col-sm-3 col-lg-2 p-0">
+                        <twig:Tile
+                                title="Motif / Master"
+                                href="{{ url('motif_master_index') }}"
+                                icon="bi-box-arrow-in-right"
+                        />
+                </div>
+        </div>
 {% endblock %}
