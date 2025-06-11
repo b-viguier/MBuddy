@@ -1,0 +1,41 @@
+{% extends "base_app.html.twig" %}
+
+{% block title %}System{% endblock %}
+
+{% block breadcrumb %}
+    {{ parent() }}
+    <twig:BreadcrumbItem href="{{ url('system_index') }}">
+        System
+    </twig:BreadcrumbItem>
+{% endblock %}
+
+{% block content %}
+    <div class="row">
+        {% if isServerEnabled %}
+        <div class="col-sm-3 col-lg-2 p-0">
+            <twig:Tile
+                title="Disable Server"
+                href="{{ url('system_server_stop') }}"
+                icon="bi-box-arrow-in-right"
+                disabled
+            />
+        </div>
+        {% else %}
+        <div class="col-sm-3 col-lg-2 p-0">
+            <twig:Tile
+                    title="Enable Server"
+                    href="{{ url('system_server_start') }}"
+                    icon="bi-box-arrow-in-right"
+                    disabled
+            />
+        </div>
+        {% endif %}
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    {{ parent() }}
+    <script>
+
+    </script>
+{% endblock %}

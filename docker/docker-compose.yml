@@ -9,6 +9,7 @@ services:
       - ./php/xdebug.ini:/usr/local/etc/php/conf.d/xdebug.ini
     working_dir: /usr/src/MBuddy
     ports:
+      - 8080:8080
       - 8383:8383
       - 8484:8484
     extra_hosts:

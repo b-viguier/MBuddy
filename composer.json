@@ -66,5 +66,10 @@
         "allow-plugins": {
             "symfony/runtime": true
         }
+    },
+    "extra": {
+        "runtime": {
+          "class": "Bveing\\MBuddy\\App\\Runtime\\Runtime"
+        }
     }
 }
