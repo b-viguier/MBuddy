@@ -58,7 +58,7 @@ services:
       - Bveing\MBuddy\Infrastructure\App\Motif\Master\Registry\Motif: ~
   Bveing\MBuddy\App\Motif\Master\Registry: '@mbuddy.motif.master.registry'
 
-when@ipad:
+when@ipad_dev:
   services:
     logger:
       class: Bveing\MBuddy\Infrastructure\UdpLogger

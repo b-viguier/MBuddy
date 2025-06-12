@@ -5,5 +5,7 @@ use Bveing\MBuddy\App\Kernel;
 require_once dirname(__DIR__).'/vendor/autoload_runtime.php';
 
 return function (array $context) {
-    return new Kernel($context['APP_ENV'], (bool) $context['APP_DEBUG']);
+    $envPrefix = isset($context['IOS_VERSION']) ? 'ipad_' : '';
+    
+    return new Kernel($envPrefix.$context['APP_ENV'], (bool) $context['APP_DEBUG']);
 };

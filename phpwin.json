@@ -3,7 +3,7 @@
     {
       "condition": "!f !d d",
       "match": "^(.*)$",
-      "target": "public/index_ipad.php",
+      "target": "public/index.php",
       "query": ""
     }
   ]
