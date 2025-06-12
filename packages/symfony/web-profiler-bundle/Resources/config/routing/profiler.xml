@@ -8,35 +8,35 @@
         <default key="_controller">web_profiler.controller.profiler::homeAction</default>
     </route>
 
-    <route id="_profiler_search" path="/search">
+    <route id="_profiler_search" path="/search/">
         <default key="_controller">web_profiler.controller.profiler::searchAction</default>
     </route>
 
-    <route id="_profiler_search_bar" path="/search_bar">
+    <route id="_profiler_search_bar" path="/search_bar/">
         <default key="_controller">web_profiler.controller.profiler::searchBarAction</default>
     </route>
 
-    <route id="_profiler_phpinfo" path="/phpinfo">
+    <route id="_profiler_phpinfo" path="/phpinfo/">
         <default key="_controller">web_profiler.controller.profiler::phpinfoAction</default>
     </route>
 
-    <route id="_profiler_search_results" path="/{token}/search/results">
+    <route id="_profiler_search_results" path="/{token}/search/result/">
         <default key="_controller">web_profiler.controller.profiler::searchResultsAction</default>
     </route>
 
-    <route id="_profiler_open_file" path="/open">
+    <route id="_profiler_open_file" path="/open/">
         <default key="_controller">web_profiler.controller.profiler::openAction</default>
     </route>
 
-    <route id="_profiler" path="/{token}">
+    <route id="_profiler" path="/{token}/">
         <default key="_controller">web_profiler.controller.profiler::panelAction</default>
     </route>
 
-    <route id="_profiler_router" path="/{token}/router">
+    <route id="_profiler_router" path="/{token}/router/">
         <default key="_controller">web_profiler.controller.router::panelAction</default>
     </route>
 
-    <route id="_profiler_exception" path="/{token}/exception">
+    <route id="_profiler_exception" path="/{token}/exception/">
         <default key="_controller">web_profiler.controller.exception_panel::body</default>
     </route>
 

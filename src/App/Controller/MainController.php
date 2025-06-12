@@ -18,10 +18,4 @@ class MainController extends AbstractController
             'main/index.html.twig',
         );
     }
-
-    #[Route('/about', name: 'main_about', methods: ['GET'])]
-    public function about(): Response
-    {
-        return new Response('<html><body><h1>About</h1></body></html>');
-    }
 }

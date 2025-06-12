@@ -19,7 +19,7 @@ class MasterController extends AbstractController
     ) {
     }
 
-    #[Route('', name: 'index')]
+    #[Route('/', name: 'index')]
     public function index(): Response
     {
         return $this->render(
@@ -30,7 +30,7 @@ class MasterController extends AbstractController
         );
     }
 
-    #[Route('/{id}/sync', name: 'sync')]
+    #[Route('/{id}/sync/', name: 'sync')]
     public function sync(int $id): Response
     {
         $id = Master\Id::fromInt($id);

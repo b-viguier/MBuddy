@@ -19,7 +19,7 @@ class StageController extends AbstractController
     ) {
     }
 
-    #[Route('/{id}', name: 'show', methods: ['GET'])]
+    #[Route('/{id}/', name: 'show', methods: ['GET'])]
     public function stage(string $id): Response
     {
         $id = Preset\Id::fromString($id);

@@ -19,7 +19,7 @@ class ScoreController extends AbstractController
     ) {
     }
 
-    #[Route('/{id}', name: 'show', methods: ['GET'])]
+    #[Route('/{id}/', name: 'show', methods: ['GET'])]
     public function score(string $id): Response
     {
         $file = $this->scoreStorage->find(Preset\Id::fromString($id));

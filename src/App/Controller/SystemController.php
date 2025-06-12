@@ -20,7 +20,7 @@ class SystemController extends AbstractController
     ) {
     }
 
-    #[Route('', name: 'index', methods: ['GET'])]
+    #[Route('/', name: 'index', methods: ['GET'])]
     public function index(): Response
     {
         return $this->render(
@@ -31,7 +31,7 @@ class SystemController extends AbstractController
         );
     }
 
-    #[Route('/start', name: 'server_start', methods: ['GET'])]
+    #[Route('/start/', name: 'server_start', methods: ['GET'])]
     public function startServer(): Response
     {
         if ($this->server->isRunning()) {
@@ -54,7 +54,7 @@ class SystemController extends AbstractController
         );
     }
 
-    #[Route('/stop', name: 'server_stop', methods: ['GET'])]
+    #[Route('/stop/', name: 'server_stop', methods: ['GET'])]
     public function stopServer(Request $request): Response
     {
         if (!$this->server->isRunning() || !($metaPort = $this->server->metaPort())) {
