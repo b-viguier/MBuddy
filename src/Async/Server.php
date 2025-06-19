@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Bveing\MBuddy\App;
+namespace Bveing\MBuddy\Async;
 
 use Amp\Http\Server\FormParser\Form;
 use Amp\Http\Server\HttpServer;
@@ -23,6 +23,7 @@ use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\HttpKernel\TerminableInterface;
 use function Amp\Http\Server\FormParser\parseForm;
 use function Amp\Http\Server\Middleware\stack;
+use function Amp\Promise;
 
 class Server
 {
@@ -99,6 +100,8 @@ class Server
 
                 \assert($this->httpServer !== null);
                 yield $this->httpServer->start();
+
+                $this->logger->info('HTTP server stopped');
             });
         } finally {
             $this->httpServer = null;

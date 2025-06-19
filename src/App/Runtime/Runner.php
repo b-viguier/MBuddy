@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Bveing\MBuddy\App\Runtime;
 
-use Bveing\MBuddy\App\Server;
+use Bveing\MBuddy\Async\Server;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Runtime\RunnerInterface;
