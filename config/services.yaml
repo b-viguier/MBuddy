@@ -30,10 +30,7 @@ services:
     public: true
     arguments:
       $port: 8383
-
-  Symfony\Bridge\PsrHttpMessage\Factory\HttpFoundationFactory: ~
-  React\Http\Middleware\RequestBodyParserMiddleware: ~
-  Amp\Http\Server\RequestHandler\CallableRequestHandler: ~
+      $uploadTmpDir: '%kernel.project_dir%/var/tmp'
 
   Bveing\MBuddy\Infrastructure\App\Core\Preset\FileRepository:
     arguments:

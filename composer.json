@@ -22,14 +22,13 @@
         "symfony/yaml": "^5.4",
         "amphp/amp": "^2.6",
         "amphp/http-server": "^2.1",
-        "symfony/psr-http-message-bridge": "^2.3",
-        "react/http": "^1.11",
         "twig/twig": "^3.19",
         "symfony/profiler-pack": "^1.0",
         "symfony/ux-twig-component": "^2.9",
         "symfony/mime": "^6.0",
         "symfony/asset": "^6.0",
-        "myclabs/php-enum": "^1.8"
+        "myclabs/php-enum": "^1.8",
+        "amphp/http-server-form-parser": "^1.1"
     },
     "autoload": {
         "psr-4": {

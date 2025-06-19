@@ -4,22 +4,24 @@ declare(strict_types=1);
 
 namespace Bveing\MBuddy\App;
 
+use Amp\Http\Server\FormParser\Form;
 use Amp\Http\Server\HttpServer;
 use Amp\Http\Server\Options;
 use Amp\Http\Server\Request;
 use Amp\Http\Server\RequestHandler\CallableRequestHandler;
 use Amp\Http\Server\Response;
 use Amp\Loop;
+use Amp\Promise;
 use Amp\Socket\Server as SocketServer;
+use Psr\Http\Message\UriInterface;
 use Psr\Log\LoggerInterface;
-use React\Http\Message\ServerRequest;
-use React\Http\Middleware\RequestBodyParserMiddleware;
-use Symfony\Bridge\PsrHttpMessage\Factory\HttpFoundationFactory;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request as SfRequest;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\HttpKernel\TerminableInterface;
+use function Amp\Http\Server\FormParser\parseForm;
 use function Amp\Http\Server\Middleware\stack;
 
 class Server
@@ -28,9 +30,9 @@ class Server
         private KernelInterface $kernel,
         private int $port,
         private LoggerInterface $logger,
-        private HttpFoundationFactory $httpBridge,
-        private RequestBodyParserMiddleware $requestBodyParser,
+        private string $uploadTmpDir,
     ) {
+        \assert(\is_dir($uploadTmpDir) && \is_writable($uploadTmpDir), 'Upload temporary directory must be a writable directory');
     }
 
     public function isRunning(): bool
@@ -45,6 +47,7 @@ class Server
         }
 
         $this->httpServer->stop(); //TODO: handle promise
+        Loop::stop();
     }
 
     public function port(): int
@@ -63,6 +66,10 @@ class Server
         $this->metaPort = $metaRequest?->getPort() === null ? null : \intval($metaRequest->getPort());
         try {
             Loop::run(function() {
+                $options = new Options();
+                if ($this->kernel->isDebug()) {
+                    $options = $options->withDebugMode();
+                }
                 $this->httpServer = new HttpServer(
                     [
                         SocketServer::listen("0.0.0.0:{$this->port}"),
@@ -71,19 +78,19 @@ class Server
                         new CallableRequestHandler(\Closure::fromCallable([$this, 'handleRequest'])),
                     ),
                     $this->logger,
-                    (new Options())->withDebugMode(), // TODO: only in dev
+                    $options->withBodySizeLimit(1_048_576),
                 );
 
                 // Stop the server gracefully when SIGINT is received.
                 // This is technically optional, but it is best to call Server::stop()
                 if (\extension_loaded("pcntl")) {
-                    \Amp\Loop::onSignal(SIGINT, function(string $watcherId) {
+                    \Amp\Loop::onSignal(\SIGINT, function(string $watcherId) {
                         \Amp\Loop::cancel($watcherId);
-                        yield $this->httpServer?->stop();
+                        $this->stop();
                     });
                 }
 
-
+                \assert($this->httpServer !== null);
                 yield $this->httpServer->start();
             });
         } finally {
@@ -94,24 +101,7 @@ class Server
     private function handleRequest(Request $request): \Generator
     {
         try {
-            $client = $request->getClient()->getRemoteAddress();
-            $severParams = [
-                'REMOTE_ADDR' => $client->getHost(),
-                'REMOTE_PORT' => $client->getPort(),
-            ];
-
-            $serverRequest = new ServerRequest(
-                $request->getMethod(),
-                (string)$request->getUri(),
-                $request->getHeaders(),
-                yield $request->getBody()->buffer(),
-                $request->getProtocolVersion(),
-                $severParams + $_SERVER
-            );
-
-            $sfRequest = $this->httpBridge->createRequest(
-                ($this->requestBodyParser)($serverRequest, fn($r) => $r)
-            );
+            $sfRequest = yield from $this->ampToSymfonyRequest($request);
             $sfResponse = $this->kernel->handle($sfRequest);
 
             try {
@@ -139,7 +129,7 @@ class Server
             }
         } catch (\Throwable $e) {
             $this->logger->error(
-                'Error handling request',
+                'Error handling request: {message} (Code: {code}, File: {file}, Line: {line})',
                 [
                     'message' => $e->getMessage(),
                     'code' => $e->getCode(),
@@ -149,6 +139,115 @@ class Server
             );
             throw $e;
         }
+    }
+
+    private function ampToSymfonyRequest(Request $request): \Generator
+    {
+        [$content, $form] = yield Promise\all([
+            $request->getBody()->buffer(),
+            parseForm($request),
+        ]);
+
+        $client = $request->getClient()->getRemoteAddress();
+        $server = [
+            'REMOTE_ADDR' => $client->getHost(),
+            'REMOTE_PORT' => $client->getPort(),
+        ];
+
+        $headers = $request->getHeaders();
+        foreach ($headers as $name => $header) {
+            $server['HTTP_' . \str_replace('-', '_', \strtoupper($name))] = $header[0];
+        }
+
+        $server += [
+            'CONTENT_TYPE' => $contentType = $server['HTTP_CONTENT_TYPE'] ?? null,
+            'CONTENT_LENGTH' => $server['HTTP_CONTENT_LENGTH'] ?? null,
+        ];
+
+        return SfRequest::create(
+            (string)$request->getUri(),
+            $request->getMethod(),
+            $this->extractParameters($request->getMethod(), $request->getUri(), $content, (string) $contentType, $form),
+            $request->getCookies(),
+            $this->extractUploadedFiles($form),
+            $server,
+            $content
+        );
+    }
+
+    /**
+     * @return array<int|string,mixed>
+     */
+    private function extractParameters(string $method, UriInterface $uri, string $content, string $contentType, Form $form): array
+    {
+        $params = [];
+        switch ($method) {
+            case 'POST':
+            case 'PUT':
+            case 'DELETE':
+            case 'PATCH':
+                if (\str_starts_with($contentType, 'multipart/form-data')) {
+                    return $this->extractMultipartFormData($form);
+                }
+                if ($contentType === 'application/x-www-form-urlencoded') {
+                    \parse_str($content, $params);
+
+                    return $params;
+                }
+        }
+        \parse_str($uri->getQuery(), $params);
+
+        return $params;
+    }
+
+    /**
+     * @param Form $form
+     * @return array<int|string,mixed>
+     */
+    private function extractMultipartFormData(Form $form): array
+    {
+        $params = [];
+        foreach ($form->getValues() as $name => $values) {
+            if (!empty($values)) {
+                $params[$name] = \reset($values);
+            }
+        }
+
+        return $params;
+    }
+
+    /**
+     * @return array<string, UploadedFile>
+     */
+    private function extractUploadedFiles(Form $form): array
+    {
+        $files = [];
+        foreach ($form->getFiles() as $name => $formFiles) {
+            if (empty($formFiles)) {
+                continue;
+            }
+            $file = \reset($formFiles);
+            if (empty($file->getContents())) {
+                continue;
+            }
+            if (false !== $fileLocation = \tempnam($this->uploadTmpDir, "uploaded_file")) {
+                \file_put_contents($fileLocation, $file->getContents());
+
+                $files[$name] = new UploadedFile(
+                    $fileLocation,
+                    $file->getName(),
+                    $file->getMimeType(),
+                    test: true,
+                );
+            } else {
+                $this->logger->error(
+                    'Failed to create temporary file for uploaded file: {name}',
+                    ['name' => $file->getName()]
+                );
+            }
+        }
+
+        return $files;
     }
 
     private ?HttpServer $httpServer = null;
