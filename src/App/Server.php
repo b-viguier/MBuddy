@@ -66,16 +66,23 @@ class Server
         $this->metaPort = $metaRequest?->getPort() === null ? null : \intval($metaRequest->getPort());
         try {
             Loop::run(function() {
+                $requestHandler = \Closure::fromCallable([$this, 'handleRequest']);
                 $options = new Options();
                 if ($this->kernel->isDebug()) {
                     $options = $options->withDebugMode();
+                    if (\function_exists('xdebug_connect_to_client')) {
+                        $requestHandler = function(Request $request): \Generator {
+                            \xdebug_connect_to_client();
+                            return yield from $this->handleRequest($request);
+                        };
+                    }
                 }
                 $this->httpServer = new HttpServer(
                     [
                         SocketServer::listen("0.0.0.0:{$this->port}"),
                     ],
                     stack(
-                        new CallableRequestHandler(\Closure::fromCallable([$this, 'handleRequest'])),
+                        new CallableRequestHandler($requestHandler),
                     ),
                     $this->logger,
                     $options->withBodySizeLimit(1_048_576),
