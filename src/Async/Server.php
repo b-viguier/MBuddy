@@ -23,7 +23,6 @@ use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\HttpKernel\TerminableInterface;
 use function Amp\Http\Server\FormParser\parseForm;
 use function Amp\Http\Server\Middleware\stack;
-use function Amp\Promise;
 
 class Server
 {
@@ -64,6 +63,7 @@ class Server
     public function run(?SfRequest $metaRequest): void
     {
         \assert(!$this->isRunning(), 'Server is already running');
+        \putenv('AMP_LOOP_DRIVER=' . NestableNativeDriver::class);
         $this->metaPort = $metaRequest?->getPort() === null ? null : \intval($metaRequest->getPort());
         try {
             Loop::run(function() {
