@@ -42,8 +42,9 @@ services:
 
   mbuddy.motif.master.repository:
     stack:
+      - Bveing\MBuddy\Infrastructure\Motif\Master\Repository\Decorator\Profiled: ~
       - Bveing\MBuddy\Motif\Master\Repository\Decorator\Delay:
-          $delayMs: 5000
+          $delayMs: 2000
       - Bveing\MBuddy\Motif\Master\Repository\InMemory: ~
   Bveing\MBuddy\Motif\Master\Repository: '@mbuddy.motif.master.repository'
 
