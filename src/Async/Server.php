@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Bveing\MBuddy\Async;
 
+use Amp\Http\Cookie\RequestCookie;
 use Amp\Http\Server\FormParser\Form;
 use Amp\Http\Server\HttpServer;
 use Amp\Http\Server\Options;
@@ -178,7 +179,7 @@ class Server
             (string)$request->getUri(),
             $request->getMethod(),
             $this->extractParameters($request->getMethod(), $request->getUri(), $content, (string) $contentType, $form),
-            $request->getCookies(),
+            \array_map(fn(RequestCookie $cookie) => $cookie->getValue(), $request->getCookies()),
             $this->extractUploadedFiles($form),
             $server,
             $content
