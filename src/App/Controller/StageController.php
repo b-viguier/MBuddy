@@ -6,9 +6,11 @@ namespace Bveing\MBuddy\App\Controller;
 
 use Bveing\MBuddy\App\Core\Preset;
 use Bveing\MBuddy\App\ScoreStorage;
+use Bveing\MBuddy\Motif\Master;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use function Amp\Promise\wait;
 
 #[Route('/stage', name: 'stage_')]
 class StageController extends AbstractController
@@ -16,6 +18,7 @@ class StageController extends AbstractController
     public function __construct(
         private Preset\Repository $presetRepository,
         private ScoreStorage $scoreStorage,
+        private Master\Repository $masterRepository,
     ) {
     }
 
@@ -28,6 +31,10 @@ class StageController extends AbstractController
             throw $this->createNotFoundException();
         }
         [$previous, $next] = $this->presetRepository->surrounding($id);
+
+        if ($masterId = $preset->masterId()) {
+            wait($this->masterRepository->setCurrentMasterId($masterId));
+        }
 
         return $this->render(
             'stage/show.html.twig',
