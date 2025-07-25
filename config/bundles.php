@@ -6,5 +6,10 @@ return [
     Symfony\Bundle\FrameworkBundle\FrameworkBundle::class => ['all' => true],
     Symfony\Bundle\TwigBundle\TwigBundle::class => ['all' => true],
     Symfony\UX\TwigComponent\TwigComponentBundle::class => ['all' => true],
-    Symfony\Bundle\WebProfilerBundle\WebProfilerBundle::class => ['dev' => true, 'ipad_dev' => true],
+    Symfony\Bundle\WebProfilerBundle\WebProfilerBundle::class => [
+        'dev' => true,
+        'staging' => true,
+        'ipad_dev' => true,
+        'ipad_staging' => true,
+    ],
 ];

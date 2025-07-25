@@ -7,4 +7,6 @@ when@dev: &web_profiler
     resource: '@WebProfilerBundle/Resources/config/routing/profiler.xml'
     prefix: /MBuddy/_profiler
 
+when@staging: *web_profiler
 when@ipad_dev: *web_profiler
+when@ipad_staging: *web_profiler

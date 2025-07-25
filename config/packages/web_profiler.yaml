@@ -6,4 +6,6 @@ when@dev: &web_profiler
   framework:
     profiler: { only_exceptions: false }
 
+when@staging: *web_profiler
 when@ipad_dev: *web_profiler
+when@ipad_staging: *web_profiler
