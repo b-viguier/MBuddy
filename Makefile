@@ -1,5 +1,7 @@
 
 DOCKER_COMPOSE = docker compose -f docker/docker-compose.yml
+EXEC = $(DOCKER_COMPOSE) exec -e APP_ENV=$(APP_ENV) php
+APP_ENV ?= dev
 
 # Misc
 .DEFAULT_GOAL = help
@@ -20,7 +22,7 @@ build: ## Build the containers
 	$(DOCKER_COMPOSE) build
 
 bash: ## Run bash from PHP container
-	$(DOCKER_COMPOSE) exec php bash
+	$(EXEC) bash
 
 bash-node: ## Run bash from Node container
 	$(DOCKER_COMPOSE) run --rm -it node bash
@@ -29,10 +31,10 @@ ps: ## List all running containers
 	$(DOCKER_COMPOSE) ps
 
 logs: ## Show logs
-	$(DOCKER_COMPOSE) exec php php bin/log.php
+	$(EXEC) php bin/log.php
 
-serve: ## Run PHP server
-	$(DOCKER_COMPOSE) exec php php -S 0.0.0.0:8080 -t public public/index.php
+serve: ## Run PHP server. Use APP_ENV to set the environment (default: dev)
+	$(EXEC) php -S 0.0.0.0:8080 -t public public/index.php
 
-serve-dbg: ## Run PHP server with XDebug enabled for all input requests
-	$(DOCKER_COMPOSE) exec php php -dxdebug.start_with_request=yes -S 0.0.0.0:8080 -t public public/index.php
+serve-dbg: ## Run PHP server with XDebug enabled for all input requests. Use APP_ENV to set the environment (default: dev)
+	$(EXEC) php -dxdebug.start_with_request=yes -S 0.0.0.0:8080 -t public public/index.php
