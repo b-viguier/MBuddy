@@ -40,9 +40,6 @@
             "Bveing\\MBuddy\\Tests\\": "tests/"
         }
     },
-    "require-dev": {
-        "bviguier/php-rtmidi": "dev-main"
-    },
     "scripts": {
         "install-tools": [
             "composer install --working-dir=tools",
