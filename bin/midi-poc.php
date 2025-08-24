@@ -5,32 +5,29 @@ declare(strict_types=1);
 require __DIR__.'/../vendor/autoload.php';
 
 Amp\Loop::run(function() {
-    $browser = new \bviguier\RtMidi\MidiBrowser("/opt/homebrew/lib/librtmidi.dylib");
-    $input = $browser->openInput("WIDI Jack Bluetooth");
-    $output = $browser->openOutput("WIDI Jack Bluetooth");
-
-    $logger = new \Bveing\MBuddy\Infrastructure\ConsoleLogger();
 
     $driver = new \Bveing\MBuddy\Motif\MidiDriver\RateLimiter(
-        new \Bveing\MBuddy\Infrastructure\Motif\MidiDriver\RtMidi($input, $output),
+        \Bveing\MBuddy\Infrastructure\Motif\MidiDriver\Udp::create(
+    'udp://0.0.0.0:8321',
+            'udp://192.168.1.161:8123',
+        ),
         0.1,
+    );
+    $logger = new \Symfony\Component\Console\Logger\ConsoleLogger(
+        new \Symfony\Component\Console\Output\ConsoleOutput(),
     );
     $sysExClient = new \Bveing\MBuddy\Motif\SysEx\Client\ConcurrencyLimiter(
         new \Bveing\MBuddy\Motif\SysEx\Client\Midi($driver, $logger),
         5,
     );
-    $repository = new \Bveing\MBuddy\Motif\Master\Repository($sysExClient);
 
-    $promises = [];
-    $countdown = 6;
-    foreach (\Bveing\MBuddy\Motif\Master\Id::all() as $masterId) {
-        $promises[] = \Amp\call('displayMaster', $repository, $masterId);
-        if (--$countdown === 0) {
-            break;
-        }
-    }
-
-    yield \Amp\Promise\all($promises);
+    yield $driver->send(
+        join('', array_map('chr', [
+            0b10010000, // MIDI Channel 1, Note On
+            60,        // Note number (Middle C)
+            127,       // Velocity
+        ])),
+    );
 
     Amp\Loop::stop();
 });
