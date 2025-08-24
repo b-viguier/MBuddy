@@ -1,0 +1,8 @@
+when@ipad_dev: &udp_logger
+  services:
+    logger:
+      class: Bveing\MBuddy\Infrastructure\UdpLogger
+      factory: ['Bveing\MBuddy\Infrastructure\UdpLogger', 'create']
+      arguments:
+        - '%dev_host%:8484'
+when@ipad_staging: *udp_logger

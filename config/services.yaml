@@ -6,8 +6,12 @@
 parameters:
   env(DEV_HOST): 192.168.1.22
   dev_host: '%env(DEV_HOST)%'
-  ipad_host: 192.168.1.161
+  env(IPAD_HOST): 127.0.0.1
+  ipad_host: '%env(IPAD_HOST)%'
   mbuddy_base_path: /MBuddy
+
+imports:
+  - { resource: services/ }
 
 services:
   # default configuration for services in *this* file
@@ -40,12 +44,6 @@ services:
     arguments:
       $basePath: '%kernel.project_dir%/var/scores'
 
-  mbuddy.motif.master.repository:
-    stack:
-      - Bveing\MBuddy\Infrastructure\Motif\Master\Repository\Decorator\Profiled: ~
-      - Bveing\MBuddy\Motif\Master\Repository\Decorator\Delay:
-          $delayMs: 2000
-      - Bveing\MBuddy\Motif\Master\Repository\InMemory: ~
   Bveing\MBuddy\Motif\Master\Repository: '@mbuddy.motif.master.repository'
 
   mbuddy.motif.master.registry:
@@ -56,10 +54,4 @@ services:
       - Bveing\MBuddy\Infrastructure\App\Motif\Master\Registry\Motif: ~
   Bveing\MBuddy\App\Motif\Master\Registry: '@mbuddy.motif.master.registry'
 
-when@ipad_dev:
-  services:
-    logger:
-      class: Bveing\MBuddy\Infrastructure\UdpLogger
-      factory: ['Bveing\MBuddy\Infrastructure\UdpLogger', 'create']
-      arguments:
-        - '%dev_host%:8484'
+

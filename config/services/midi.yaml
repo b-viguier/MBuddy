@@ -1,0 +1,45 @@
+when@dev: &in_memory_repository
+  services:
+    _defaults:
+      autowire: true
+      autoconfigure: true
+
+    mbuddy.motif.master.repository:
+      stack:
+        - Bveing\MBuddy\Infrastructure\Motif\Master\Repository\Decorator\Profiled: ~
+        - Bveing\MBuddy\Motif\Master\Repository\Decorator\Delay:
+            $delayMs: 2000
+        - Bveing\MBuddy\Motif\Master\Repository\InMemory: ~
+
+when@ipad_dev: *in_memory_repository
+
+when@staging: &udp_repository
+  services:
+    _defaults:
+      autowire: true
+      autoconfigure: true
+
+    mbuddy.motif.midi.driver:
+      stack:
+        - Bveing\MBuddy\Infrastructure\Motif\MidiDriver\Decorator\Profiled: ~
+        - class: Bveing\MBuddy\Infrastructure\Motif\MidiDriver\Udp
+          factory: ['Bveing\MBuddy\Infrastructure\Motif\MidiDriver\Udp', 'create']
+          arguments:
+            - 'udp://0.0.0.0:8321'
+            - 'udp://%ipad_host%:8123'
+    Bveing\MBuddy\Motif\MidiDriver: '@mbuddy.motif.midi.driver'
+
+    mbuddy.motif.sysex.client:
+      stack:
+        - Bveing\MBuddy\Motif\SysEx\Client\ConcurrencyLimiter:
+            $maxConcurrency: 5
+        - Bveing\MBuddy\Motif\SysEx\Client\Midi:
+            $timeoutInSeconds: 3
+    Bveing\MBuddy\Motif\SysEx\Client: '@mbuddy.motif.sysex.client'
+
+    mbuddy.motif.master.repository:
+      stack:
+        - Bveing\MBuddy\Infrastructure\Motif\Master\Repository\Decorator\Profiled: ~
+        - Bveing\MBuddy\Motif\Master\Repository\Midi: ~
+
+when@ipad_staging: *udp_repository

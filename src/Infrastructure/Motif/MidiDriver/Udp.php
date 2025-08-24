@@ -18,6 +18,26 @@ class Udp implements MidiDriver
     ) {
     }
 
+    /**
+     * @return Promise<Udp>
+     */
+    static public function createAsync(
+        string $inputSocket,
+        string $outputSocket,
+    ): Promise {
+        return \Amp\call(fn(): \Generator => new self(
+            DatagramSocket::bind($inputSocket),
+            yield \Amp\Socket\connect($outputSocket),
+        ));
+    }
+
+    static public function create(
+        string $inputSocket,
+        string $outputSocket,
+    ): self {
+        return Promise\wait(self::createAsync($inputSocket, $outputSocket));
+    }
+
     public function send(string $message): Promise
     {
         return $this->output->write($message);
