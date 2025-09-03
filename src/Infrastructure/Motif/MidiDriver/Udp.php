@@ -21,7 +21,7 @@ class Udp implements MidiDriver
     /**
      * @return Promise<Udp>
      */
-    static public function createAsync(
+    public static function createAsync(
         string $inputSocket,
         string $outputSocket,
     ): Promise {
@@ -31,7 +31,7 @@ class Udp implements MidiDriver
         ));
     }
 
-    static public function create(
+    public static function create(
         string $inputSocket,
         string $outputSocket,
     ): self {

@@ -22,7 +22,7 @@ class NestableNativeDriver extends Loop\NativeDriver
     }
 
     #[\Override]
-    public function run()
+    public function run(): void
     {
         $nesting = $this->nesting;
         $this->setNesting($this->nesting + 1);
@@ -40,7 +40,7 @@ class NestableNativeDriver extends Loop\NativeDriver
     }
 
     #[\Override]
-    public function stop()
+    public function stop(): void
     {
         $this->setNesting(\max(0, $this->nesting - 1));
     }
