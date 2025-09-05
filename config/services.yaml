@@ -15,12 +15,11 @@ parameters:
     - 'composer.lock'
     - '.env'
     - 'phpwin.json'
-    - 'web/'
     - 'src/'
     - 'public/'
     - 'config/'
     - 'templates/'
-    - 'packages/'  
+    - 'packages/'
 
 imports:
   - { resource: services/ }
