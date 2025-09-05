@@ -65,15 +65,19 @@ services:
       - Bveing\MBuddy\Infrastructure\App\Motif\Master\Registry\Motif: ~
   Bveing\MBuddy\App\Motif\Master\Registry: '@mbuddy.motif.master.registry'
 
+  ## iPad connection
+  Bveing\MBuddy\DevTools\ApiClient:
+    arguments:
+      $iPadHost: '%ipad_host%'
+      $port: '%server_port%'
+
 ## Files synchronization
   Bveing\MBuddy\App\Controller\DevToolsController:
     arguments:
       $projectDir: '%kernel.project_dir%'
       $synchronizedFiles: '%synchronized_files%'
 
-  Bveing\MBuddy\App\Command\SyncCommand:
+  Bveing\MBuddy\App\Command\RemoteSyncCommand:
     arguments:
       $projectDir: '%kernel.project_dir%'
       $synchronizedFiles: '%synchronized_files%'
-      $iPadHost: '%ipad_host%'
-      $port: '%server_port%'
