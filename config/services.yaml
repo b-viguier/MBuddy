@@ -8,7 +8,19 @@ parameters:
   dev_host: '%env(DEV_HOST)%'
   env(IPAD_HOST): 127.0.0.1
   ipad_host: '%env(IPAD_HOST)%'
+  server_port: 8383
   mbuddy_base_path: /MBuddy
+  synchronized_files:
+    - 'composer.json'
+    - 'composer.lock'
+    - '.env'
+    - 'phpwin.json'
+    - 'web/'
+    - 'src/'
+    - 'public/'
+    - 'config/'
+    - 'templates/'
+    - 'packages/'  
 
 imports:
   - { resource: services/ }
@@ -33,8 +45,8 @@ services:
   Bveing\MBuddy\Async\Server:
     public: true
     arguments:
-      $port: 8383
-      $uploadTmpDir: '%kernel.project_dir%/var/tmp'
+      $port: '%server_port%'
+      $uploadTmpDir: '%kernel.project_dir%/var/upload'
 
   Bveing\MBuddy\Infrastructure\App\Core\Preset\FileRepository:
     arguments:
@@ -54,4 +66,15 @@ services:
       - Bveing\MBuddy\Infrastructure\App\Motif\Master\Registry\Motif: ~
   Bveing\MBuddy\App\Motif\Master\Registry: '@mbuddy.motif.master.registry'
 
+## Files synchronization
+  Bveing\MBuddy\App\Controller\DevToolsController:
+    arguments:
+      $projectDir: '%kernel.project_dir%'
+      $synchronizedFiles: '%synchronized_files%'
 
+  Bveing\MBuddy\App\Command\SyncCommand:
+    arguments:
+      $projectDir: '%kernel.project_dir%'
+      $synchronizedFiles: '%synchronized_files%'
+      $iPadHost: '%ipad_host%'
+      $port: '%server_port%'
