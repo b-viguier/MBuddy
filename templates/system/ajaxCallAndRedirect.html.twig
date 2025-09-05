@@ -16,7 +16,7 @@
             function() {
                 window.location.assign("{{ redirect_url }}");
             },
-            {{ timeout | default(2000)}}
+            {{ timeout | default(5000)}}
         );
     </script>
 </body>
