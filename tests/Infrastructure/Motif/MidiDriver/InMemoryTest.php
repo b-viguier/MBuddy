@@ -6,9 +6,9 @@ namespace Bveing\MBuddy\Tests\Infrastructure\Motif\MidiDriver;
 
 use Amp\Loop;
 use Bveing\MBuddy\Infrastructure\Motif\MidiDriver;
+use Bveing\MBuddy\Infrastructure\Motif\MidiListener;
 use PHPUnit\Framework\TestCase;
 use function Amp\call;
-use function Amp\Promise\all;
 
 class InMemoryTest extends TestCase
 {
@@ -37,70 +37,19 @@ class InMemoryTest extends TestCase
         });
     }
 
-    public function testReceiveMessage(): void
+    public function testDispatchingMessage(): void
     {
         Loop::run(function() {
             $driver = new MidiDriver\InMemory();
-            $sequence = [];
+            $listener1 = new MidiListener\InMemory();
+            $listener2 = new MidiListener\InMemory();
+            $driver->addListener($listener1);
+            $driver->addListener($listener2);
 
-            $receivePromises = [
-                call(function() use (&$driver, &$sequence) {
-                    $sequence[] = 'receiving1';
-                    $message = yield $driver->receive();
-                    $sequence[] = 'received1';
-
-                    return $message;
-                }),
-                call(function() use (&$driver, &$sequence) {
-                    $sequence[] = 'receiving2';
-                    $message = yield $driver->receive();
-                    $sequence[] = 'received2';
-
-                    return $message;
-                }),
-            ];
-            $sequence[] = 'pushing';
             $driver->pushReceivedMessage('My Message');
-            $sequence[] = 'pushed';
 
-            $messages = yield all($receivePromises);
-            self::assertSame(['My Message', 'My Message'], $messages);
-
-            self::assertSame(
-                [
-                'receiving1',
-                'receiving2',
-                'pushing',
-                'received1',
-                'received2',
-                'pushed',
-            ],
-                $sequence,
-            );
+            self::assertSame(['My Message'], $listener1->messages);
+            self::assertSame(['My Message'], $listener2->messages);
         });
-    }
-
-    public function testNotReceivingAlreadyPushedMessage(): void
-    {
-        $sequence = [];
-        Loop::run(function() use (&$sequence) {
-            $driver = new MidiDriver\InMemory();
-
-            $sequence[] = 'pushing';
-            $driver->pushReceivedMessage('My Message');
-            $sequence[] = 'pushed';
-
-            $receivePromise = call(function() use (&$driver, &$sequence) {
-                $sequence[] = 'receiving';
-                $message = yield $driver->receive();
-                $sequence[] = 'received';
-
-                return $message;
-            });
-
-            yield $receivePromise;
-        });
-
-        self::assertSame(['pushing', 'pushed', 'receiving'], $sequence);
     }
 }

@@ -23,7 +23,6 @@ when@staging: &udp_repository
       stack:
         - Bveing\MBuddy\Infrastructure\Motif\MidiDriver\Decorator\Profiled: ~
         - class: Bveing\MBuddy\Infrastructure\Motif\MidiDriver\Udp
-          factory: ['Bveing\MBuddy\Infrastructure\Motif\MidiDriver\Udp', 'create']
           arguments:
             - 'udp://0.0.0.0:8321'
             - 'udp://%ipad_host%:8123'

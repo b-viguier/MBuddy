@@ -6,6 +6,7 @@ namespace Bveing\MBuddy\Infrastructure\Motif\MidiDriver\Decorator;
 
 use Amp\Promise;
 use Bveing\MBuddy\Motif\MidiDriver;
+use Bveing\MBuddy\Motif\MidiListener;
 use Symfony\Component\Stopwatch\Stopwatch;
 
 class Profiled implements MidiDriver
@@ -27,14 +28,18 @@ class Profiled implements MidiDriver
         return $promise;
     }
 
-    public function receive(): Promise
+    public function addListener(MidiListener $listener): void
     {
-        $this->stopwatch->start('midi.receive', 'midi');
-        $promise = $this->driver->receive();
-        $promise->onResolve(function() {
-            $this->stopwatch->stop('midi.receive');
-        });
+        $this->driver->addListener($listener);
+    }
 
-        return $promise;
+    public function poll(): Promise
+    {
+        return $this->driver->poll();
+    }
+
+    public function stopPolling(): void
+    {
+        $this->driver->stopPolling();
     }
 }

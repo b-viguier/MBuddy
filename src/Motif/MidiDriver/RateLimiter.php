@@ -7,6 +7,7 @@ namespace Bveing\MBuddy\Motif\MidiDriver;
 use Amp\Deferred;
 use Amp\Promise;
 use Bveing\MBuddy\Motif\MidiDriver;
+use Bveing\MBuddy\Motif\MidiListener;
 use function Amp\asyncCall;
 use function Amp\delay;
 
@@ -33,10 +34,21 @@ class RateLimiter implements MidiDriver
         return $deferred->promise();
     }
 
-    public function receive(): Promise
+    public function addListener(MidiListener $listener): void
     {
-        return $this->driver->receive();
+        $this->driver->addListener($listener);
     }
+
+    public function poll(): Promise
+    {
+        return $this->driver->poll();
+    }
+
+    public function stopPolling(): void
+    {
+        $this->driver->stopPolling();
+    }
+
     private float $nextAllowedTime = 0.0;
 
     private \Closure $microtimeFunction;

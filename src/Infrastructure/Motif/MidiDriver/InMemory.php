@@ -10,10 +10,12 @@ use Bveing\MBuddy\Motif\MidiDriver;
 
 class InMemory implements MidiDriver
 {
+    use MidiDriver\DispatcherTrait;
+
     public function __construct()
     {
         $this->sendQueue = new \SplQueue();
-        $this->receiveDeferred = new Deferred();
+        $this->pollingDeferred = new Deferred();
     }
 
     public function send(string $message): Promise
@@ -24,9 +26,14 @@ class InMemory implements MidiDriver
         return $deferred->promise();
     }
 
-    public function receive(): Promise
+    public function poll(): Promise
     {
-        return $this->receiveDeferred->promise();
+        return $this->pollingDeferred->promise();
+    }
+
+    public function stopPolling(): void
+    {
+        $this->pollingDeferred->resolve();
     }
 
     public function popSentMessage(): ?string
@@ -43,13 +50,12 @@ class InMemory implements MidiDriver
 
     public function pushReceivedMessage(string $message): void
     {
-        $deferred = $this->receiveDeferred;
-        $this->receiveDeferred = new Deferred();
-        $deferred->resolve($message);
+        $this->dispatch($message);
     }
+
     /** @var \SplQueue<array{0:string,1:Deferred<null>}> */
     private \SplQueue $sendQueue;
 
-    /** @var Deferred<string>  */
-    private Deferred $receiveDeferred;
+    /** @var Deferred<null> */
+    private Deferred $pollingDeferred;
 }

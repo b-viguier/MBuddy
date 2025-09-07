@@ -7,12 +7,13 @@ namespace Bveing\MBuddy\Motif\SysEx\Client;
 use Amp\Deferred;
 use Amp\Promise;
 use Bveing\MBuddy\Motif\MidiDriver;
+use Bveing\MBuddy\Motif\MidiListener;
 use Bveing\MBuddy\Motif\SysEx;
 use Psr\Log\LoggerInterface;
 use function Amp\asyncCall;
 use function Amp\delay;
 
-class Midi implements Sysex\Client
+class Midi implements Sysex\Client, MidiListener
 {
     public function __construct(
         private MidiDriver $midiDriver,
@@ -20,16 +21,7 @@ class Midi implements Sysex\Client
         private float $timeoutInSeconds = 3.0,
     ) {
         \assert($timeoutInSeconds > 0, 'Timeout must be greater than 0');
-        asyncCall(function() {
-            while (true) {
-                $message = yield $this->midiDriver->receive();
-                if ($message === null) {
-                    break;
-                }
-
-                $this->onMessage($message);
-            }
-        });
+        $this->midiDriver->addListener($this);
     }
 
     public function requestDump(SysEx\DumpRequest $request): Promise
@@ -90,16 +82,8 @@ class Midi implements Sysex\Client
     {
         return $this->midiDriver->send((string)$change->toSysEx());
     }
-    /** @var list<SysEx\BulkDumpBlock> */
-    private array $blocksBuffer = [];
 
-    /** @var array<string,Deferred<list<SysEx\BulkDumpBlock>>> */
-    private array $deferredDump = [];
-
-    /** @var array<string,Deferred<SysEx\ParameterChange>> */
-    private array $deferredParam = [];
-
-    private function onMessage(string $message): bool
+    public function onMidiMessage(string $message): bool
     {
         $sysex = SysEx::fromBinaryString($message);
         if ($sysex === null) {
@@ -127,6 +111,14 @@ class Midi implements Sysex\Client
             return false;
         }
     }
+    /** @var list<SysEx\BulkDumpBlock> */
+    private array $blocksBuffer = [];
+
+    /** @var array<string,Deferred<list<SysEx\BulkDumpBlock>>> */
+    private array $deferredDump = [];
+
+    /** @var array<string,Deferred<SysEx\ParameterChange>> */
+    private array $deferredParam = [];
 
     private function handleBulkDumpBlock(SysEx\BulkDumpBlock $block): void
     {

@@ -14,8 +14,12 @@ interface MidiDriver
      */
     public function send(string $message): Promise;
 
+    public function addListener(MidiListener $listener): void;
+
     /**
-     * @return Promise<?string> Resolves to null if connection is closed
+     * @return Promise<null>
      */
-    public function receive(): Promise;
+    public function poll(): Promise;
+
+    public function stopPolling(): void;
 }
