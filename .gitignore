@@ -1,6 +1,6 @@
-/bin/.sync-timestamp.txt
 /.php-cs-fixer.cache
 /vendor/
 /tools/vendor/
 /tools/bin/
 /var/
+/.env.local

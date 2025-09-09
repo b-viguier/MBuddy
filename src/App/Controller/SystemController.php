@@ -6,6 +6,7 @@ namespace Bveing\MBuddy\App\Controller;
 
 use Bveing\MBuddy\Async\Server;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Filesystem\Path;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
@@ -27,6 +28,7 @@ class SystemController extends AbstractController
             'system/index.html.twig',
             [
                 'isServerEnabled' => $this->server->isRunning(),
+                'app_env' => $this->getParameter('kernel.environment'),
             ],
         );
     }
@@ -82,6 +84,39 @@ class SystemController extends AbstractController
             ]
         );
     }
+
+    #[Route('/sf_env/list/', name: 'sf_env_list', methods: ['GET'])]
+    public function listEnv(): Response
+    {
+        return $this->render(
+            'system/env.html.twig',
+            [
+                'sf_envs' => self::VALID_ENVS,
+                'current_env' => $this->getParameter('kernel.environment'),
+            ],
+        );
+    }
+
+    #[Route('/sf_env/change/{env}/', name: 'sf_env_change', methods: ['GET'])]
+    public function changeEnv(string $env): Response
+    {
+        if (!\in_array($env, self::VALID_ENVS, true)) {
+            throw new BadRequestHttpException(
+                'Invalid environment. Valid options are: ' . \implode(', ', self::VALID_ENVS),
+            );
+        }
+
+        $projectDir = $this->getParameter('kernel.project_dir');
+        \assert(\is_string($projectDir) && \is_dir($projectDir));
+        \file_put_contents(
+            Path::join($projectDir, '.env.local'),
+            "APP_ENV=$env\n",
+        );
+
+        return $this->redirectToRoute('system_index');
+    }
+
+    private const VALID_ENVS = ['dev', 'staging'];
 
     private function replacePortInUrl(string $url, int $newPort): string
     {

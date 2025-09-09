@@ -19,6 +19,9 @@
     right: 0;
     left: 0;
 }
+.tile-selected {
+    border: 3px solid !important;
+}
 
 .tile-preset-list {
     background-color: #9fc3a4;
