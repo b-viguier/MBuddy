@@ -7,6 +7,11 @@ A Midi companion to manage my MIDI devices.
 composer install
 ```
 
+From iPad:
+```shell
+composer create-project bveing/mbuddy ./ "dev-phpwin-sf" --repository='{"type": "vcs","url": "https://github.com/b-viguier/MBuddy"}'
+```
+
 ## Development
 To run from a compatible Docker container:
 ```shell
