@@ -1,0 +1,6 @@
+when@ipad_staging:
+  services:
+    Bveing\MBuddy\DevTools\MidiUdpForwarder:
+      arguments:
+        $outputSocket: 'udp://%dev_host%:8321'
+      tags: ['mbuddy.background']

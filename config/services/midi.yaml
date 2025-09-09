@@ -19,13 +19,16 @@ when@staging: &udp_repository
       autowire: true
       autoconfigure: true
 
+    Bveing\MBuddy\Infrastructure\Motif\MidiDriver\Udp:
+      tags: [ {name: 'mbuddy.background', start: 'poll', stop: 'stopPolling'} ]
+      arguments:
+        $inputSocket: 'udp://0.0.0.0:8321'
+        $outputSocket: 'udp://%ipad_host%:8123'
+
     mbuddy.motif.midi.driver:
       stack:
         - Bveing\MBuddy\Infrastructure\Motif\MidiDriver\Decorator\Profiled: ~
-        - class: Bveing\MBuddy\Infrastructure\Motif\MidiDriver\Udp
-          arguments:
-            - 'udp://0.0.0.0:8321'
-            - 'udp://%ipad_host%:8123'
+        - '@Bveing\MBuddy\Infrastructure\Motif\MidiDriver\Udp'
     Bveing\MBuddy\Motif\MidiDriver: '@mbuddy.motif.midi.driver'
 
     mbuddy.motif.sysex.client:
