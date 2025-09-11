@@ -9,7 +9,7 @@ parameters:
   env(IPAD_HOST): 127.0.0.1
   ipad_host: '%env(IPAD_HOST)%'
   server_port: 8383
-  mbuddy_base_path: /MBuddy
+  mbuddy_base_path: !php/const Bveing\MBuddy\App\Controller\ServerController::MBUDDY_BASE_PATH
   synchronized_files:
     - 'composer.json'
     - 'composer.lock'

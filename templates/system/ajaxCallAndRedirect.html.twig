@@ -7,9 +7,6 @@
     <script>
         var xmlHttp = new XMLHttpRequest();
         xmlHttp.open( "GET", "{{ target_url }}", true );
-        {% for key,value in target_headers|default([]) %}
-        xmlHttp.setRequestHeader("{{ key }}", "{{ value }}");
-        {% endfor %}
         xmlHttp.send( null );
 
         setTimeout(

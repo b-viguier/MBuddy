@@ -14,15 +14,23 @@
         <div class="col-sm-3 col-lg-2 p-0">
             {% if isServerEnabled %}
             <twig:Tile
-                title="Disable Server"
-                href="{{ url('system_server_stop') }}"
-                icon="bi-bootstrap-reboot"
+                title="Stop Server"
+                href="{{ url('system_server_stop', {'redirect_url': url('system_index')}) }}"
+                icon="bi-sign-stop"
+            />
+        </div>
+
+        <div class="col-sm-3 col-lg-2 p-0">
+            <twig:Tile
+                    title="Restart Server"
+                    href="{{ url('system_server_restart', {'redirect_url': url('system_index')}) }}"
+                    icon="bi-bootstrap-reboot"
             />
             {% else %}
             <twig:Tile
-                title="Enable Server"
-                href="{{ url('system_server_start') }}"
-                icon="bi-bootstrap-reboot"
+                title="Start Server"
+                href="{{ url('system_server_start', {'redirect_url': url('system_index')}) }}"
+                icon="bi-play-fill"
             />
             {% endif %}
         </div>

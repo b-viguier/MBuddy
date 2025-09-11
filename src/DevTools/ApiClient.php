@@ -70,9 +70,8 @@ class ApiClient
         try {
             $this->request(
                 'GET',
-                'system_server_start',
+                'server_start',
                 [
-                    'headers' => ['MBUDDY_START_PHP_SERVER' => 'true'],
                     'timeout' => 2,
                 ],
                 self::META_PORT,
@@ -87,8 +86,7 @@ class ApiClient
         try {
             $this->request(
                 'GET',
-                'system_server_stop',
-                ['query' => ['ajax' => 'true']],
+                'server_stop',
             )->getStatusCode();
         } catch(TransportException) {
             // Expected, as the server is stopping

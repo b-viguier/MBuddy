@@ -34,7 +34,7 @@ class SystemController extends AbstractController
     }
 
     #[Route('/start/', name: 'server_start', methods: ['GET'])]
-    public function startServer(): Response
+    public function startServer(Request $request): Response
     {
         if ($this->server->isRunning()) {
             throw new BadRequestHttpException(
@@ -42,14 +42,17 @@ class SystemController extends AbstractController
             );
         }
 
+        $redirectUrl = $request->query->get('redirect_url')
+            ?? $this->generateUrl('main_index', referenceType: UrlGeneratorInterface::ABSOLUTE_URL);
+        \assert(\is_string($redirectUrl));
+
         return $this->render(
             'system/ajaxCallAndRedirect.html.twig',
             [
                 'title' => 'Starting Server 🚀',
-                'target_url' => $this->generateUrl('system_server_start'),
-                'target_headers' => ['MBUDDY_START_PHP_SERVER' => 'true'],
+                'target_url' => $this->generateUrl('server_start'),
                 'redirect_url' => $this->replacePortInUrl(
-                    $this->generateUrl('system_index', referenceType: UrlGeneratorInterface::ABSOLUTE_URL),
+                    $redirectUrl,
                     $this->server->port(),
                 ),
             ]
@@ -65,23 +68,45 @@ class SystemController extends AbstractController
             );
         }
 
-        if ($request->query->has('ajax')) {
-            $this->server->stop();
-
-            return new Response();
-        }
-
+        $redirectUrl = $request->query->get('redirect_url')
+            ?? $this->generateUrl('main_index', referenceType: UrlGeneratorInterface::ABSOLUTE_URL);
+        \assert(\is_string($redirectUrl));
 
         return $this->render(
             'system/ajaxCallAndRedirect.html.twig',
             [
                 'title' => 'Stopping Server 🛑',
-                'target_url' => $this->generateUrl('system_server_stop', ['ajax' => 'true']),
+                'target_url' => $this->generateUrl('server_stop'),
                 'redirect_url' => $this->replacePortInUrl(
-                    $this->generateUrl('system_index', referenceType: UrlGeneratorInterface::ABSOLUTE_URL),
+                    $redirectUrl,
                     $metaPort,
                 ),
             ]
+        );
+    }
+
+    #[Route('/restart/', name: 'server_restart', methods: ['GET'])]
+    public function restartServer(Request $request): Response
+    {
+        if (!$this->server->isRunning() || !($metaPort = $this->server->metaPort())) {
+            throw new BadRequestHttpException(
+                'Server is not running. Please start it first.',
+            );
+        }
+
+        // Redirection to final page, after start
+        $redirectUrl = $request->query->get('redirect_url')
+            ?? $this->generateUrl('main_index', referenceType: UrlGeneratorInterface::ABSOLUTE_URL);
+        // Redirection to start page, after stop
+        $redirectUrl = $this->generateUrl(
+            'system_server_start',
+            ['redirect_url' => $redirectUrl],
+            UrlGeneratorInterface::ABSOLUTE_URL,
+        );
+
+        return $this->redirectToRoute(
+            'system_server_stop',
+            ['redirect_url' => $redirectUrl]
         );
     }
 
