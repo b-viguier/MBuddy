@@ -1,11 +1,11 @@
 when@dev: &web_profiler
   web_profiler_wdt:
     resource: '@WebProfilerBundle/Resources/config/routing/wdt.xml'
-    prefix: /MBuddy/_wdt
+    prefix: '%mbuddy_base_path%/_wdt'
 
   web_profiler_profiler:
     resource: '@WebProfilerBundle/Resources/config/routing/profiler.xml'
-    prefix: /MBuddy/_profiler
+    prefix: '%mbuddy_base_path%/_profiler'
 
 when@staging: *web_profiler
 when@ipad_dev: *web_profiler
