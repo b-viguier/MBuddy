@@ -1,8 +1,16 @@
 when@ipad_dev: &udp_logger
   services:
     logger:
-      class: Bveing\MBuddy\Infrastructure\UdpLogger
-      factory: ['Bveing\MBuddy\Infrastructure\UdpLogger', 'create']
+      class: Bveing\MBuddy\Infrastructure\Log\ChainLogger
       arguments:
-        - '%dev_host%:8484'
+        - !service
+          class: Symfony\Component\HttpKernel\Log\Logger
+          arguments:
+            $minLevel: !php/const Psr\Log\LogLevel::WARNING
+            $output: '%kernel.logs_dir%/%kernel.environment%.log'
+        - !service
+          class: Bveing\MBuddy\Infrastructure\UdpLogger
+          factory: [ 'Bveing\MBuddy\Infrastructure\Log\UdpLogger', 'create' ]
+          arguments:
+            - '%dev_host%:8484'
 when@ipad_staging: *udp_logger

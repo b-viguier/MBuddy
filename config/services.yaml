@@ -4,7 +4,7 @@
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
-  env(DEV_HOST): 192.168.1.22
+  env(DEV_HOST): 192.168.1.222
   dev_host: '%env(DEV_HOST)%'
   env(IPAD_HOST): 127.0.0.1
   ipad_host: '%env(IPAD_HOST)%'

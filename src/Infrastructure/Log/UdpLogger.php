@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Bveing\MBuddy\Infrastructure;
+namespace Bveing\MBuddy\Infrastructure\Log;
 
 use Amp\Promise;
 use Amp\Socket\EncryptableSocket;
