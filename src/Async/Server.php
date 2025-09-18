@@ -102,9 +102,19 @@ class Server
                 \assert($this->httpServer !== null);
                 yield $this->httpServer->start();
 
-                $this->logger->info('HTTP server stopped');
+                $this->logger->info('HTTP server started');
             });
+        } catch(\Throwable $e) {
+            $this->logger->error(
+                \sprintf(
+                    'Error running HTTP server: %s (File: %s, Line: %d)',
+                    $e->getMessage(),
+                    $e->getFile(),
+                    $e->getLine(),
+                )
+            );
         } finally {
+            $this->logger->info('HTTP server stopped');
             $this->httpServer = null;
         }
     }
