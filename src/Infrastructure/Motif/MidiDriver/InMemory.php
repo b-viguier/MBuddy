@@ -26,9 +26,9 @@ class InMemory implements MidiDriver
         return $deferred->promise();
     }
 
-    public function poll(): Promise
+    public function poll(): void
     {
-        return $this->pollingDeferred->promise();
+        $this->pollingDeferred->promise();
     }
 
     public function stopPolling(): void

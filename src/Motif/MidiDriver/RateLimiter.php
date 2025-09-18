@@ -39,9 +39,9 @@ class RateLimiter implements MidiDriver
         $this->driver->addListener($listener);
     }
 
-    public function poll(): Promise
+    public function poll(): void
     {
-        return $this->driver->poll();
+        $this->driver->poll();
     }
 
     public function stopPolling(): void

@@ -16,10 +16,7 @@ interface MidiDriver
 
     public function addListener(MidiListener $listener): void;
 
-    /**
-     * @return Promise<null>
-     */
-    public function poll(): Promise;
+    public function poll(): void;
 
     public function stopPolling(): void;
 }
