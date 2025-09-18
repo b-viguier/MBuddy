@@ -9,6 +9,10 @@ parameters:
   env(IPAD_HOST): 127.0.0.1
   ipad_host: '%env(IPAD_HOST)%'
   server_port: 8383
+  env(MIDI_IN_PORT): '8321'
+  midi_in_port: '%env(MIDI_IN_PORT)%'
+  midi_out_port: 8123
+  midi_thru_port: 8322
   mbuddy_base_path: !php/const Bveing\MBuddy\App\Controller\ServerController::MBUDDY_BASE_PATH
   synchronized_files:
     - 'composer.json'
@@ -35,6 +39,8 @@ services:
 
   Bveing\MBuddy\App\Runtime\BackgroundService:
     public: true
+    calls:
+      - addService: ['@Bveing\MBuddy\Motif\MidiDriver', 'poll', 'stopPolling']
 
   Bveing\MBuddy\Async\Server:
     public: true

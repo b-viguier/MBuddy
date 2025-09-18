@@ -24,7 +24,7 @@ class BackgroundService
         }
     }
 
-    public function addService(object $service, ?string $startFn, ?string $stopFn): void
+    public function addService(object $service, ?string $startFn = null, ?string $stopFn = null): void
     {
         $this->services[] = [
             'service' => $service,
