@@ -14,6 +14,9 @@ class ChainLogger extends AbstractLogger
         $this->loggers = $loggers;
     }
 
+    /**
+     * @param mixed[] $context
+     */
     public function log($level, \Stringable|string $message, array $context = []): void
     {
         foreach ($this->loggers as $logger) {
@@ -21,5 +24,6 @@ class ChainLogger extends AbstractLogger
         }
     }
 
+    /** @var LoggerInterface[] */
     private array $loggers;
 }
