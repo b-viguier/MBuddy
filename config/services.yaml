@@ -40,9 +40,7 @@ services:
   Bveing\MBuddy\Async\LoopRunner:
     public: true
   
-  Bveing\MBuddy\App\Runtime\BackgroundService:
-    calls:
-      - addService: ['@Bveing\MBuddy\Motif\MidiDriver', 'poll', 'stopPolling']
+  Bveing\MBuddy\App\Runtime\BackgroundService: ~
 
   Bveing\MBuddy\Async\Server:
     arguments:

@@ -7,6 +7,7 @@ namespace Bveing\MBuddy\App\DependencyInjection\Compiler;
 use Bveing\MBuddy\App\Runtime\BackgroundService;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Reference;
 
 class BackgroundServicePass implements CompilerPassInterface
 {
@@ -19,7 +20,7 @@ class BackgroundServicePass implements CompilerPassInterface
             foreach ($tags as $attributes) {
                 $startFn = $attributes['start'] ?? null;
                 $stopFn = $attributes['stop'] ?? null;
-                $bgDefinition->addMethodCall('addService', [$container->getDefinition($id), $startFn, $stopFn]);
+                $bgDefinition->addMethodCall('addService', [new Reference($id), $startFn, $stopFn]);
             }
         }
     }

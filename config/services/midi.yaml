@@ -19,14 +19,17 @@ when@staging: &udp_repository
       autowire: true
       autoconfigure: true
 
-    mbuddy.motif.midi.driver:
-      stack:
-        - Bveing\MBuddy\Infrastructure\Motif\MidiDriver\Decorator\Profiled: ~
-        - class: Bveing\MBuddy\Infrastructure\Motif\MidiDriver\Udp
-          arguments:
-            $inputSocket: 'udp://0.0.0.0:%midi_in_port%'
-            $outputSocket: 'udp://%ipad_host%:%midi_out_port%'
-    Bveing\MBuddy\Motif\MidiDriver: '@mbuddy.motif.midi.driver'
+    Bveing\MBuddy\Motif\MidiDriver:
+      class: Bveing\MBuddy\Infrastructure\Motif\MidiDriver\Udp
+      arguments:
+        $inputSocket: 'udp://0.0.0.0:%midi_in_port%'
+        $outputSocket: 'udp://%ipad_host%:%midi_out_port%'
+      tags: [{name: 'mbuddy.background', start: 'poll', stop: 'stopPolling'}]
+
+    Bveing\MBuddy\Infrastructure\Motif\MidiDriver\Decorator\Profiled:
+      # Cannot use stack decoration
+      # because it duplicates the service during BackgroundService compiler pass
+      decorates: Bveing\MBuddy\Motif\MidiDriver
 
     mbuddy.motif.sysex.client:
       stack:
