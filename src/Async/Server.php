@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Bveing\MBuddy\Async;
 
+use Amp\Deferred;
 use Amp\Http\Cookie\RequestCookie;
 use Amp\Http\Server\FormParser\Form;
 use Amp\Http\Server\HttpServer;
@@ -11,7 +12,6 @@ use Amp\Http\Server\Options;
 use Amp\Http\Server\Request;
 use Amp\Http\Server\RequestHandler\CallableRequestHandler;
 use Amp\Http\Server\Response;
-use Amp\Loop;
 use Amp\Promise;
 use Amp\Socket\Server as SocketServer;
 use Psr\Http\Message\UriInterface;
@@ -22,6 +22,7 @@ use Symfony\Component\HttpFoundation\Request as SfRequest;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\HttpKernel\TerminableInterface;
+use function Amp\asyncCall;
 use function Amp\Http\Server\FormParser\parseForm;
 use function Amp\Http\Server\Middleware\stack;
 
@@ -34,6 +35,7 @@ class Server
         private string $uploadTmpDir,
     ) {
         \assert(\is_dir($uploadTmpDir) && \is_writable($uploadTmpDir), 'Upload temporary directory must be a writable directory');
+        $this->stopDeferred = new Deferred();
     }
 
     public function isRunning(): bool
@@ -47,8 +49,10 @@ class Server
             return;
         }
 
-        $this->httpServer->stop(); //TODO: handle promise
-        Loop::stop();
+        $this->logger->info('Stopping HTTP server');
+
+        $this->httpServer->stop();
+        $this->stopDeferred->resolve();
     }
 
     public function port(): int
@@ -61,62 +65,44 @@ class Server
         return $this->metaPort;
     }
 
-    public function run(?SfRequest $metaRequest): void
+    /**
+     * @return Promise<null>
+     */
+    public function run(?SfRequest $metaRequest): Promise
     {
-        \assert(!$this->isRunning(), 'Server is already running');
-        \putenv('AMP_LOOP_DRIVER=' . NestableNativeDriver::class);
-        $this->metaPort = $metaRequest?->getPort() === null ? null : \intval($metaRequest->getPort());
-        try {
-            Loop::run(function() {
-                $requestHandler = \Closure::fromCallable([$this, 'handleRequest']);
-                $options = new Options();
-                if ($this->kernel->isDebug()) {
-                    $options = $options->withDebugMode();
-                    if (\function_exists('xdebug_connect_to_client')) {
-                        $requestHandler = function(Request $request): \Generator {
-                            \xdebug_connect_to_client();
-                            return yield from $this->handleRequest($request);
-                        };
-                    }
+        asyncCall(function() use ($metaRequest) {
+            \assert(!$this->isRunning(), 'Server is already running');
+            $this->metaPort = $metaRequest?->getPort() === null ? null : \intval($metaRequest->getPort());
+
+            $requestHandler = \Closure::fromCallable([$this, 'handleRequest']);
+            $options = new Options();
+            if ($this->kernel->isDebug()) {
+                $options = $options->withDebugMode();
+                if (\function_exists('xdebug_connect_to_client')) {
+                    $requestHandler = function(Request $request): \Generator {
+                        \xdebug_connect_to_client();
+                        return yield from $this->handleRequest($request);
+                    };
                 }
-                $this->httpServer = new HttpServer(
-                    [
-                        SocketServer::listen("0.0.0.0:{$this->port}"),
-                    ],
-                    stack(
-                        new CallableRequestHandler($requestHandler),
-                    ),
-                    $this->logger,
-                    $options->withBodySizeLimit(1_048_576),
-                );
+            }
 
-                // Stop the server gracefully when SIGINT is received.
-                // This is technically optional, but it is best to call Server::stop()
-                if (\extension_loaded("pcntl")) {
-                    \Amp\Loop::onSignal(\SIGINT, function(string $watcherId) {
-                        \Amp\Loop::cancel($watcherId);
-                        $this->stop();
-                    });
-                }
-
-                \assert($this->httpServer !== null);
-                yield $this->httpServer->start();
-
-                $this->logger->info('HTTP server started');
-            });
-        } catch(\Throwable $e) {
-            $this->logger->error(
-                \sprintf(
-                    'Error running HTTP server: %s (File: %s, Line: %d)',
-                    $e->getMessage(),
-                    $e->getFile(),
-                    $e->getLine(),
-                )
+            $this->httpServer = new HttpServer(
+                [
+                    SocketServer::listen("0.0.0.0:{$this->port}"),
+                ],
+                stack(
+                    new CallableRequestHandler($requestHandler),
+                ),
+                $this->logger,
+                $options->withBodySizeLimit(1_048_576),
             );
-        } finally {
-            $this->logger->info('HTTP server stopped');
-            $this->httpServer = null;
-        }
+
+            yield $this->httpServer->start();
+
+            $this->logger->info('HTTP server started');
+        });
+
+        return $this->stopDeferred->promise();
     }
 
     private function handleRequest(Request $request): \Generator
@@ -273,4 +259,8 @@ class Server
 
     private ?HttpServer $httpServer = null;
     private ?int $metaPort = null;
+    /**
+     * @var Deferred<null>
+     */
+    private Deferred $stopDeferred;
 }

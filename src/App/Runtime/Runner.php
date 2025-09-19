@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Bveing\MBuddy\App\Runtime;
 
-use Bveing\MBuddy\Async\Server;
+use Bveing\MBuddy\Async\LoopRunner;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Runtime\RunnerInterface;
@@ -19,19 +19,15 @@ class Runner implements RunnerInterface
 
     public function run(): int
     {
+        LoopRunner::globalInit();
         $this->kernel->boot();
 
-        $server = $this->kernel->getContainer()->get(Server::class);
-        if (!$server instanceof Server) {
-            throw new \RuntimeException('Server not found in container');
+        $loopRunner = $this->kernel->getContainer()->get(LoopRunner::class);
+        if (!$loopRunner instanceof LoopRunner) {
+            throw new \RuntimeException('LoopRunner not found in container');
         }
-        $backgroundService = $this->kernel->getContainer()->get(BackgroundService::class);
-        if (!$backgroundService instanceof BackgroundService) {
-            throw new \RuntimeException('BackgroundService not found in container');
-        }
-        $backgroundService->start();
-        $server->run($this->request);
-        $backgroundService->stop();
+
+        $loopRunner->run($this->request);
 
         $this->kernel->shutdown();
 

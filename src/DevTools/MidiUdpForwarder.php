@@ -19,20 +19,17 @@ class MidiUdpForwarder implements MidiListener
         private LoggerInterface $logger,
     ) {
         $this->logger->debug("Starting MIDI UDP Forwarder from input driver to {$this->outputSocket}");
+        $this->output = wait(\Amp\Socket\connect($this->outputSocket));
+
         $this->inputDriver->addListener($this);
     }
 
     public function onMidiMessage(string $message): bool
     {
         $this->logger->debug("Forwarding MIDI message");
-
-        if ($this->output === null) {
-            $this->output = wait(\Amp\Socket\connect($this->outputSocket));
-        }
-
         rethrow($this->output->write($message));
         return true;
     }
 
-    private ?EncryptableSocket $output = null;
+    private EncryptableSocket $output;
 }
