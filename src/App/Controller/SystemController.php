@@ -141,7 +141,7 @@ class SystemController extends AbstractController
         return $this->redirectToRoute('system_index');
     }
 
-    private const VALID_ENVS = ['dev', 'staging'];
+    private const VALID_ENVS = ['dev', 'staging', 'prod'];
 
     private function replacePortInUrl(string $url, int $newPort): string
     {

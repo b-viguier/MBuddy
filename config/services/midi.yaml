@@ -45,3 +45,31 @@ when@staging: &udp_repository
         - Bveing\MBuddy\Motif\Master\Repository\Midi: ~
 
 when@ipad_staging: *udp_repository
+
+when@prod: &prod_udp_repository
+  services:
+    _defaults:
+      autowire: true
+      autoconfigure: true
+
+    Bveing\MBuddy\Motif\MidiDriver:
+      class: Bveing\MBuddy\Infrastructure\Motif\MidiDriver\Udp
+      arguments:
+        $inputSocket: 'udp://0.0.0.0:%midi_in_port%'
+        $outputSocket: 'udp://%ipad_host%:%midi_out_port%'
+      tags: [ { name: 'mbuddy.background', start: 'poll', stop: 'stopPolling' } ]
+
+
+    mbuddy.motif.sysex.client:
+      stack:
+        - Bveing\MBuddy\Motif\SysEx\Client\ConcurrencyLimiter:
+            $maxConcurrency: 5
+        - Bveing\MBuddy\Motif\SysEx\Client\Midi:
+            $timeoutInSeconds: 3
+    Bveing\MBuddy\Motif\SysEx\Client: '@mbuddy.motif.sysex.client'
+
+    mbuddy.motif.master.repository:
+      stack:
+        - Bveing\MBuddy\Motif\Master\Repository\Midi: ~
+
+when@ipad_prod: *prod_udp_repository

@@ -14,3 +14,11 @@ when@ipad_dev: &udp_logger
           arguments:
             - '%dev_host%:8484'
 when@ipad_staging: *udp_logger
+
+when@ipad_prod:
+  services:
+    logger:
+      class: Symfony\Component\HttpKernel\Log\Logger
+      arguments:
+        $minLevel: !php/const Psr\Log\LogLevel::WARNING
+        $output: '%kernel.logs_dir%/%kernel.environment%.log'
