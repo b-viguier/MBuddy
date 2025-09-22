@@ -22,7 +22,7 @@ class StageController extends AbstractController
     ) {
     }
 
-    #[Route('/{id}/', name: 'show', methods: ['GET'])]
+    #[Route('/{id}/', name: 'show', methods: ['GET'], priority: -100)]
     public function stage(string $id): Response
     {
         $id = Preset\Id::fromString($id);
@@ -67,5 +67,16 @@ class StageController extends AbstractController
         }
 
         throw $this->createNotFoundException();
+    }
+
+    #[Route('/list/', name: 'list', methods: ['GET'])]
+    public function list(): Response
+    {
+        return $this->render(
+            'stage/list.html.twig',
+            [
+                'presets' => $this->presetRepository->list(),
+            ]
+        );
     }
 }

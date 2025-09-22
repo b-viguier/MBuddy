@@ -1,0 +1,18 @@
+{% extends "stage/base.html.twig" %}
+
+{% block actions %}
+    <a class="btn btn-success" href="{{ url('stage_start') }}" role="button">
+        <i class="bi bi-play"></i> Start!
+    </a>
+{% endblock %}
+
+
+{% block preset %}
+    <twig:Tile
+            :title="preset.name"
+            :href="url('stage_show', {'id': preset.id})"
+            icon="bi-play-circle"
+            class="tile-preset-list"
+    />
+{% endblock %}
+
