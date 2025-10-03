@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Bveing\MBuddy\App\Controller\Motif;
 
 use Bveing\MBuddy\App\Motif\Master\NameRegistry;
+use Bveing\MBuddy\App\Motif\Master\Registry;
 use Bveing\MBuddy\Motif\Master;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -16,6 +17,7 @@ class MasterController extends AbstractController
 {
     public function __construct(
         private NameRegistry $nameRegistry,
+        private Registry $registry,
     ) {
     }
 
@@ -37,6 +39,23 @@ class MasterController extends AbstractController
 
         wait($this->nameRegistry->sync($id));
 
-        return $this->redirectToRoute('motif_master_index');
+        return $this->redirectToRoute('motif_master_edit', ['id' => $id->toInt()]);
+    }
+
+    #[Route('/{id}/edit', name: 'edit')]
+    public function edit(int $id): Response
+    {
+        $id = Master\Id::fromInt($id);
+        $master = $this->registry->get($id);
+        $name = $this->nameRegistry->get($id);
+
+        return $this->render(
+            'motif/master/edit.html.twig',
+            [
+                'id' => $id->toInt(),
+                'name' => $name,
+                'master' => $master,
+            ]
+        );
     }
 }

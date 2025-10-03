@@ -1,0 +1,39 @@
+{%  extends "motif/master/base.html.twig" %}
+
+{%  block title %}Master Edit{% endblock %}
+
+{% block breadcrumb %}
+    {{ parent() }}
+    <twig:BreadcrumbItem href="{{ url('motif_master_edit', {'id': id }) }}">
+        Edit
+    </twig:BreadcrumbItem>
+{% endblock %}
+
+{% block actions %}
+    <a href="{{ url('motif_master_index') }}" class="btn btn-success">
+        <i class="bi bi-check"></i> Done
+    </a>
+    <button type="submit" form="master_form" class="btn btn-success">
+        <i class="bi bi-floppy"></i> Save
+    </button>
+    <a class="btn btn-danger" href="{{ url('motif_master_sync', {'id': id}) }}" role="button">
+        <i class="bi bi-arrow-repeat"></i> Sync
+    </a>
+{%  endblock %}
+
+{% block content %}
+    {% if master %}
+    <form id="master_form" method="POST" action="{{ url('motif_master_edit', {'id': id}) }}" enctype="multipart/form-data">
+        <div class="input-group">
+            <div class="input-group-prepend">
+                <span class="input-group-text col-form-label col-form-label-lg">Name</span>
+            </div>
+            <input type="text" class="form-control form-control-lg" id="name" name="name" placeholder="Name" value="{{ master.name }}">
+        </div>
+    </form>
+    {% else %}
+        <div class="alert alert-danger" role="alert">
+            Master "{{ name }}" not yet synced.
+        </div>
+    {% endif %}
+{% endblock %}
