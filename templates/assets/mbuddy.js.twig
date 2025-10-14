@@ -1,0 +1,28 @@
+
+const mbuddy = {
+    master: {
+        load: function(id) {
+            if (typeof id !== 'number') {
+                return;
+            }
+
+            phpwin.busy('Loading');
+            const url = "{{ url('motif_master_select', {id: 123456789}) }}".replace('123456789', id);
+            try {
+                $.ajax(url, {
+                    method: 'POST',
+                    dataType: 'json'
+                }).done(function(response) {
+                    console.log('Master motif selected.');
+                }).fail(function() {
+                    phpwin.alert('Error fetching master motif.');
+                }).always(function() {
+                    phpwin.busy(false);
+                });
+            } catch (error) {
+                console.error('Error:', error);
+                phpwin.alert('An unexpected error occurred.');
+            }
+        },
+    },
+};

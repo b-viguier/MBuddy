@@ -34,6 +34,11 @@ class InMemoryCache implements Registry
         });
     }
 
+    public function select(Master\Id $id): Promise
+    {
+        return $this->delegate->select($id);
+    }
+
     /**
      * @var array<int, Master>
      */

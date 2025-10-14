@@ -24,4 +24,9 @@ class Motif implements Registry
     {
         return $this->repository->get($id);
     }
+
+    public function select(Master\Id $id): Promise
+    {
+        return $this->repository->setCurrentMasterId($id);
+    }
 }

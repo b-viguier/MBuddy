@@ -15,6 +15,10 @@
     <script src="{{ asset('assets/js/popper.js') }}" crossorigin="anonymous"></script>
     <script src="{{ asset('assets/js/bootstrap.js') }}" crossorigin="anonymous"></script>
     <script src="{{ asset('assets/js/Sortable.js') }}" crossorigin="anonymous"></script>
+    <script src="{{ asset('assets/js/mbuddy.js') }}" crossorigin="anonymous"></script>
+    {% if not (app.environment starts with "ipad_") %}
+    <script src="{{ asset('assets/js/phpwin.js') }}" crossorigin="anonymous"></script>
+    {% endif %}
 
     {%  block header %}{% endblock %}
 

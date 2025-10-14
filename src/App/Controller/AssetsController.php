@@ -15,6 +15,10 @@ class AssetsController extends AbstractController
     #[Route('/js/{file}.js', name: 'js')]
     public function getJs(string $file): Response
     {
+        if ($file === 'mbuddy') {
+            return $this->render('assets/mbuddy.js.twig');
+        }
+
         return $this->handleFile("js/$file.js", 'application/javascript');
     }
 

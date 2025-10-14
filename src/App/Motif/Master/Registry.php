@@ -15,4 +15,9 @@ interface Registry
      * @return Promise<?Master>
      */
     public function refresh(Master\Id $id): Promise;
+
+    /**
+     * @return Promise<int>
+     */
+    public function select(Master\Id $id): Promise;
 }

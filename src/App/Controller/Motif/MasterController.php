@@ -8,6 +8,7 @@ use Bveing\MBuddy\App\Motif\Master\NameRegistry;
 use Bveing\MBuddy\App\Motif\Master\Registry;
 use Bveing\MBuddy\Motif\Master;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use function Amp\Promise\wait;
@@ -57,5 +58,18 @@ class MasterController extends AbstractController
                 'master' => $master,
             ]
         );
+    }
+
+    #[Route('/{id}/select/', name: 'select', methods: ['POST'])]
+    public function select(int $id): JsonResponse
+    {
+        $masterId = Master\Id::fromInt($id);
+        try {
+            wait($this->registry->select($masterId));
+        } catch(\Throwable $e) {
+            return new JsonResponse(['status' => 'error', 'message' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+
+        return new JsonResponse(['status' => 'ok']);
     }
 }

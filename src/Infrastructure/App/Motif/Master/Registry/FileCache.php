@@ -71,6 +71,11 @@ class FileCache implements Registry
         });
     }
 
+    public function select(Master\Id $id): Promise
+    {
+        return $this->delegate->select($id);
+    }
+
     private function cachePath(Master\Id $id): string
     {
         return \sprintf("%s/%d.sysex", $this->cacheDir, $id->toInt());
